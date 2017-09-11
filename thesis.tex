@@ -1,0 +1,170 @@
+\documentclass[11pt,twoside]{ce}
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage{acronym}
+\usepackage{hyperref}
+\usepackage{newclude}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{eso-pic}       % TD custom cover
+\usepackage{epstopdf}      % TD custom cover
+\definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
+
+%-----------------------------------------------------------------------%
+%           Please enter your personal details !!!                      %
+%-----------------------------------------------------------------------%
+
+\newcommand{\TITLE}{TITLE}
+\newcommand{\AUTHOR}{AUTHOR}
+\newcommand{\country}{COUNTRY}
+\newcommand{\city}{PLACE}
+\newcommand{\NR}{CE-MS-\the\year-number} 
+\newcommand{\KEY}{}   % key words for your thesis
+\newcommand{\SUBTITLE}{}
+
+%-----------------------------------------------------------------------%
+%            Fixed Title page - Don't change any thing here             %
+%-----------------------------------------------------------------------%
+\newcommand{\DATE}{\today} 
+\newcommand{\LTYPE}{latex2e}
+\newcommand{\reffig}[1]{Figure~\ref{#1}}
+\newcommand{\reftab}[1]{Table~\ref{#1}}
+\newcommand{\refsec}[1]{Section~\ref{#1}}
+
+%-----------------------------------------------------------------------%
+%  Enter the names of members in the committee,i.e. chair-person,       %
+%  advisors and other members. At this moment,                          %
+%  maximally 7 members signatures are supported. Be careful             %
+%  with the length of the abstract (should be about 15 lines ).         %
+%                                                                       %
+%  Use the following format to fill in the committee memebers           %
+%        " name, group, organization"
+%
+%        for example, Stephan Wong, CE, TU Delft                        %
+%-----------------------------------------------------------------------%
+\firstadvisor{, CE, TU Delft}
+\chairperson{, CE, TU Delft}
+\firstmember{, CE, TU Delft}
+\secondmember{, CE, TU Delft}
+
+
+%-----------------------------------------------------------------------%
+%            Fixed   - Don't change any thing here                      %
+%-----------------------------------------------------------------------%
+
+\begin{document}
+\pagenumbering{roman}
+\pagestyle{plain}
+
+%-----------------------------------------------------------------------%
+%            Fixed cover page  - Don't change any thing here            %
+%-----------------------------------------------------------------------%
+\thispagestyle{empty}
+\include{0_template/cover2}                                   % thesis cover
+\setcounter{page}{0} \cleardoublepage
+
+%-----------------------------------------------------------------------%
+%            Fixed Title page - Don't change any thing here             %
+%-----------------------------------------------------------------------%
+\thispagestyle{empty}
+\title{\TITLE}
+\subtitle{\SUBTITLE} \extitle{\EXTITLE}
+\author{\AUTHOR}
+\date{
+    \small \LAB \\
+    \small \DEP \\
+    \small \FAC \\
+    \small \INSTITUTE \\
+} \maketitle
+
+\setcounter{page}{0} \cleardoublepage
+
+%-----------------------------------------------------------------------%
+%       Front page includes a small abstract and signatures of          %
+%       advisor, supervisor and mentors                                 %
+%                                                                       % 
+%       Please fill in your dedication words                            %
+%-----------------------------------------------------------------------%
+\include{0_template/front}
+\cleardoublepage
+
+\dedicate{Dedicated to my family and friends}                                        % fill in your dedication words  
+
+\thankyou                                          % "Thankyou" page
+\tableofcontents                                   %  Table of contents
+
+%------------------------------------------------------------------------%
+%        List of Figures and Tables - don't change anything here         %
+%------------------------------------------------------------------------%
+%\clearsinglepage
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+%\clearsinglepage
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\clearpage
+\input{0_template/acronym}
+\addcontentsline{toc}{chapter}{List of Acronyms}
+
+%-----------------------------------------------------------------------%
+%                     Include thesis acknowledgements                   %
+%-----------------------------------------------------------------------%
+\include{0_template/ack}                                     % inlcude acknowledgements page
+
+\addtocontents{toc}{\protect\addvspace{1cm}}
+\cleardoublepage
+
+\pagestyle{headings}
+\pagestyle{private}
+\pagenumbering{arabic}
+
+%-----------------------------------------------------------------------%
+%                     Include separate chapters                         %
+%                                                                       %
+%       1)  fill in the tex file of each chapter                        %
+%       2)  If more chapters, add more include commands                 %
+%-----------------------------------------------------------------------%
+
+\input{1_introduction/index}
+\input{2_background/index}
+\input{3_concept/index}
+\input{4_specification/index}
+\input{5_experiments/index}
+\input{6_conclusion/index}
+
+%-----------------------------------------------------------------------%
+%             Use IEEE bibtex style instead of the one                  %
+%                   defined in the style file                           %
+%             fill in your thesis bib file                              %
+%-----------------------------------------------------------------------%
+\cleardoublepage
+\bibliographystyle{IEEEtran}
+%\bibliographystyle{amsplain}
+%\bibliographystyle{plain}
+\markboth{BIBLIOGRAPHY}{BIBLIOGRAPHY}
+\bibliography{biblio,thispaper,tecs-nopreamble}                                   % fill in your thesis bib file here
+\addcontentsline{toc}{chapter}{Bibliography}
+
+%-----------------------------------------------------------------------%
+%                     Include thesis appendixes if you have             %
+%-----------------------------------------------------------------------%
+
+
+\cleardoublepage
+\markboth{LIST OF DEFINITIONS}{LIST OF DEFINITIONS}
+\addcontentsline{toc}{chapter}{List of Definitions}
+\include{appendix/dictionary}    
+
+\cleardoublepage
+
+\appendix
+\include{appendix/appendixA}                                       % fill in the tex file for thesis Appendixes
+
+\end{document}
