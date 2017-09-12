@@ -9,10 +9,12 @@
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{subfiles}      % TD subfiles
 \usepackage{mciteplus}     % TD needed for bibliography
 \usepackage{eso-pic}       % TD custom cover
 \usepackage{epstopdf}      % TD custom cover
 \definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
+
 
 %-----------------------------------------------------------------------%
 %           Please enter your personal details !!!                      %
@@ -57,6 +59,7 @@
 %-----------------------------------------------------------------------%
 
 \begin{document}
+\newcommand{\main}{1}         % TD detect main or subfile
 \pagenumbering{roman}
 \pagestyle{plain}
 
@@ -133,12 +136,19 @@
 %       2)  If more chapters, add more include commands                 %
 %-----------------------------------------------------------------------%
 
-\input{1_introduction/index}
-\input{2_background/index}
-\input{3_concept/index}
-\input{4_specification/index}
-\input{5_experiments/index}
-\input{6_conclusion/index}
+%\input{1_introduction/index}
+%\input{2_background/index}
+%\input{3_concept/index}
+%\input{4_specification/index}
+%\input{5_experiments/index}
+%\input{6_conclusion/index}
+\subfile{1_introduction/index}
+\subfile{2_background/index}
+\subfile{3_concept/index}
+\subfile{4_specification/index}
+\subfile{5_experiments/index}
+\subfile{6_conclusion/index}
+
 
 %-----------------------------------------------------------------------%
 %             Use IEEE bibtex style instead of the one                  %
