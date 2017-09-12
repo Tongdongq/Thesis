@@ -1,15 +1,80 @@
-This is BibTeX, Version 0.99dThe top-level auxiliary file: thesis.aux
-The style file: IEEEtran.bst
-I couldn't open database file thispaper.bib
----line 147 of file thesis.aux
- : \bibdata{biblio,thispaper
- :                          ,tecs-nopreamble}
-I'm skipping whatever remains of this command
-I found no \citation commands---while reading file thesis.aux
+This is BibTeX, Version 0.99d (TeX Live 2017)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: thesis.aux
+The style file: IEEEtranM.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: biblio.bib
--- IEEEtran.bst version 1.13 (2008/09/30) by Michael Shell.
+You're missing a field name---line 33 of file biblio.bib
+ : 
+ : % author = "",
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 51 of file biblio.bib
+ : 
+ : % author = {},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 68 of file biblio.bib
+ : 
+ : % author = {},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 78 of file biblio.bib
+ : 
+ : %      author       = "",
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "latexcompanion"
+-- IEEEtranM.bst version 1.13 (2008/09/30) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
--- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+-- See the "IEEEtran_bst_HOWTO.pdf" and "mciteplus_doc.pdf" manuals
+   for usage information.
+** Mciteplus version - not for use with work to be submitted to the IEEE.
 
 Done.
-(There were 2 error messages)
+You've used 1 entry,
+            4133 wiz_defined-function locations,
+            848 strings with 8101 characters,
+and the built_in function-call counts, 489 in all, are:
+= -- 28
+> -- 4
+< -- 0
++ -- 2
+- -- 1
+* -- 40
+:= -- 98
+add.period$ -- 2
+call.type$ -- 1
+change.case$ -- 1
+chr.to.int$ -- 0
+cite$ -- 1
+duplicate$ -- 31
+empty$ -- 38
+format.name$ -- 1
+if$ -- 80
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 7
+newline$ -- 31
+num.names$ -- 1
+pop$ -- 21
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 4
+skip$ -- 25
+stack$ -- 0
+substring$ -- 1
+swap$ -- 20
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 7
+type$ -- 1
+warning$ -- 0
+while$ -- 1
+width$ -- 2
+write$ -- 38
+(There were 4 error messages)

@@ -9,6 +9,7 @@
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{mciteplus}     % TD needed for bibliography
 \usepackage{eso-pic}       % TD custom cover
 \usepackage{epstopdf}      % TD custom cover
 \definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
@@ -145,11 +146,12 @@
 %             fill in your thesis bib file                              %
 %-----------------------------------------------------------------------%
 \cleardoublepage
-\bibliographystyle{IEEEtran}
+\bibliographystyle{IEEEtranM}        % TD added M to suit mciteplus
 %\bibliographystyle{amsplain}
 %\bibliographystyle{plain}
 \markboth{BIBLIOGRAPHY}{BIBLIOGRAPHY}
-\bibliography{biblio,thispaper,tecs-nopreamble}                                   % fill in your thesis bib file here
+%\bibliography{biblio,thispaper,tecs-nopreamble}                                  
+\bibliography{biblio}          % fill in your thesis bib file here
 \addcontentsline{toc}{chapter}{Bibliography}
 
 %-----------------------------------------------------------------------%
