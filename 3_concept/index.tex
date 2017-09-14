@@ -11,9 +11,36 @@ MAIN IS TRUE
 MAIN IS NOT TRUE
 \fi
 
-\section{Daligner}
+\section{Pacbio reads}
 Daligner finds alignments between long, noisy reads.
-Pacific Biosciences has commercially launched its first  sequencer in 2011 \cite{PBlaunch1}.
+Pacific Biosciences has commercially launched its first sequencer in 2011.
+It is able to output reads with an average of 1000 bases, which is significantly longer than \ac{NGS} reads  \cite{PBlaunch1}.
+In 2014, a new polymerase-chemistry combination was released, called P6-C4.
+This version can output average read lengths of 10000-15000 bases, and its longest reads can exceed 40000 bases \cite{Longreads}.
+While the drawback is that these reads have an error rate of 12-15\%, this can be compensated by the distribution of these errors \cite{Daligner}.
+First, the set of reads is a nearly Poisson sampling of the sampled genome.
+This implies that there exists a coverage c for every target coverage k, such that every region of the genome is covered k times \cite{Poisson}.
+Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
+This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage.
+
+Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly? And how to build an assembler that is able to deal with high error rates and long reads?
+Most previous assemblers work with \ac{NGS} reads, which are much shorter and have much lower error rates. Some algorithms used in these assemblers, such as \ac{DBG}  \cite{DeBruijn} would grow too large for high error rates and long reads.
+Since Daligner was build, new methods of using \ac{DBG} with long reads have been developed, but they rely on a short read based \ac{DBG} to correct errors in long reads.
 
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
