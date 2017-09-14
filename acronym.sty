@@ -40,10 +40,10 @@
 %%
 %%
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesPackage{acronym}[2010/09/08
-                          v1.36
+\ProvidesPackage{acronym}[2015/03/21
+                          v1.41
                           Support for acronyms (Tobias Oetiker)]
-\RequirePackage{suffix}
+\RequirePackage{suffix,xstring}
 \newif\ifAC@footnote
 \AC@footnotefalse
 \DeclareOption{footnote}{\AC@footnotetrue}
@@ -134,7 +134,7 @@
 }
 \newcommand*\acresetall{\the\AC@clearlist\AC@clearlist={}}
 \def\AC@reset#1{%
-  \global\expandafter\let\csname ac@#1\endcsname\relax
+  \global\expandafter\let\csname AC@#1\endcsname\relax
 }
 \newcommand*\AC@used{@<>@<>@}
 \newcommand{\AC@populated}{}
@@ -168,15 +168,16 @@
    \@bsphack
    \protected@write\@auxout{}{\string\newacro{#1}[#2]{#3}}%
    \@esphack}
-\def\bflabel#1{{\textbf{\textsf{#1}}\hfill}}
+\newcommand*{\aclabelfont}[1]{\textbf{\acsfont{#1}}}
+\def\AC@makelabel#1{#1\hfil}
 \newenvironment{AC@deflist}[1]%
         {\ifAC@nolist%
          \else%
             \raggedright\begin{list}{}%
-                {\settowidth{\labelwidth}{\textbf{\textsf{#1}}}%
+                {\settowidth{\labelwidth}{\AC@makelabel{\aclabelfont{#1}}}%
                 \setlength{\leftmargin}{\labelwidth}%
                 \addtolength{\leftmargin}{\labelsep}%
-                \renewcommand{\makelabel}{\bflabel}}%
+                \renewcommand{\makelabel}{\AC@makelabel}}%
           \fi}%
         {\ifAC@nolist%
          \else%
@@ -186,10 +187,11 @@
 \newenvironment{acronym}[1][1]{%
    \providecommand*{\acro}{\AC@acro}%
    \providecommand*{\acroplural}{\AC@acroplural}%
+   \providecommand*{\acroindefinite}{\AC@acroindefinite}%
    \long\def\acroextra##1{##1}%
    \def\@tempa{1}\def\@tempb{#1}%
    \ifx\@tempa\@tempb%
-      \global\expandafter\let\csname ac@des@mark\endcsname\AC@used%
+      \global\expandafter\let\csname AC@des@mark\endcsname\AC@used%
       \ifAC@nolist%
       \else%
          \begin{description}%
@@ -205,7 +207,7 @@
           \item[]\relax%
       \fi%
    \fi%
-   \expandafter\ifx\csname ac@des@mark\endcsname\AC@used%
+   \expandafter\ifx\csname AC@des@mark\endcsname\AC@used%
       \ifAC@nolist%
       \else%
         \end{description}%
@@ -221,7 +223,7 @@
   \else%
   \ifAC@printonlyused%
     \expandafter\ifx\csname acused@#1\endcsname\AC@used%
-       \item[\protect\AC@hypertarget{#1}{\acsfont{#2}}] #3%
+       \item[\protect\AC@hypertarget{#1}{\aclabelfont{#2}}] #3%
           \ifAC@withpage%
             \expandafter\ifx\csname r@acro:#1\endcsname\relax%
                \PackageInfo{acronym}{%
@@ -233,7 +235,7 @@
           \fi%
     \fi%
  \else%
-    \item[\protect\AC@hypertarget{#1}{\acsfont{#2}}] #3%
+    \item[\protect\AC@hypertarget{#1}{\aclabelfont{#2}}] #3%
  \fi%
  \fi%
  \begingroup
@@ -243,6 +245,21 @@
        {\string\newacro{#1}[\string\AC@hyperlink{#1}{#2}]{#3}}%
     \@esphack
   \endgroup}
+\newcommand*\newacroindefinite[3]{%
+  \expandafter\gdef\csname fn@#1@IS\endcsname{#2}%
+  \expandafter\gdef\csname fn@#1@IL\endcsname{#3}%
+}
+\newcommand*\acrodefindefinite[3]{%
+  \@bsphack
+  \protected@write\@auxout{}{\string\newacroindefinite{#1}{#2}{#3}}%
+  \@esphack
+}
+\newcommand\AC@acroindefinite[3]{
+  \@bsphack
+  \protected@write\@auxout{}%
+    {\string\newacroindefinite{#1}{\string\AC@hyperlink{#1}{#2}}{#3}}%
+  \@esphack
+}
 \newcommand*\newacroplural[1]{%
   \@ifnextchar[%]
   {\AC@newacroplurali{#1}}{\AC@newacropluralii{#1}}%
@@ -314,13 +331,13 @@
    \mbox{\expandafter\AC@get\csname fn@#1\endcsname\@firstoftwo{#1}}}
 \newcommand*\AC@acl[1]{%
    \expandafter\AC@get\csname fn@#1\endcsname\@secondoftwo{#1}}
-\renewcommand*{\acs}{\AC@starredfalse\protect\acsa}%
+\newcommand*{\acs}{\AC@starredfalse\protect\acsa}%
 \WithSuffix\newcommand\acs*{\AC@starredtrue\protect\acsa}%
 \newcommand*{\acsa}[1]{%
    \texorpdfstring{\protect\@acs{#1}}{#1}}
 \newcommand*{\@acs}[1]{%
    \acsfont{\AC@acs{#1}}%
-%% having a footnote on acs sort of defetes the purpose
+%% having a footnote on acs sort of defeats the purpose
 %%   \ifAC@footnote
 %%      \footnote{\AC@acl{#1}{}}%
 %%   \fi
@@ -332,13 +349,13 @@
    \ifAC@starred\else\AC@logged{#1}\fi}
 \newcommand*\@verridelabel[1]{%
   \@bsphack
-  \protected@write\@auxout{}{\string\undonewlabel{#1}}%
+  \protected@write\@auxout{}{\string\AC@undonewlabel{#1}}%
   \label{#1}%
-  \@overriddenmessage rs{#1}%
+  \AC@overriddenmessage rs{#1}%
   \@esphack
 }%
-\newcommand*\undonewlabel{\@und@newl@bel rs}%
-\newcommand*\@und@newl@bel[3]{%
+\newcommand*\AC@undonewlabel{\AC@und@newl@bel rs}%
+\newcommand*\AC@und@newl@bel[3]{%
   \@ifundefined{#1@#3}%
   {%
     \global\expandafter\let\csname#2@#3\endcsname\@nnil
@@ -347,7 +364,7 @@
     \global\expandafter\let\csname#1@#3\endcsname\relax
   }%
 }%
-\newcommand*\@overriddenmessage[3]{%
+\newcommand*\AC@overriddenmessage[3]{%
   \expandafter\ifx\csname#2@#3\endcsname\@nnil
     \expandafter\@firstoftwo
   \else
@@ -371,7 +388,7 @@
     \expandafter\g@addto@macro\csname#2@#3\endcsname{i}%
   }%
 }%
-\newcommand*\ac@testdef[3]{%
+\newcommand*\AC@testdef[3]{%
   \@ifundefined{s@#2}\@secondoftwo\@firstofone
   {%
     \expandafter\ifx\csname s@#2\endcsname\empty
@@ -389,20 +406,20 @@
     \@testdef{#1}{#2}{#3}%
   }%
 }%
-\protected@write\@auxout{}{%
-  \string\reset@newl@bel
-}%
-\newcommand*\reset@newl@bel{%
+\AtBeginDocument{\immediate\write\@auxout{\string\AC@reset@newl@bel}}
+\newcommand*\AC@reset@newl@bel{%
   \ifx\@newl@bel\@testdef
-    \let\@newl@bel\ac@testdef
-    \let\undonewlabel\@gobble
+    \let\@newl@bel\AC@testdef
+    \let\AC@undonewlabel\@gobble
   \fi
 }%
 \newcommand*\AC@placelabel[1]{%
-  \expandafter\ifx\csname ac@#1\endcsname\AC@used
+  \expandafter\ifx\csname AC@#1\endcsname\AC@used
   \else
     {\AC@phantomsection\@verridelabel{acro:#1}}%
-    \global\expandafter\let\csname ac@#1\endcsname\AC@used
+    \ifAC@starred\else%
+    \global\expandafter\let\csname AC@#1\endcsname\AC@used
+    \fi%
     \AC@addtoAC@clearlist{#1}%
   \fi
 }%
@@ -428,12 +445,42 @@
   \ifAC@dua
      \ifAC@starred\acl*{#1}\else\acl{#1}\fi%
   \else
-     \expandafter\ifx\csname ac@#1\endcsname\AC@used%
+     \expandafter\ifx\csname AC@#1\endcsname\AC@used%
      \ifAC@starred\acs*{#1}\else\acs{#1}\fi%
    \else
      \ifAC@starred\acf*{#1}\else\acf{#1}\fi%
    \fi
   \fi}
+\newcommand{\@firstupper}[1]{%
+    \StrLeft{#1}{1}[\firstletter]%
+    \StrGobbleLeft{#1}{1}[\remainder]%
+    \MakeUppercase\firstletter\remainder
+}
+\newcommand*{\iac}{\AC@starredfalse\protect\@iac}%
+\WithSuffix\newcommand\iac*{\AC@starredtrue\protect\@iac}%
+\newcommand*{\Iac}{\AC@starredfalse\protect\@Iac}%
+\WithSuffix\newcommand\Iac*{\AC@starredtrue\protect\@Iac}%
+\newcommand*{\@iaci}[1]{%
+   \ifcsname fn@#1@IL\endcsname
+     \ifAC@dua
+        \csname fn@#1@IL\endcsname%
+     \else
+        \expandafter\ifx\csname AC@#1\endcsname\AC@used%
+        \csname fn@#1@IS\endcsname%
+      \else
+        \csname fn@#1@IL\endcsname%
+      \fi
+     \fi
+   \else
+   a%
+   \fi
+}
+\newcommand*{\@iac}[1]{%
+   \@iaci{#1} \ifAC@starred\ac*{#1}\else\ac{#1}\fi%
+}
+\newcommand*{\@Iac}[1]{%
+   \@firstupper{\@iaci{#1}} \ifAC@starred\ac*{#1}\else\ac{#1}\fi%
+}
 \newcommand*{\acsp}{\AC@starredfalse\protect\acspa}%
 \WithSuffix\newcommand\acsp*{\AC@starredtrue\protect\acspa}%
 \newcommand*{\acspa}[1]{%
@@ -468,7 +515,7 @@
   \ifAC@dua
      \ifAC@starred\aclp*{#1}\else\aclp{#1}\fi%
   \else
-   \expandafter\ifx\csname ac@#1\endcsname\AC@used
+   \expandafter\ifx\csname AC@#1\endcsname\AC@used
       \ifAC@starred\acsp*{#1}\else\acsp{#1}\fi%
    \else
       \ifAC@starred\acfp*{#1}\else\acfp{#1}\fi%
@@ -479,7 +526,7 @@
 \newcommand{\acfia}[1]{%
   {\itshape \AC@acl{#1} \nolinebreak[3]} (\ifAC@starred\acs*{#1}\else\acs{#1}\fi)}
 \newcommand{\acused}[1]{%
-\global\expandafter\let\csname ac@#1\endcsname\AC@used%
+\global\expandafter\let\csname AC@#1\endcsname\AC@used%
 \AC@addtoAC@clearlist{#1}}
 \newcommand*{\acsu}{\AC@starredfalse\protect\acsua}%
 \WithSuffix\newcommand\acsu*{\AC@starredtrue\protect\acsua}%

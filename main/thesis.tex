@@ -1,4 +1,4 @@
-\documentclass[11pt,twoside]{ce}
+\documentclass[11pt,twoside]{../ce}
 
 \usepackage{graphicx}
 \usepackage{wrapfig}
@@ -9,6 +9,7 @@
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{amsmath}       % TD column vectors
 \usepackage{subfiles}      % TD subfiles
 \usepackage{mciteplus}     % TD needed for bibliography
 \usepackage{eso-pic}       % TD custom cover
@@ -71,13 +72,13 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
-\include{acronyms.tex}
+\include{../acronyms.tex}
 
 %-----------------------------------------------------------------------%
 %            Fixed cover page  - Don't change any thing here            %
 %-----------------------------------------------------------------------%
 \thispagestyle{empty}
-\include{0_template/cover2}                                   % thesis cover
+\include{../0_template/cover2}                                   % thesis cover
 \setcounter{page}{0} \cleardoublepage
 
 %-----------------------------------------------------------------------%
@@ -102,7 +103,7 @@
 %                                                                       % 
 %       Please fill in your dedication words                            %
 %-----------------------------------------------------------------------%
-\include{0_template/front}
+\include{../0_template/front}
 \cleardoublepage
 
 \dedicate{Dedicated to my family and friends}                                        % fill in your dedication words  
@@ -124,13 +125,13 @@
 \addcontentsline{toc}{chapter}{List of Tables}
 
 \clearpage
-\input{0_template/acronym}
+\input{../0_template/acronym}
 \addcontentsline{toc}{chapter}{List of Acronyms}
 
 %-----------------------------------------------------------------------%
 %                     Include thesis acknowledgements                   %
 %-----------------------------------------------------------------------%
-\include{0_template/ack}                                     % inlcude acknowledgements page
+\include{../0_template/ack}                                     % inlcude acknowledgements page
 
 \addtocontents{toc}{\protect\addvspace{1cm}}
 \cleardoublepage
@@ -152,12 +153,12 @@
 %\input{4_specification/index}
 %\input{5_experiments/index}
 %\input{6_conclusion/index}
-\subfile{1_introduction/index}
-\subfile{2_background/index}
-\subfile{3_concept/index}
-\subfile{4_specification/index}
-\subfile{5_experiments/index}
-\subfile{6_conclusion/index}
+\subfile{../1_introduction/index}
+\subfile{../2_background/index}
+\subfile{../3_concept/index}
+\subfile{../4_specification/index}
+\subfile{../5_experiments/index}
+\subfile{../6_conclusion/index}
 
 
 %-----------------------------------------------------------------------%
@@ -171,7 +172,7 @@
 %\bibliographystyle{plain}
 \markboth{BIBLIOGRAPHY}{BIBLIOGRAPHY}
 %\bibliography{biblio,thispaper,tecs-nopreamble}                                  
-\bibliography{biblio}          % fill in your thesis bib file here
+\bibliography{../biblio}          % fill in your thesis bib file here
 \addcontentsline{toc}{chapter}{Bibliography}
 
 %-----------------------------------------------------------------------%
@@ -182,11 +183,11 @@
 \cleardoublepage
 \markboth{LIST OF DEFINITIONS}{LIST OF DEFINITIONS}
 \addcontentsline{toc}{chapter}{List of Definitions}
-\include{appendix/dictionary}    
+\include{../appendix/dictionary}    
 
 \cleardoublepage
 
 \appendix
-\include{appendix/appendixA}                                       % fill in the tex file for thesis Appendixes
+\include{../appendix/appendixA}                                       % fill in the tex file for thesis Appendixes
 
 \end{document}

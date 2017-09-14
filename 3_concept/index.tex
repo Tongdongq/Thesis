@@ -1,5 +1,6 @@
+\documentclass[../main/thesis.tex]{subfiles}
 
-\documentclass[../thesis.tex]{../ce}
+%\RequirePackage{amsmath}
 
 \begin{document}
 
@@ -9,12 +10,13 @@
 MAIN IS TRUE
 \else
 MAIN IS NOT TRUE
+%\input{../notmain.tex}
 \fi
 
 \section{Pacbio reads}
 Daligner finds alignments between long, noisy reads.
 Pacific Biosciences has commercially launched its first sequencer in 2011.
-It is able to output reads with an average of 1000 bases, which is significantly longer than \ac{NGS} reads  \cite{PBlaunch1}.
+It is able to output reads with an average of 1000 bases, which is significantly longer than \ac{NGS} reads \cite{PBlaunch1}.
 In 2014, a new polymerase-chemistry combination was released, called P6-C4.
 This version can output average read lengths of 10000-15000 bases, and its longest reads can exceed 40000 bases \cite{Longreads}.
 While the drawback is that these reads have an error rate of 12-15\%, this can be compensated by the distribution of these errors \cite{Daligner}.
@@ -45,8 +47,19 @@ Daligner performs all-to-all comparison on two input databases $A$, with $M$ lon
 Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
 The correlation, or percent identity of the alignment is defined as $1-2\epsilon$.
 
+An edit graph for read $A=a_1a_2...a_m$ and $B=b_1b_2...b_n$ is a graph with $(m+1)(n+1)$ vertices $(i,j) \in [0,M]\times[0,N]$.
+It also has three types of edges:
+\begin{itemize}
+\item deletion edges $(i-1,j) \rightarrow (i,j)$ with label
+\begin{equation}
+\begin{bmatrix}
+a_i \\ -
+\end{bmatrix}
+\end{equation}
+\end{itemize}
 
 
+%TODO insert picture of edit graph
 
 
 \end{document}
