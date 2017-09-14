@@ -23,9 +23,30 @@ This implies that there exists a coverage c for every target coverage k, such th
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
 This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage.
 
-Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly? And how to build an assembler that is able to deal with high error rates and long reads?
-Most previous assemblers work with \ac{NGS} reads, which are much shorter and have much lower error rates. Some algorithms used in these assemblers, such as \ac{DBG}  \cite{DeBruijn} would grow too large for high error rates and long reads.
-Since Daligner was build, new methods of using \ac{DBG} with long reads have been developed, but they rely on a short read based \ac{DBG} to correct errors in long reads.
+Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
+And how to build an assembler that is able to deal with high error rates and long reads?
+Most previous assemblers work with \ac{NGS} reads, which are much shorter and have much lower error rates.
+Some algorithms used in these assemblers, such as \ac{DBG} \cite{DeBruijn} would grow too large for high error rates and long reads.
+Since Daligner was build, new methods of using \ac{DBG} with long reads have been developed, but they rely on a short read based \ac{DBG} to correct errors in long reads \cite{DBG1}\cite{DBG2}.
+
+\section{Daligner}
+
+The first step in an \ac{OLC} assembler is usually finding overlaps between reads \cite{OLC}.
+BLASR \cite{BLASR} was the only long read aligner at the time, and inpsired Daligner.
+It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
+%TODO is seed-extend already introduced?
+The most time-consuming step is extending the seed hit to find an alignment.
+To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a datastructure that describes a sparse path from the seed hit to the furthest reaching point.
+
+%TODO daligner paper includes a small section on results
+%TODO next part is copied straight from daligner paper
+Daligner performs all-to-all comparison on two input databases $A$, with $M$ long reads $A_1, A_2,...A_M$ and $B$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
+ It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
+Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
+The correlation, or percent identity of the alignment is defined as $1-2\epsilon$.
+
+
+
 
 
 \end{document}
