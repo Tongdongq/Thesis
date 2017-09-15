@@ -121,10 +121,15 @@ All entries for a certain read pair $(a,b)$ are in a continuous segment of the l
 This makes it easy to determine if that read pair has enough $k$-mers and in the right places to constitute a seed hit.
 Given parameters $h$ and $s$, each entry $(a,b,i,j)$ for the current read pair is placed in diagonal bands $d = \lfloor(i-j)/2^s\rfloor$ and $d+1$.
 Now determine the number of bases in the A-read covered by $k$-mers in each pair of neighbouring diagonal bands.
+Note that only bases in matching $k$-mers are counted, not the number of $k$-mers.
+When there are k+1 matching consecutive bases, two $k$-mers are generated.
+These are less 'valuable' than two non-overlapping $k$-mers.
+If $Count(d) \ge h$ for any diagonal band $d$, there is a seed hit for each position $(i,j$) in the band $d$ unless position $i$ was already in the range of a previously calculated local alignment.
+
 
 %TODO insert image of diagonal bands
 
-
+%TODO something about BLASR statistics and Daligner parameter defaults
 For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
 
 
