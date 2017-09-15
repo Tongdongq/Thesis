@@ -10,7 +10,7 @@
 MAIN IS TRUE
 \else
 MAIN IS NOT TRUE
-%\input{../notmain.tex}
+\input{../notmain.tex}
 \fi
 
 \section{Pacbio reads}
@@ -51,15 +51,24 @@ An edit graph for read $A=a_1a_2...a_m$ and $B=b_1b_2...b_n$ is a graph with $(m
 It also has three types of edges:
 \begin{itemize}
 \item deletion edges $(i-1,j) \rightarrow (i,j)$ with label
-\begin{equation}
-\begin{bmatrix}
+$\begin{bmatrix}
 a_i \\ -
-\end{bmatrix}
-\end{equation}
+\end{bmatrix}$ if $i > 0$.
+\item insertion edges $(i,j-1) \rightarrow (i,j)$ with label 
+$\begin{bmatrix}
+- \\ b_j
+\end{bmatrix}$ if $j > 0$.
+\item diagonal edges $(i-1,j-1) \rightarrow (i,j)$ with label
+$\begin{bmatrix}
+a_i \\ b_j
+\end{bmatrix}$ if $i,j > 0$.
 \end{itemize}
 
-
 %TODO insert picture of edit graph
+
+An alignment between $A[i+1,g]$ and $B[j+1,h]$ is described as a sequence of labels from vertex $(i,j)$ to $(g,h)$.
+
+
 
 
 \end{document}
