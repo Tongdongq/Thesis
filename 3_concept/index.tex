@@ -42,8 +42,8 @@ To do this, Daligner uses a novel method which adaptively computes furthest reac
 
 %TODO daligner paper includes a small section on results
 %TODO next part is copied straight from daligner paper
-Daligner performs all-to-all comparison on two input databases $A$, with $M$ long reads $A_1, A_2,...A_M$ and $B$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
- It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
+Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
+It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
 Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
 The correlation, or percent identity of the alignment is defined as $1-2\epsilon$.
 
@@ -51,24 +51,81 @@ An edit graph for read $A=a_1a_2...a_m$ and $B=b_1b_2...b_n$ is a graph with $(m
 It also has three types of edges:
 \begin{itemize}
 \item deletion edges $(i-1,j) \rightarrow (i,j)$ with label
-$\begin{bmatrix}
+{\small$\begin{bmatrix}
 a_i \\ -
-\end{bmatrix}$ if $i > 0$.
+\end{bmatrix}$} if $i > 0$.
 \item insertion edges $(i,j-1) \rightarrow (i,j)$ with label 
-$\begin{bmatrix}
+{\small$\begin{bmatrix}
 - \\ b_j
-\end{bmatrix}$ if $j > 0$.
+\end{bmatrix}$} if $j > 0$.
 \item diagonal edges $(i-1,j-1) \rightarrow (i,j)$ with label
-$\begin{bmatrix}
+{\small$\begin{bmatrix}
 a_i \\ b_j
-\end{bmatrix}$ if $i,j > 0$.
+\end{bmatrix}$} if $i,j > 0$.
 \end{itemize}
 
 %TODO insert picture of edit graph
 
 An alignment between $A[i+1,g]$ and $B[j+1,h]$ is described as a sequence of labels from vertex $(i,j)$ to $(g,h)$.
+A diagonal edge can be either be a match edge, when $a_i = b_j$, or a substitution edge.
+If a match edge has weight 0, and the other edges have weight 1, the weight of the total path is the number of differences in the alignment it represents.
+To find suitable alignments, we have to find a read subset pairs P such that $len(P)\ge \tau$ and the weight of the lowest scoring path between $(i,j)$ and $(g,h)$ in the edit graph of $A_a$ and $B_b$ is not more than $2\epsilon\cdot len(P)$.
+
+%TODO include something about SW and if Daligner is actually SW with certain penalty values?
+%A naive but exact way to calculate the lowest scoring path is described in the paper from Smith and Waterman \cite{SW}.
+
+The O(ND) algorithm tries to find progressive waves of furthest reaching (f.r.) points until the endpoint is reached.
+The goal is to find longest possible paths starting at a starting point $\rho = (i,j)$ with 0 differences, then 1 difference, then 2 and so on.
+After d differences, the possible paths can end in diagonals $\kappa \pm d$, where $\kappa = i-j$ is the diagonal of the starting point.
+The furthest reaching point on diagonal $k$ that can be reached from $\rho$ with $d$ differences is called $F_\rho(d,k)$.
+A collection of these points for a particular value of $d$ is called the $d$-wave emanating from $\rho$, and defined as $W_\rho(d) = \{F_\rho(d,\kappa-d),...,F_\rho(d,\kappa+d)\}$.
+$F_\rho(d,k)$ will be refered to as $F(d,k)$, where $\rho$ is implicitely understood from the context.
+
+In the O(ND) paper it is proven that:
+\begin{equation}
+F(d,k)=Slide(k, max\{F(d-1,k-1)+(1,0), F(d-1,k)+(1,1), F(d-1,k+1)+(0,1)\}
+\end{equation}
+
+where $Slide(k,(i,j)) = (i,j) + max\{\Delta:a_{i+1}a_{i+2}...a_{i+\Delta} = b_{j+1}b_{j+2}...b_{j+\Delta}\}$.
+
+A slide is a path of sequential match edges.
+The f.r. $d$-point on diagonal $k$ is calculated by finding the furthest of
+\begin{itemize}
+\item the f.r. ($d$-1)-point on $k-1$ followed by an insertion
+\item the f.r. ($d$-1)-point on $k$ followed by a substitution
+\item the f.r. ($d$-1)-point on $k+1$ followed by a deletion
+\end{itemize}
+and then continuing as far as possible along the slide.
+A point $(i,j)$ is furthest when its anti-diagonal $i+j$ is greatest.
+The best alignment between reads A and B is the smallest $d$ such that $(m,n)\in W_{(0,0)}(d)$, where $m$ and $n$ are the length of reads A and B.
+The O(ND) algorithm cimputes $d$-waves from starting point $(0,0)$ until the end point $(m,n)$ is reached.
+The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive sequences \cite{Daligner}.
+Because seeds are not always at the beginning, so waves are computed in both forward and reverse direction.
+The latter is easily done by reversing the direction of edges in the edit graph.
+
+\section{Seeding}
+To find suitable starting points for the edit graphs, seeding is done.
+A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
+Finding a seed means finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
+Previous methods to match $k$-mers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
+
+Daligner uses a sort-merge procedure:
+\begin{itemize}
+\item Build a list $List_X = \{(kmer(X_x,i),x,i)\}_{x,i}$ of all $k$-mers for database $X \in \{\mathcal{A},\mathcal{B}\}$, where $kmer(R,i)$ is the $k$-mer $R[i-k+1,i]$.
+\item Sort both lists in order of their $k$-mers.
+\item Merge the two lists and build $List_M=\{(a,b,i,j): kmer(A_a,i) = kmer(B_b,j)\}$ of read and position pairs that have the same $k$-mer.
+\item Sort $List_M$ lexicographically on $a$, $b$ and $i$ where $a$ is most significant.
+\end{itemize}
+
+All entries for a certain read pair $(a,b)$ are in a continuous segment of the list.
+This makes it easy to determine if that read pair has enough $k$-mers and in the right places to constitute a seed hit.
+Given parameters $h$ and $s$, each entry $(a,b,i,j)$ for the current read pair is placed in diagonal bands $d = \lfloor(i-j)/2^s\rfloor$ and $d+1$.
+Now determine the number of bases in the A-read covered by $k$-mers in each pair of neighbouring diagonal bands.
+
+%TODO insert image of diagonal bands
 
 
+For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
 
 
 \end{document}
