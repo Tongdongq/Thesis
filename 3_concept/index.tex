@@ -8,6 +8,7 @@
 \ifdefined\main
 \acresetall
 MAIN IS TRUE
+\newcommand{\code}{../3_concept/code/}
 \else
 MAIN IS NOT TRUE
 \input{../notmain.tex}
@@ -103,13 +104,29 @@ The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive s
 Because seeds are not always at the beginning, so waves are computed in both forward and reverse direction.
 The latter is easily done by reversing the direction of edges in the edit graph.
 
-\section{Seeding}
+\section{Seeding: concept}
 To find suitable starting points for the edit graphs, seeding is done.
 A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
-Finding a seed means finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
+Finding a seed includes finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
 Previous methods to match $k$-mers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
 
-Daligner uses a sort-merge procedure:
+Assuming that the $k$-mer matches are independent, the probablity that a $k$-mer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
+The number of conserved $k$-mers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ $k$-mers are expected in this alignment.
+An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved $k$-mers is 10.
+Only $.046\%$ of the expected readpairs have 1 or fewer $k$-mers, and only $0.26\%$ have 2 of fewer.
+To filter with $99.74\%$ sensitivity, only readpairs with 3 or more $k$-mer matches need to be examined.
+
+The specificity of the filter is increased in two ways:
+\begin{itemize}
+\item computing the number of $k$-mer matches in diagonal bands of width $2^s$ instead of in the whole reads
+\item thresholding on the number of bases in $k$-mer matches, instead of the number of $k$-mers themselves
+\end{itemize}
+
+The first way decreases the false positive rate because it only allows readpairs that have their $k$-mer matches relatively close, indicating a smaller region with higher similarity.
+The second way relies on the fact that 3 overlapping $k$-mers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint $k$-mers with $3k$ basepairs ($\pi^3$).
+
+
+The actually find the $k$-mer matches, Daligner uses a sort-merge procedure:
 \begin{itemize}
 \item Build a list $List_X = \{(kmer(X_x,i),x,i)\}_{x,i}$ of all $k$-mers for database $X \in \{\mathcal{A},\mathcal{B}\}$, where $kmer(R,i)$ is the $k$-mer $R[i-k+1,i]$.
 \item Sort both lists in order of their $k$-mers.
@@ -126,11 +143,40 @@ When there are k+1 matching consecutive bases, two $k$-mers are generated.
 These are less 'valuable' than two non-overlapping $k$-mers.
 If $Count(d) \ge h$ for any diagonal band $d$, there is a seed hit for each position $(i,j$) in the band $d$ unless position $i$ was already in the range of a previously calculated local alignment.
 
-
 %TODO insert image of diagonal bands
 
-%TODO something about BLASR statistics and Daligner parameter defaults
+The best values for $h$ and $s$ depend on things like $\epsilon$ and the read lengths.
+
 For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
+
+%TODO include time analysis?
+
+
+\section{Seeding: implementation}
+Daligner is designed to use multiple threads and use the cache efficiently.
+Building and merge the lists in steps 1 and 3 is easy, since only one pass is needed for both actions.
+The elements of the lists are compressed into 64-bit integers.
+Daligner uses a radix sort \cite{sorting}\cite{radix} to sort the lists in steps 2 and 4.
+Each 64-bit integer is a vector of $P=\lceil hbits/B\rceil$, $B$-bit digits ($x_P,x_{P-1},x,...,x_1$) where $B$ is a parameter.
+The sort needs $P$ passes, where each pass sorts the elements on a $B$-bit digit $x_i$.
+Each pass is done with a bucket sort \cite{sorting} with $2^B$ buckets.
+Instead of a linked list, the integers in the list $src$ are moved in precomputed segments $trg[bucket[b]...bucket[b+1]-1]$ of an array $trg[0...N-1]$ with the same size as $src$.
+For the $p^{th}$ pass, $bucket[b] = \{i: src[i]_p < b\}$ for each $b \in [0,2^B-1]$.
+
+%TODO include code segment?
+
+\lstinputlisting{\code radix1.c}
+
+The algorithm takes $O(P(N+2^B))$ time, but $B$ and $P$ are small fixed numbers so it is effectively $O(N)$.
+There are a lot of parallel sorting algorithms \cite{parRadix1}\cite{parRadix2}, but Daligner uses a new method that needs half the number of passes that traditional methods use.
+Each thread sorts a contiguous segment of size $part = \lceil N/T\rceil$ of $src$ into $trg$, where $T$ is the number of threads.
+This means each thread $t \in [0,T-1]$ has a bucket array $bucket[t]$ where $bucket[t][b] = \{i: src[i] < b$ or $src[i] = b$ and $i/part < t\}$.
+To reduce the number of passes, a bucket array for the next pass is filled during the current pass.
+Each thread counts the number of $B$-bit digits that will be handled in the next pass by itself and every other thread seperately.
+If the number at index $i$ will be at index $j$ and in bucket $b$ next pass, then the count in the current pass must not be recorded for the thread $i/part$ that currently sorts the number, but for thread $j/part$ that will sort it in the next pass.
+To do this we need to count the number of these events in $next[j/part][i/part][b]$ where $next$ is a $T\times T\times 2^B$ matrix.
+If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
+
 
 
 \end{document}
