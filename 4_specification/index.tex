@@ -1,2 +1,31 @@
+\documentclass[../main/thesis.tex]{subfiles}
+
+\begin{document}
+
 \chapter{Specification}
+\ifdefined\main
 \acresetall
+MAIN IS TRUE
+\newcommand{\code}{../3_concept/code/}
+\else
+MAIN IS NOT TRUE
+\input{../notmain.tex}
+\fi
+
+\section{Profiling}
+
+MCprof \cite{mcprof1}\cite{mcprof2} was used to profile Daligner
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+

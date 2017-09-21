@@ -181,7 +181,7 @@ Each bucket sort makes one sweep through $src$ and $2^B$ sweeps through the buck
 This totals $2^B+1$ sweeps during each pass.
 Each sweep can be prefetched if it is small enough.
 This means a smaller $B$ is better for caching behaviour, but this increases the number of passes $hbit/B$ that are needed.
-On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{daligner}.
+On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{Daligner}.
 The optimal number of threads is more complex, because they usually do not have their own caches.
 
 %TODO insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware
@@ -212,7 +212,7 @@ It makes sense that the f.r. point on diagonal $k^*$ that will be in the final a
 As the other f.r. points in the wave move away from diagonal $k^*$, their anti-diagonal values decrease rapidly, and the wave gets the appearance of an arrowhead.
 The higher the correlation of the alignment, the sharper the arrowhead becomes.
 This means that points far enough behind the tip can be almost certainly removed.
-A value of $\mathcal{L} = 30$ is a universally good value for trimming \cite{daligner}.
+A value of $\mathcal{L} = 30$ is a universally good value for trimming \cite{Daligner}.
 Formally, for each wave computed from the previous trimmed wave, each f.r. point from $[low-1,hgh+1]$ that has either $M[j]<\mathcal{M}$ or $(2W[k^*]+k^*) - (2W[j]+j) > \mathcal{L}$ is removed.
 Note that $W[k]$ contains the $B$-coordinate $j$, and $k=i-j$, so $(2W[k]+k) = i+j$.
 
