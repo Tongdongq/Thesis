@@ -24,7 +24,7 @@ While the drawback is that these reads have an error rate of 12-15\%, this can b
 First, the set of reads is a nearly Poisson sampling of the sampled genome.
 This implies that there exists a coverage c for every target coverage k, such that every region of the genome is covered k times \cite{Poisson}.
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
-This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage.
+This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage \cite{Daligner}.
 
 Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
 And how to build an assembler that is able to deal with high error rates and long reads?
@@ -163,8 +163,6 @@ Each pass is done with a bucket sort \cite{sorting} with $2^B$ buckets.
 Instead of a linked list, the integers in the list $src$ are moved in precomputed segments $trg[bucket[b]...bucket[b+1]-1]$ of an array $trg[0...N-1]$ with the same size as $src$.
 For the $p^{th}$ pass, $bucket[b] = \{i: src[i]_p < b\}$ for each $b \in [0,2^B-1]$.
 
-%TODO include code segment?
-
 \lstinputlisting{\code radix1.c}
 
 The algorithm takes $O(P(N+2^B))$ time, but $B$ and $P$ are small fixed numbers so it is effectively $O(N)$.
@@ -176,6 +174,97 @@ Each thread counts the number of $B$-bit digits that will be handled in the next
 If the number at index $i$ will be at index $j$ and in bucket $b$ next pass, then the count in the current pass must not be recorded for the thread $i/part$ that currently sorts the number, but for thread $j/part$ that will sort it in the next pass.
 To do this we need to count the number of these events in $next[j/part][i/part][b]$ where $next$ is a $T\times T\times 2^B$ matrix.
 If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
+This algorithm takes $O(N/T+T^2)$ time, assuming $B$ and $P$ are fixed.
+
+\lstinputlisting{\code radix2.c}
+
+This algorithm is particularly cache efficient because each bucket sort uses two small arrays $bucket$ and $next$ that will usually fit in the L1 cache.
+Each bucket sort makes one sweep through $src$ and $2^B$ sweeps through the bucket segments of $trg$.
+This totals $2^B+1$ sweeps during each pass.
+Each sweep can be prefetched if it is small enough.
+This means a smaller $B$ is better for caching behaviour, but this increases the number of passes $hbit/B$ that are needed.
+On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{daligner}.
+The optimal number of threads is more complex, because they usually do not have their own caches.
+
+%TODO insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware
+
+
+\section{Local Alignment}
+Assuming the filter finds a seed-hit $\rho = (i,j)$, the basic idea is compute furthest reaching waves in forward and reverse direction to find the alignment.
+The problem is that as the wave propagates further from $\rho$, it spans wider and wider since it occupies $2d+1$ diagonals.
+The final alignment will have only one point from each wave so most of the points are wasted, but we only which ones until the whole alignment is done.
+Several strategies are used to trim the width of the wave by removing f.r. points that are unlikely to be in the final alignment.
+
+One of the trimming strategies is stopping when a segment with very low correlation is found.
+This referred to as the \textit{regional alignment quality}.
+F.r. points with less than $\mathcal{M}$ matches in the last $C$ columns are removed.
+For example, when $\epsilon = .15$ then a segment with $M[k] < .55C = 33$ if $C = 60$ is probably not desirable.
+
+To keep track of the matching/mismatching bases, we keep a bitvector $B(d,k)$ that represents the last $C = 60$ columns of the best path from $\rho$ to a given f.r. point $F(d,k)$.
+A 0 will denote a mismatch and a 1 a match.
+This is easily updated by left-shifting a 0 or 1.
+The number of matches $M(d,k)$ can be tracked by observing the bit that is shifted out.
+Listing \ref{code:LA} shows pseudo-code that computes $W_\rho(d+1)[low-1,hgh+1]$ from $W_\rho(d)[low,hgh]$ assuming $[low,hgh] \subseteq [\kappa-d,\kappa+d]$ is the trimmed result of the wave $W_\rho(d)$.
+Note that the array $W$ only holds the $B$-coordinate $j$ of each f.r. point $(i,j)$, since $i = j + k$.
+
+\lstinputlisting[caption=Local Alignment, label=code:LA]{\code la.c}
+
+The second trimming principle involves only keeping f.r. points which are within $\mathcal{L}$ anti-diagonals of the maximal anti-diagonal reached by its wave.
+It makes sense that the f.r. point on diagonal $k^*$ that will be in the final alignment is on a greater anti-diagonal $i+k$ than points that are not.
+As the other f.r. points in the wave move away from diagonal $k^*$, their anti-diagonal values decrease rapidly, and the wave gets the appearance of an arrowhead.
+The higher the correlation of the alignment, the sharper the arrowhead becomes.
+This means that points far enough behind the tip can be almost certainly removed.
+A value of $\mathcal{L} = 30$ is a universally good value for trimming \cite{daligner}.
+Formally, for each wave computed from the previous trimmed wave, each f.r. point from $[low-1,hgh+1]$ that has either $M[j]<\mathcal{M}$ or $(2W[k^*]+k^*) - (2W[j]+j) > \mathcal{L}$ is removed.
+Note that $W[k]$ contains the $B$-coordinate $j$, and $k=i-j$, so $(2W[k]+k) = i+j$.
+
+The Daligner paper does not give a formal proof, but an argument why the average width of the wave $hgh-low$ is constant for any fixed value of $\epsilon$.
+This means that the alignment finding algorithm has linear expected time as a function of alignment length.
+Consider two f.r. points $A$ and $B$, where $A$ lies on an alignment path with correlation $1-2\epsilon$ or higher, and $B$ does not.
+For the next wave, point $A$ moves forward with one difference and then slides on average $\alpha = (1-\epsilon)^2/(1-(1-\epsilon)^2)$ bases.
+Point $B$ has no such correlation, so it jumps one difference and then only slides $\beta = 1/(\Sigma-1)$ bases, assuming each base is equally likely.
+So an f.r. point $d$ diagonals away from the final path has involved $d$ jumps off the path, and is on average $d(\alpha-\beta)$ anti-diagonals behind the best f.r. point in the wave.
+The average width of a wave with an $\mathcal{L}$ lag cutoff is less than $2\mathcal{L}/(\alpha-\beta)$.
+This last step is incorrect because the statistics of average random path length under this difference model is complexer than assuming all random steps are the same.
+However, there is a definite expected value of path length with $d$ differences, so the basis of the argument holds, although with a different value for $\beta$.
+When $\epsilon$ goes to 0, there is a very long slide from the starting point $\rho$.
+Each f.r. point not on the path should lag a lot behind the best f.r. point.
+As $\alpha$ increases as $\epsilon$ goes to 0, this explains further why the wave becomes very pointy and narrow.
+
+%TODO which last step of the argument is wrong exactly? Probably the formula of \beta
+
+The alignment finding algorithm ends because either the boundary of the edit graph is reached, or because all f.r. points have failed the regional alignment criterion, this means that the reads are probably not correlated anymore.
+In the second case, the best point in the last wave should not be reported as endpoint of the alignment, because the last columns could all be mismatches.
+Because the overall path should have an average correlation of $1-2\epsilon$, only a polished point with greatest anti-diagonal can be the end of a path.
+A \textit{polished point} is a point for which the last $E\le C$ columns are such that every suffix of the last $E$ columns have a correlation of $1-2\epsilon$ or better, this is called being \textit{suffix positive}.
+Daligner keep track of the polished f.r. point with the greatest anti-diagonal during the computation of the waves, it does so by testing if each bit-vector of the leading f.r. points is suffix positive.
+Testing bit-vector $e$ can be done in $O(1)$ time by precomputing a table $SP[e]$ with $2^E$ elements.
+Define $Score(\emptyset)=0$ and recursively $Score(1b) = Score(b) + \alpha$ and $Score(0b) = Score(b) - \beta$ where $\alpha = 2\epsilon$ and $\beta = 1-2\epsilon$.
+Note that if bit-vector $b$ has $m$ matches and $d$ differences, then $Score(b) = \alpha m - \beta d$.
+If this is non-negative then $m/(m+d) \ge 1-2\epsilon$, which means $b$ has a correlation of $1-2\epsilon$ or higher.
+Now let $SP[e] = min\{Score(b): b$ is a suffix of $e\}$.
+The table $SP$ can be built in linear time by computing $Score$ over the trie \cite{trie1}\cite{trie2} of all $E$-bit vectors and taking the minimum of each path of the trie.
+
+However for large values of $E$, say 30, the table $SP$ gets too big.
+To solve this, a size $D$, say 15, is chosen for which the $SP$ table is reasonable.
+Consider an $E$-bit vector $e$ that consists of $X=E/D$, $D$-bit segments $e_X\cdot e_{X-1}\cdot ... \cdot e_1$.
+Precompute table $SP$ as before, but now only for $D$ bits, and a table $SC$ for $D$-bit vectors as well, where $SC[b] = Score(b)$.
+With these two $2^D$ tables it takes $O(X)$ time to determine if the longer bit-vector $e$ is suffix positive by calculating if $Polish(X)$ is true with the following recurrences:
+\begin{align}
+Score(x) = &\begin{cases}
+Score(x-1) + SC[e_x] &\text{ if } x \ge 1 \\
+0&\text{ if } x = 0
+\end{cases} \\
+Polish(x) = &\begin{cases}
+Polish(x-1) \text{ and } Score(x-1) + SP[e_x] \ge 0 &\text{ if } x \ge 1 \\
+true &\text{ if } x = 0
+\end{cases}
+\end{align}
+
+%TODO include summary of Daligner algorithm?
+%TODO include summary of Daligner results wrt sensitivity and running time?
+
+
 
 
 
