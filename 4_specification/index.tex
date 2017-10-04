@@ -14,13 +14,22 @@ MAIN IS NOT TRUE
 
 \section{Profiling}
 
-MCprof \cite{mcprof1}\cite{mcprof2} was used to profile Daligner
+MCprof \cite{mcprof1}\cite{mcprof2} was used to profile Daligner, the results are shown in Figures \ref{prof1} and \ref{prof2}.
+The algorithm consists of three main phases: seeding, filtering and aligning.
+The seeding phase takes part in the lex\_sort(), count\_thread() and merge\_thread() functions.
+The filter implementation is not very complex, and is combined with the alignment part in report\_thread(), this function starts the actual alignment in the form of Local\_Alignment() when a suitable seed is found.
+Each seed is aligned in forward and reverse direction.
 
 
+%TODO insert pictures of profiling
+% \label{prof1}, \label{prof2}
 
 
+Since Local\_Alignment() is the most timeconsuming function, that will be the first one the be considered for acceleration.
+Each Local\_Alignment() call originates from a separate readpair $A, B$, so executing multiple Local\_Alignment() instances at the same time should not be a problem.
+This is why Daligner uses multiple threads, each one running the filter-align function report\_thread() on its own list of readpairs.
 
-
+In order to launch multiple Local\_Alignment() functions from one kernel, they have to be prepared.
 
 
 \end{document}
