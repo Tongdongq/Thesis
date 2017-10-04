@@ -1,0 +1,88 @@
+Local_Alignment(){
+	...
+	forward_wave()
+	...
+	reverse_wave()
+	...
+}
+
+reverse_wave(){
+	...
+	while(){        \
+		for(){      |           \
+                     > test3()   > test4(), not fully implemented
+		}           |           /
+	}               /
+	...
+}
+forward_wave(){
+	...
+	while(){
+		for(){                 \
+                                > test5(), not implemented
+		}                      /
+	}               
+	...
+}
+
+all measurements run on Msc room desktop
+single core, run with NOTHREAD flag in filter.c
+-O3 compiler flag, -O0 is roughly 50% slower
+
+6_8MB:
+gprof: 49 % forward_wave()
+       43 % reverse_wave()
+
+- no -pg flag
+unix time: real: 20.2 s
+           user: 21.2 s
+           sys :   .1 s
+
+timestamps: 
+- no -pg flag
+    forward_wave (measured from Local_Alignment()): 10.7 s
+    reverse_wave (measured from Local_Alignment()):  8.9 s
+-----------------------
+
+50MB:
+gprof:  57.01 % Local_Alignment
+        39.72 % reverse_wave
+
+- no -pg flag
+unix time: real: 14m21s
+           user: 14m20s
+           sys :     2s.0
+
+timestamps:
+- no -pg flag
+    forward_wave (measured from Local_Alignment()): 493 s
+    reverse_wave (measured from Local_Alignment()): 346 s
+
+--------------------
+130MB:
+gprof: 52.96  % Local_Alignment
+       36.09  % reverse_wave 
+
+- no -pg flag
+unix time: real: 10m58s
+           user:  9m16s
+           sys :     6s.1
+
+timestamps:
+- no -pg flag
+    forward_wave (measured from Local_Alignment()): 360 s
+    reverse_wave (measured from Local_Alignment()): 208 s
+----------------------------------------------------
+----------------------------------------------------
+----------------------------------------------------
+
+Measurements run on kova-01 server
+
+6_8MB:
+gprof: 96 % .Local_Alignment, this includes forward_wave() and reverse_wave()
+        3 % .__gmon_start__, this is probably gprof overhead, since it creates gmon.out
+
+- no -pg flag
+unix time: real: 26.8s
+           user: 28.2s
+           sys :   .4s

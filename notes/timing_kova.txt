@@ -1,0 +1,13 @@
+
+
+
+Measurements on the kova server
+Compiler flags: -03 -Wall -Wextra -fno-strict-aliasing
+
+
+Multithreaded (no #define NOTHREAD)
+130MB:
+4 threads:
+	real: 68m22
+	user: 69m7
+	sys:     27s

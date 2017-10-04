@@ -1,0 +1,436 @@
+
+http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#hardware-implementation:
+PARTLY CITATION:
+A warp consists of 32 parallel threads. Individual threads start together at the same program address, but they have their own instruction address counter and are free to branch and execute independently. A warp executes one common instruction at a time. If threads diverge via a data-dependent conditional branch, the warp serially executes each branch path taken, disabling threads that are not on that path. When all paths complete, the threads converge back to the same execution path. Different warps execute independently regardsless of whether they are executing common or disjoint code paths.
+
+Threads can be active or inactive. Threads can be inactive because they finish earlier than other threads within the warp, or because they are on a different branch than the branch currently executed by the warp, or because they are the last threads of a block whose number of threads is not a multiple of the warp size.
+---------- end citation
+So if multiple diagonals in one alignment are calculated simultaniously, this will take as long as the time needed to find the longest snake in that d-wave. Trimming and pruning might be done in parallel.
+
+From: CUDA programming A Developer's Guide to Parallel Computing with GPUs, Shane Cook, page 93
+The scheduler is half-warp based, so you can execute two sides of a branch simultaniously, if 16 threads take the branch, and the other 16 don't take it.
+
+----
+Higher level parallelism:
+Aligning reads A & B, and C & D is independent, so in theory, each thread in the warp could align its own two reads. But then the same problem occurs: aligning is very branching/while loopy. Thread 2 aligning C & D has to wait to find a new snake until thread 1 aligning A & B has completed its snake.
+----
+Ignoring the 32 threads per warp:
+Each warp can execute one instruction at the time, since aligning is not very predictable, branches will occur, decreasing the performance. We can give each warp their own two reads, and not worry about the 32 threads.
+----
+The GTX 750 Ti has 640 cores = 20 SMs, if we have one alignment per SM, we need to store 40 reads in global memory. Or 2 reads per SM memory.
+----
+24-5-2017
+Iterations of the while loop (test3) are not parallelizable, 'besta' and 'lasta' could be changed every iteration. This loop has a comment 'compute successive waves until no furthest reaching points remain'.
+Iterations of the for loop (test4) are could be difficult to parallelize, since each iteration reads from and writes to arrays V, T, M, HA and HB. However, they only write to 'k', which is strictly increasing. Reading is done at the start of the iteration from either 'k' or 'k+1'.
+Variables n,t,ua and ub are used to store information between successive iterations, but they are used to store the old T[k],M[k],HA[k] and HB[k], this information is also available at the start of the iteration.
+The pointer to read 'a' is incremented each for-iteration, to mimic moving one row down in the edit graph.
+29-5-2017
+bseq is the same for each iteration of the test4 loop. a is the same as well, but incremented. Send a and bseq, and let each thread increment a by threadIdx.x.
+1-6-2017
+am, ac and ap form a moving window. Where V[k+1] gets inserted from the right each iteration. To parallalize this, you can read from V[k-1] to V[k+1] at once. However, c is stored in V[k] at the end of the iteration, and read by the next iteration via V[k-1]. c is only available after finishing the snake, this could mean the iterations need to be pipelined.
+22-6-2017
+To implement coarse grained parallelism, the big for loop in report_thread() needs to be split into parts. First, all calls to Local_Alignment() need to be recorded. After all the seed hits are processed (or 32 Local_Alignment() calls are recorded), the calls can actually be made. These calls might need to be load balanced first, because multiple CPU threads can filter. These filtered and balanced LAcalls can be dispatched to the GPU, possibly per 32. After all Local_Alignment() calls are made, the post-processing can occur. Like Diagonal_Scan() and Handle_Redundancies().
+
+A problem is seed hits like diag=100 and diag=200. Both seed hits are recorded. In a sequential algorithm, seed hit 100 is calculated, this overlap might be longer than 100 bases, so seed hit 200 does not have to be calculated. However, in a parallel algorithm, both seed hits are extended at the same time. In theory, when seed hit 100 hits the 200th position, they can be merged into one overlap already. In practice, they might have to be combined by Handle_Redundancies().
+
+To record the LA() calls, the arguments (Alignment *align, Work_Data *work, Align_Spec *MR_spec, int diag, int diag, int antidiag, -1, -1) are needed. The last five arguments are ints, and only two ints have to be recorded. The *MR_spec is the same for all threads and thus all alignments. Each thread has a Work_Data object, but this is empty at the time of the LAcall, so this need not be stored.
+
+Each thread in filter.c has Overlap ovla and ovlb and an Alignment align. align->path = apath, where apath = ovla->path.
+
+Match_Filter() allocates NTHREADS*3*w*sizeof(int) memory for diagonal buckets, where w is observed from 30 to 1088. These buckets store the score to filter, but also the lasta to see if current seed hits is probably already in an Overlap. If LAcalls are processed in parallel, this lasta function becomes unnecessary. The score array is not needed after the LAcalls have been stored. The lastp records the last position of a seed hits, to prevent overlapping seed hits from causing too high scores, this array is also not needed after the LAcalls.
+
+23-6-2017
+There is a seperate CPU function that only dispatches LAcalls, the postprocessing is done in another function called post_thread. This thread needs to process each LAcall, but some calls have dependencies when they belong to the same read pair. To keep track of which read pair an LAcall belongs to, we can store the readIDs, or we can store n, where n is the nth seed hit for a certain read pair. Because the second way uses less memory, we use that one.
+
+24-6-2017
+There is a problem with calling LA on each seed hit: the extensions of seed hits can overlap eachover. This problem is described on 22-6-2017, line 34. Three options are possible:
+- do nothing, let Handle_Redundancies handle these overlaps
+- let each LAcall know where the next LAcall starts, so that it can stop in time, this might prevent reverse_wave() to be needed for the second LAcall
+- create a GPU thread for each read pair, instead of each LAcall.
+
+27-6-2017
+It is possible to combine a few LAcall arguments. Each pair has a unique Align object, this means that a pair with multiple LAcalls has redundant information wrt to the Align object. A new version of LAcall, where one LAcall is made for each read pair, and this object contains a dynamic array containing the seed hit positions, is a possibility to reduce space.
+
+28-6-2017
+Tesla K40c has 15 SMX, with each 4 warp schedulers. The warp scheduler selects an eligible warp and issues 1 or 2 instructions. One warp has 32 parallel threads. Each half-warp has to perform the same instruction. Shuffle allows threads within a warp to share data. Grid -> threadblock -> thread. User creates threadblocks, each threadblock is assigned to an SMX. The SMX divides the threadblock into warps. All threads of a warp belong to the same threadblock. Start with 32 warps/SMX, adjust from there. Active threadblocks use resources on an SMX, they are release as the threadblock is finished.
+
+Thread resources:       local memory (as slow as global memory!!!)
+Thread block resources: shared memory (very fast), barriers
+Grid resources:         constant memory, texture/surface bindings
+Global resources:       global memory
+
+Possible parallel implementations:
+- read pair = warp
+	- LAcall = thread
+	- need 32 LAcalls to occupy warp, but median seed hits per read pair is 7!, much divergence
+	- more work is done, no if(apos<lasta[diag]) filter
+- read pair = thread
+	- 32 read pairs per warp
+	- less work, because filter if(apos,lasta[diag]) can be used
+	- some read pairs are done quickly, much divergence
+- read pair = dynamic
+	- first: read pair = thread
+	- as read pair is done, the thread would becomes idle for the rest of the duration of the warp, but assign a new read pair to the thread. Thread ends when no read pair is available. Make sure that those threads belong to the same threadblock, so they can use shared memory to indicate which read pair they are doing. This indicates we need big threadblocks, as oppose to many.
+
+	if(new read pair needed)
+		if(getNewReadPair() == fail)
+			exit thread
+	for(all seed hits of read pair)
+		while(apos<lasta[diag])
+			skip seed hit
+		_syncthreads()
+		LA()
+
+29-6-2017
+To let the warp start the LAcall, all threads should have a seed hit ready. Threads should only exit when there is no read pair left, this should only happen when the threadblock is almost fully computed.
+Memory accesses are per warp, memory is accessed in discrete chunks. This will be slow. Some threads advance quicker through the read (longer/more snakes). Different threads also have different active diagonals and d-wave widths. These non-coalesced memory accesses will cause multiple memory transactions. One transaction is a 128B line (when caching) or 1,2,4 32B segments (when non-caching). Maybe SCORE/TABLE can fit in constant cache. We need to saturate the memory bus (latency*bandwidth bytes in flight). GK110 needs ~100 lines/SMX in flight, each line is 128B. To increase concurrent accesses: increase occupancy (more warps, adjust threadblock dimensions on register and smem or reduce register count), or increase number of elements read per thread. Smem: 32 banks, each 8B wide. Choose 4 or 8B access. Each bank holds 32*8B=256B. Bank conflict when multiple threads access different 8B words in the same bank. Smem size: up to 48KB. Each threadblock needs some smem to indicate which reads are done, each threadblock needs enough smem to be active. 48KB/N active threadblocks possible where N is amount of smem one threadblock takes.
+Watch out for register spilling.
+Tail effect limits max performance when threadblocks are too big or too few. 1000+ threadblocks are recommended.
+Don't just choose big threadblocks. Look at the register and smem sizes to maximize the number of warps/SMX.
+
+30-6-2017
+Reduce registers from https://devtalk.nvidia.com/default/topic/597219/once-again-for-registry-spills-performance-and-nvcc-magic/
+- recalculate easy values instead of storing them
+- use volatile to force recalculation
+- compress values into short2 or char4, indices to shared arrays and small counters are good
+- save expensive calculations to smem and perform broadcast read when value is needed (probably not useful for us)
+- give C preprocessor and compiler opportunity to expand/collapse/fold constants and code
+- avoid arrays with local extent
+split larger algorithms into multiple smaller kernels, more overhead to gmem between kernels, but smaller kernels have less registers
+
+10-7-2017
+It is possible to use m/realloc() on device, but the resulting pointer cannot be accessed by cudaMemcpy(). A solution is to allocate a very big buffer for the output-to-file data, or let the device use realloc(), copy the device pointer to host, use cudaMalloc() to allocate enough space, send the device pointer to device via another kernel, copy the data from the device pointer to the cudaMalloced pointer, and let the host use cudaMemcpy on the cudaMalloced pointer. However, this seems like an inefficient process.
+
+19-7-2017
+Previous solution to copy data back to CPU needs to preserve data across the kernels, this could be difficult.
+Bug fix: printing 64 bits for ahits when ahits is int caused problems
+Bug: LAshow uses the readIDs for the db, which are the original reads, the readIDs that are written to file are the mapped reads. Solution: give mapping to GPU, the GPU will unmap before writing to out->buf.
+
+20-7-2017
+Unmapping done, LAshow now has the same results for the GPU and original implementation. But the hexdump shows that the GPU has 4B trailing, and the pointer to ovl->path->trace is visible in the hexdump (not via LAshow) and cannot be altered easily. The GPU implementation writes 0s to those bytes.
+
+21-7-2017
+Trying the 6.8MB set, the out->buf is out of space. Increased size to 100KB, but since the final las files can be very large, this needs work to make it scalable. E.g. the host could keep spawning new instances of the GPU kernel until all the readpairs are finished.
+
+22-7-2017
+A dataset with 25000 lines (1.7MB) is fine for 8 GPU threads. The 6.8MB set accesses an illegal memory address.
+
+23-7-2017
+Changed d_realloc manual byte-by-byte copying to memcpy.
+Multiplied oldsize argument by sizeof(Path) in d_realloc call for a/bmatch.
+3.4MB set is ok, work on 6.8MB
+The rpairs with more than (~300) ovls that cause a d_realloc of tbuf->trace are the only ones different from the original implementation. The only aread that has this is 798 for the 6.8MB set.
+Multiplied oldsize argument by sizeof(short) in d_realloc call for tbuf->trace, does not seem to make a difference
+
+24-7-2017
+Removed a lot of 'sizeof(short)' for the d_realloc call for tbuf->trace. tbuf->top/max indicate the number of trace points.
+3.4MB set is ok
+6.8MB set is ok, despite numerous reallocs for tbuf->trace
+6.8MB: T8 : 26m
+       T16: 28m, wrong output due to could not allocate for Allocating paths
+No complement yet.
+
+25-7-2017
+Increased heap size to 20MB (from 8MB), probably per grid or device.
+CBT notation: x,y,z: x number of CPU pthreads, y number of blocks per CPU pthread, z number of GPU threads per block
+
+26-7-2017
+Created superrun.sh to run GPU daligner with different GPUTHREADS and HEAPSIZEs.
+Memory leaks might be causing problems when computing the complement.
+
+27-7-2017
+Added extra free() and cudaFree() calls to reduce memory leakage.
+LAmerge cannot or does not write all overlaps to final las file since the moment the complement is also computed.
+Output is wrong for complement only runs.
+
+28-7-2017
+LAshow only reads N overlaps from the GPU implementation, while half of them should be C overlaps. The GPU only writes 0 as flags, indicating N reads, the flags are not passed to the ovla that is written. Fixed: d_MG_comp indicates if current DB is complement.
+Output including complement is correct for 3.4MB set.
+
+1-8-2017
+Align_Spec->score now is preserved for the complement.
+The asettings variable in daligner.c cannot be freed, it apparently already is.
+Output including complement seems correct for 6.8MB set.
+
+2-8-2017
+Output including complement is correct for 6.8MB set.
+Created x_scalingrun.sh, view_results.sh
+
+4-8-2017
+Cannot run with 512 threads per block: each thread uses 255 registers, and 512*255=130560>64k max regs/SMX.
+cuda-memcheck.sh fails when using 2100 MB heapsize, 2000 MB is ok, happens with both 63 and 255 register/thread. Fixed, HEAPSIZE was 32 bit, which limits the max heapsize to 2.2GB.
+run.sh works for 128 regs/thread and 512 threads, more than 128 fails, as expected, 64 regs/thread and 1024 threads busy
+The complement was actually not compared, some values are wrong. h2.h1 is wrong, mainly n/c faults, and new- has a lot more overlaps.
+h2.h1 is wrong for 3.4MB too
+Let's compare the files before external sorting.
+The written ovlb.flags did not have the correct value of d_MG_comp, this is why only the h2.h1 files were wrong, fixed now.
+
+6-8-2017
+Removed some unused parameters for _LAparams.
+Started to run 130MB set, stopped after 2h and no "calling cuda_host_function" msg was printed.
+
+8-8-2017
+Multiple GPU_BLOCKS are used now, added BlockPar struct.
+Works with 2 blocks and 2 threads for 3.4MB.
+Works with 4 blocks and 8 threads for 6.8MB.
+
+9-8-2017
+Some threads don't have an LAcall when other do, this means that the uptime of those threads is very low. To prevent this, we need to make sure that each thread has an LAcall when the warp reaches that instruction.
+
+11-8-2017
+Fixed bug: i was used to keep track of which LAcall was used, but it was also used somewhere else, and it reset constantly.
+
+12-8-2017
+get_new_readpair() now returns -1 when no new readpair was found, instead of 0.
+Dramatically changed order of pre/main/postprocessing, see 9-8-2017 draft.
+Now works for 1.7MB, need to remove cripple to test for 3.4MB.
+
+13-8-2017
+Works for 6.8MB, singlethreaded
+Trying with multiple threads, both files miss one overlap.
+Changed atomicExch to atomicMax.
+Still not every thread has an LAcall when calling Local_Alignment()
+
+20-8-2017
+Added atomic counter to check if enough threads have an LAcall, but still only one thread is doing LAcall after the first readpairs are done.
+
+21-8-2017
+Removed atomic counter.
+Still both files miss one overlap, for 256 threads, but not for 64 threads, 3.4MB.
+Reverted to 8-8-2017 commit.
+3.4MB is ok, also for multiple threads, not checked for multiple blocks.
+Possibly implement a round-robin scheme:
+if(1/10 chance){
+	LAcall()
+}
+to allow other threads some time to get an LAcall as well, see source [1].
+Possibly implement thread-remapping, source [2].
+
+22-8-2017
+Fixed blockpar calculation again.
+Removed bpar param from _LAparams, blockIdx.x can be used.
+Ran with more blocks, very little speedup.
+Used Nsight to profile, as expected low occupancy, but no very informative results.
+Started to implement delayed iterations, see source [1], stopped after talk with Zaid.
+Talked to Zaid: try implementing LAcall() only, instead of the whole Readpair assignment thing on GPU.
+
+23-8-2017
+Started with justLA branch
+
+24-8-2017
+justLA works for 1.7MB, singlethreaded.
+Worked on read_generator again.
+justLA does not work for 3.4MB, singlethreaded, lots of overlaps are missed. It seems just one LAcall is computed for many rpairs, especially the middle and last ones.
+
+25-8-2017
+Created read generator in c.
+justLA works for 2.1MB, up to 4 threads, except LAshow shows a bb/be pos of over 1 billion, but the hexdump is correct. DB from 1 and 6_8MB show correct values.
+justLA works for 0.4MB, up to 5 threads, 6 threads miss some overlaps: not enough memory, but tbuf->max is over a billion, was because tbuf->top was not initialized.
+justLA works for 0.4MB, up to 32 threads, 64 results in illegal memory access, probably because there are not enough readpairs.
+justLA works for 2.1MB, 128 threads, except LAshow still shows values over 1 billion.
+
+27-8-2017:
+amatch was too small, and not realloced dynamically, added error message
+
+28-8-2017:
+Created best/worst/perfect reads in read_generator.
+Writing Path instead of Overlap from GPU to buf.
+
+29-8-2017:
+justLA works for 2.1MB, 128 threads.
+
+30-8-2017:
+justLA CPU scheduling had apos<lasta, instead of apos<=lasta.
+justLA works for 6.8MB, 512 threads.
+
+1-9-2017:
+Created justLA_multiple_pairs
+Worked on generating perfect reads to show that GPU can be faster in ideal situation
+
+4-9-2017:
+Used NSight to profile, computation part seems 2s for 10000 best reads.
+Merged individual out->buf1/2 into one large buffer that holds GPU output for each thread, both buf1 and buf2.
+Persistent work struct, preallocd on CPU, probably cannot be resized on device
+
+5-9-2017:
+Bug fix: tmp buffer for reading overlaps was not offset properly for h2.h1
+Works for 100k worst reads, CBT: 32 16 32 and 16 32 32
+Changed read_generator: synthetic starting point now only causes 3 LAcalls
+
+6-9-2017:
+Removed blockPar.
+Works for 100k best reads, CBT: 4 36 256, 64 regs/thread
+100% occupancy for CBT: 8 32 128, 3500MB heap, 32 regs/thread, still slower than CPU
+justLA_multiple_pairs works for 2.1MB, 1 thread
+
+7-9-2017:
+Best reads: 1100 10000:
+- CBT: 8 32 128 has 13% occ, but 12% gmem eff, is 3x slower, 128 regs/thread seems to be slightly faster than 32 regs.
+- CBT: 2 128 512 has 97% occ, but 12% gmem eff, is 5x slower, 32 regs/thread
+- CBT: 1 128 1024 has 97% occ, but 12% gmem eff, is 6x slower, 32 regs/thread
+
+8-9-2017:
+One rpair with 1100 bases each, one thread, 248 regs:
+local load: 46, store: 57
+shared load: 1, store: 1
+global load: 8174, store: 3031
+bseq[] reads: 1503
+   a[] reads: 1499
+ TABLE reads: 117
+ SCORE reads: 38
+  work reads: 11 (no reallocs needed)
+
+11 - 15-9-2017:
+Worked on thesis
+
+18-9-2017:
+Moved flexible debug printing to histogram to measure number of reads and writes to bseq, TABLE, work, work->vector and num Pebbles and num tracepoints.
+Cachable: bseq, a, V, M, T, ..., Pebbles (wait until 5 Pebbles, then writeback to gmem), tracepoints (wait until 20 tracepoints, then writeback to gmem).
+Coalescable: bseq, a, VectorEl from work->vector, Pebbles, tracepoints
+Sizeof smem per thread: 48kB/(num threads).
+Regs/thread: 128 -> max 512 threads/SMX
+Threads/block: 128 -> max 4 blocks/SMX
+48kB / 512 = 96 B
+sizeof(Pebble) = 16 B -> don't cache Pebbles, coalescing possible
+sizeof(VectorEl) = 32 B
+sizeof(Path) = 32 B
+sizeof(*) = 8 B
+Create coalescable crosstalk by making every 88 reads the same, instead of 95
+main for loop (test4) has mostly k as index for work->vector arrays, easily coalescable if they have the same reads
+97.1% of work->vector  reads are in the main for loop (best 1100 10000)
+93.8% of work->vector writes are in the main for loop (best 1100 10000)
+Maybe unmapping or LAcall array can go in constant memory
+Gmem transaction size: 32B (non-caching) or 128B (caching)
+TABLE read indices are quite random and well distributed, but median is 27k, max is 32k -> only store top half of TABLE in constant memory. This is because there are more ones than zeroes in 'b'.
+
+19-9-2017:
+Started coalescing bseq and a, not tested yet
+Cmem cache size is 8kB, but it is probably slower than gmem when reading different addresses.
+Started coalescing MTHAB arrays, not tested yet
+
+21-9-2017:
+99.6% of work->vector  reads are in the main for loop (6.8MB)
+99.0% of work->vector writes are in the main for loop (6.8MB)
+Redone profiling on /dev server, no other servers have the mcprof tools
+
+26-9-2017:
+Successfully made workflow to TACC
+
+27-9-2017:
+ABSEQ did not work, started to work on MTHAB
+CBTr notation: r for number of regs per thread
+Reverified baseline with 12% gmem efficiency on TACC, stored in coaleasce.txt
+MTHAB seems to work for 2.1MB, gives ERROR MOVING IN FORWARD WAVE for larger sets and worksizes 16k 5k 15k, but gives 'misaligned address' when using 20k 5k 15k.
+It looks like this error is caused by mthab[k].T = PATH_INT;, since gdb claims the error is in the line after it, no matter which order it is in.
+'misaligned address' also occurs when using 17k, 22000, 20064, 20072, 20080, 20088 for work_vector_size, but not when using 18k, 17024, 20032, 20056, 20096
+
+28-9-2017:
+Forgot to implement MTHAB in reverse_wave, did now
+Tested MTHAB gmem bandwidth and efficiency for option 1: put MTHAB next to eachother for each thread.
+		best:	MTHAB	VMTHAB		worst: VMTHAB wrt to base and in %
+LD Transactions: -11		- 0			- 0
+ST Transactions: -15		-35			-35
+LD Efficiency:	 +11		+ 0			+ 0
+ST Efficiency:	 +15		+35			+53
+ST Bandwidth:	 +29		+20			+34
+LD Bandwidth:	 +34		+60			+100
+Turning off cache is almost useless:
+Transactions: -0.00%
+Efficiency: +0.00%
+Bandwidth: +0.4%
+MTHAB option 2: interleave all M arrays, all T ararys, seperate
+
+29-9-2017:
+Talked to Zaid
+
+2-10-2017:
+Fixed ABSEQ coalescing, works for best reads and 2.1MB
+ABSEQ coalescing almost works for 6.8MB, C=150k recommended, hangs at different readpairs for different CBT configs, very weird
+
+3-10-2017:
+Fixed bug where more than needed bytes were allocated for the bases
+Did some profiling with ABSEQ coalescing.
+
+4-10-2017:
+More profiling with ABSEQ coalescing
+
+
+
+TODO: find out relation between number of seed hits, etc. and overlaps. This can be used to preprocess the readpairs and possibly decrease divergence. First check if the threads really have a lot of divergence.
+
+
+9-8-2017
+cuda_device.cu draft:
+while(1){
+	if(cpair == done (i > cpair.eidx)){
+		getNewReadpair();
+	}
+	while(c->apos < lasta[diag]){
+		try next seed hit
+	}
+OR
+	while(not ready for LAcall){
+		if(cpair == done (i > cpair.eidx)){
+			getNewReadpair();
+		}
+		if(c->apos < lasta[diag]){
+			break;
+		}
+		try next seed hit
+	}
+
+
+	LAcall()
+	checkOverlap()
+	if(cpair == done){
+		HandleRedundancies()
+	}
+}
+
+
+typedef struct{             // size(LAcall) == 168
+  Alignment  align;
+  Overlap    ovla, ovlb;
+  int        diag, adiag;
+  int        doA, doB;      // could be compressed into one byte
+  int        aread;       // keep track of which read pair this LAcall belongs to
+  int        bread;         // NOT NEEDED, info is also in ovla and ovlb
+  Path      *bpath;
+} LAcall;
+
+struct Alignment{
+	Path *path;		// points to apath/ovla->path
+	uint32 flags;	// this either 0 or 1 for complement DB
+	char *aseq;		// pointer to aseq
+	char *bseq;		// pointer to bseq
+	int alen;
+	int blen;
+}
+
+struct Path{
+	void *trace;	// vector of trace cells, actually points to work->points
+	int tlen;
+	int diffs;
+	int abpos, bbpos;
+	int aepos, bepos;
+}
+
+struct Overlap{
+	Path path;
+	uint32 flags;
+	int aread;		// index of read (ar + afirst(constant))
+	int bread;
+}
+
+typedef void Work_Data;
+
+struct _Work_Data{
+	int vecmax;
+	void *vector;	// contains V,M,NA,NB,HA,HB
+	int celmax;
+	void *cells;	// actually holds Pebbles
+	int pntmax;
+	void *points;	// actually holds trace cells
+	int tramax;
+	void *trace;	// not used unless complete alignment is needed
+}

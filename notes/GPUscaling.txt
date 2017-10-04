@@ -1,0 +1,93 @@
+CBT notation: x,y,z: x: number of CPUTHREADS
+                     y: number of blocks per CPUTHREAD
+                     z: number of GPUTHREADS per block
+
+branch nosnakes
+No complement
+6.8MB: 1,1,  16: 24m
+       1,1,  32: 22m, 20MB heap not enough, 22MB is
+       1,1,  64: 11m, 40MB not enough, 45MB is
+       1,1, 128:  6m, 70MB not enough, 100MB is
+       1,1, 256:  3m, 160MB not enough, 180MB is
+
+branch nosnakes
+With complement, -O3
+sizes indicate option -D device side heap memory size in MB
+6.8MB: 1,1,1024:  8m29, 1050MB not enough, 1100MB is ok       64 regs/thread
+       1,1, 512:  6m29, 545MB not enough, 550MB is ok        128 regs/thread
+	1,1, 256:  7m25, 270MB not enough, 275MB ok
+       1,1, 128: 11m33, 137MB not enough, 145MB ok
+       1,1,  64: 19m49, 68MB not enough, 75MB ok
+       1,1,  32: 39m45, 30MB not enough, 35MB ok
+       1,1,  16: 42m57, 17MB not enough, 18MB ok
+       1,1,   8: 46m16, 40MB ok
+       1,1,   4: 50m02, 40MB ok
+       1,1,   2: 54m31, 40MB ok
+       1,1,   1: 58m34, 1MB ok
+
+       1,2, 256:  5m50, 600MB ok
+
+       1,4, 256:  4m58, 1200MB ok
+
+       1,8, 256:  4m35, 2200MB ok
+       1,8, 128:  5m02, 1000MB not enough, 1200MB ok
+       1,8,  64:  7m04, 600MB ok
+       1,8,  32: 11m05
+       1,8,  16: 13m12
+
+       1,12,256:  4m17, 3600MB ok
+
+       1,15,256: 4800MB not enough
+
+       1,16,256: 4800MB not enough
+
+       1,20,256: 4000MB not enough, 5000MB illegal memory access
+       1,30,256: invalid argument
+       1,32,256: invalid argument
+
+3.4MB: 1,1,1024:  1m51, 600MB not enough, 1200MB ok     64 regs/thread
+       1,1, 512:  1m24, 600MB ok,                      128 regs/thread
+       1,1, 256:  1m32, 600MB ok
+       1,1, 128:  2m26, 600MB ok
+
+---------------
+justLA, -O3
+6.8MB: 1,1, 512: 10m20        128 regs/thread
+       1,1, 256:  9m59
+       1,1, 128: 10m39
+       1,1,  64: 14m13
+       1,1,  32: 20m29
+
+       1,4, 256: 10m51
+       1,4, 128:  8m46
+
+       1,8, 256: 12m54
+       1,8, 128: 10m40
+
+       1,16,256:  7m47
+       1,16,128: 10m56
+
+       2,4, 256: 14m37
+       4,4, 256: 12m42
+
+       2,1, 128: 14m12
+
+
+6.8MB: time:  34, tdone:  65
+       time:  34, tdone: 243
+       time:  35, tdone: 317
+       time:  36, tdone: 390
+       time:  50, tdone: 440
+       time: 100, tdone: 477
+       time: 150, tdone: 497
+       time: 200, tdone: 503
+       time: 240, tdone: 509
+       time: 290, tdone: 511
+
+
+---------------
+
+CPU:
+6.8MB: T32: 8.4s
+3.4MB: T32: 3.8s
+

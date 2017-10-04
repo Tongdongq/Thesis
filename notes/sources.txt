@@ -1,0 +1,93 @@
+
+
+
+CUDA memory alignment (error Misaligned Address)
+https://stackoverflow.com/questions/37323053/misaligned-address-in-cuda
+https://stackoverflow.com/questions/12778949/cuda-memory-alignment
+
+Constant mem can be slower than gmem when reading different addresses:
+http://cuda-programming.blogspot.nl/2013/01/what-is-constant-memory-in-cuda.html
+
+Faster than daligner!?
+https://github.com/ocxtal/minialign
+
+LoRDEC: accurate and efficient long read error correction
+https://academic.oup.com/bioinformatics/article/30/24/3506/2422175/LoRDEC-accurate-and-efficient-long-read-error
+
+Assembling large genomes with single-molecule sequencing and locality-sensitive hashing
+MHAP, 3rd gen reads
+https://www.ncbi.nlm.nih.gov/pubmed/26006009
+
+Accurate self-correction of errors in long reads using de Bruijn graphs
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5351550/
+
+Jabba: hybrid error correction for long sequencing reads
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4855726/
+
+A practical guide to de novo genome assembly using long reads
+Mahul Chakraborty, James G. Baldwin-Brown, Anthony D. Long, J.J. Emerson
+http://dx.doi.org/10.1101/029306
+http://www.biorxiv.org/content/biorxiv/early/2015/10/16/029306.full.pdf
+
+Third-gen info:
+http://www.nature.com/nbt/journal/v28/n5/full/nbt0510-426.html
+
+PaccBio RS II launch:
+author unknown, 11 apr 2013, http://nextgenseek.com/2013/04/pacbio-launches-pacbio-rs-ii-sequencer/
+
+PacBio RS launch:
+Kevin Davies, 29 apr 2011, http://www.bio-itworld.com/news/04/29/2011/Pacific-Biosciences-software-commercial-launch.html
+
+Branch and Data Herding: Reducing Control and Memory Divergence for Error-Tolerant GPU Applications
+John Sartori, Rakesh Kumar
+http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6376229
+
+[2] Streamlining GPU applications on the fly
+Eddy Zhang, Yunlian Jiang, Ziyu Guo, Xipeng Shen
+http://delivery.acm.org/10.1145/1820000/1810104/p115-zhang.pdf?ip=131.180.21.185&id=1810104&acc=ACTIVE%20SERVICE&key=0C390721DC3021FF.512956D6C5F075DE.4D4702B0C3E38B35.4D4702B0C3E38B35&CFID=800030620&CFTOKEN=59359468&__acm__=1503328204_98a25bc59aee2297c2b366626527cc71
+
+[1] Reducing branch divergence in GPU programs
+Tianyi David Han, Tarek S. Abdelrahman
+http://delivery.acm.org/10.1145/1970000/1964184/a3-han.pdf?ip=131.180.21.185&id=1964184&acc=ACTIVE%20SERVICE&key=0C390721DC3021FF.512956D6C5F075DE.4D4702B0C3E38B35.4D4702B0C3E38B35&CFID=800030620&CFTOKEN=59359468&__acm__=1503326950_2f22108aeb2ab0e41f173ec5588c1a67
+
+Trace points, daligner blog:
+https://dazzlerblog.wordpress.com/2015/11/05/trace-points/
+
+More distribution of PacBio errors:
+http://genomebiology.biomedcentral.com/articles/10.1186/gb-2013-14-5-r51
+
+Distribution of PacBio errors: (14i,4d,1s)%
+http://homolog.us/Tutorials/index.php?p=2.8&s=2
+
+Missing: O(ND) on GPU
+Probably German PHD thesis, using multidimensional CUDA for Multiple Sequence Alignment
+
+Thread-cooperative bit parallel computation of levenshtein distance on GPU
+http://dl.acm.org/citation.cfm?id=2597677
+
+DALIGNER:
+http://www.homolog.us/blogs/blog/2014/07/28/in-dalign-paper-gene-myers-delivers-a-major-blow-to-his-biggest-competitor/
+
+DALIGNER paper:
+https://publications.mpi-cbg.de/Myers_2014_6106.pdf
+
+Darwin (hardware accelerated assembly, 15x faster than DALIGNER):
+http://biorxiv.org/content/biorxiv/early/2017/01/24/092171.full.pdf
+
+Diff tutorial:
+http://simplygenius.net/Article/DiffTutorial1
+
+BLASR paper:
+http://download.springer.com/static/pdf/422/art%253A10.1186%252F1471-2105-13-238.pdf?originUrl=http%3A%2F%2Fbmcbioinformatics.biomedcentral.com%2Farticle%2F10.1186%2F1471-2105-13-238&token2=exp=1489402510~acl=%2Fstatic%2Fpdf%2F422%2Fart%25253A10.1186%25252F1471-2105-13-238.pdf*~hmac=f66922ed6729f95c1f24a71d4817622733f730353f96aadaad31a1ac729b44b5
+
+Human genome from PacBio:
+http://datasets.pacb.com/2014/Human54x/fasta.html
+
+More PacBio datasets:
+https://github.com/PacificBiosciences/DevNet/wiki/Datasets
+
+c_elegans dataset from Pacbio datasets
+http://datasets.pacb.com.s3.amazonaws.com/2014/c_elegans/list.html
+
+How to install Valgrind without admin previleges?
+http://greg-n-blog.blogspot.nl/2011/06/valgrind-dowloading-building-and.html

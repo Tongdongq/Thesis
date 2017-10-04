@@ -1,0 +1,29 @@
+FALCON is a toolset for aligning 3rd generation long reads for overlap consensus and assembly.
+
+Steps of FALCON:
+- raw sub-reads overlapping for error correction (slightly modified DALIGNER)
+- pre-assembly and error correction
+- overlapping detection of the error corrected reads
+- overlap filtering
+- constructing graph from overlaps
+- constructing contig from graph
+
+---------------------
+h1, /ecoli3:
+FALCON: real  30m29s,   30m30s
+		user 998m39s, 1003m3s
+		sys   55m51s,   57m
+
+daligner:
+-T1:    real  99m55s
+		user  97m33s
+		sys    1m50s
+-T8:    real  14m27s, 14m25s
+		user  99m32s, 98m49s
+		sys    1m39s,  1m43s
+-T32:   real   6m22s,   6m37s
+		user 148m44s, 154m3s
+		sys     2m18s,  2m23s
+---------------------
+h1, /c_elegans:
+FALCON: real busy workspace 3, h1

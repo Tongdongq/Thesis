@@ -1,0 +1,103 @@
+
+
+Possible GPU programming:
+- CUDA, only for NVIDIA cards
+- OpenCL, portable, but that might not be important
+        , debugging is harder, kernel is string
+- OpenACC, OpenMP-like directives, need GCC 5.1+
+- OpenMP (4.0), need GCC 4.9+
+- StarPU
+
+
+Local_Alignment(){
+	...
+	forward_wave()
+	...
+	reverse_wave()
+	...
+}
+
+reverse_wave(){
+	...
+	while(){        \
+		for(){      |           \
+                     > test3()   > test4(), not fully implemented
+		}           |           /
+	}               /
+	...
+}
+forward_wave(){
+	...
+	while(){
+		for(){                 \
+                                > test5(), not implemented
+		}                      /
+	}               
+	...
+}
+
+all measurements run on Msc room desktop
+
+6_8MB:
+gprof: 49 % Local_Alignment, I suspect this is wrong
+       40 % test3
+unix time: real:  7.3 s
+           user: 23.1 s
+           sys:    .2 s
+
+timestamps: 
+some fast functions have 0.000000 or 0.000001 as duration
+up to 17 million printf statements
+measured values are CPU time, not wall time
+tested with -pg flag
+	test3 (measured from reverse_wave())          :  9.8 s
+	test4 (measured from test3())                 :  9.8 s
+	forward_wave (measured from Local_Alignment()): 11.4 s
+	reverse_wave (measured from Local_Alignment()):  9.8 s
+	test5 (measured from forward_wave())          : 11.6 s
+
+
+50MB:
+gprof: 56 % Local_Alignment, I suspect this is wrong
+	   40 % test3
+unix time without -pg: real:  4m19s    = 259s
+					   user: 15m13s    = 913s
+					   sys :     2s.4
+unix time with -pg   : real:  4m24s    = 264s
+					   user: 15m27s    = 927s
+					   sys :     2s.1
+timestamps:
+measured values are CPU time, not wall time
+tested with -pg flag
+	forward_wave (measured from Local_Alignment()): 524.1 s
+	reverse_wave (measured from Local_Alignment()): 383.4 s
+tested without -pg flag
+	forward_wave (measured from Local_Alignment()): 514.9 s
+	reverse_wave (measured from Local_Alignment()): 385.4 s
+	for and rev_wave							  : 890s
+
+130MB:
+index is too big, more than 1/4 of physical memory, possible delay due to this
+gprof: 52 % Local_Alignment, I suspect this is wrong
+	   38 % test3
+unix time without -pg: real: 4m17s, 4m23s
+					   user: 9m45s, 9m44s   = 585s
+					   sys :    5s.8,  6s.2
+unix time with -pg   : real: 4m23s, 4m30s
+					   user: 9m59s, 9m52s   = 599s
+					   sys :   12s.7,  8s.4
+tested without -pg flag
+	forward_wave (measured from Local_Alignment()): 457s, 421s
+	reverse_wave (measured from Local_Alignment()): 232s, 231s
+	for and rev_wave							  : 691s
+
+225MB:
+index is too big
+sensitivity hampered by low physical memory (7.7GB), reduce block size
+gprof: 
+
+unix time without -pg: real: 12m55s
+					   user:  1m18s
+					   sys :    14s.1
+
+unix time with -pg:    did not finish overnight

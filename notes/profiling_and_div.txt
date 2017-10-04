@@ -1,0 +1,19 @@
+
+
+while(new wave){							 div			time
+	for(all points in wave)									38   %
+		while(snake){}										10.2 %
+		while(time for Pebble A){}			 2.5 %			 5.9 %
+		while(time for Pebble B){}			 2.5 %			 4.8 %
+		if(best antidiagonal){				 7.4 %  (0.7%)	 1.9 %
+			if(regional alignment quality){	52.0 %
+				if(polished){}				10   %
+			}
+		}
+}
+
+if(end of read){}							 0.1 %
+else stopped because of regional alignment quality
+
+0.975 ^ 32 = 0.45
+0.926 ^ 32 = 0.09

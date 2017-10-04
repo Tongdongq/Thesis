@@ -1,0 +1,219 @@
+
+// flexible PRINTX statements:
+// bseq read: 10
+// aseq read: 11
+// TABLE read: 20
+// SCORE read: 21
+// work->xxx read: 30
+// work->xxx write: 31
+// work->vector->V   read: 40
+// work->vector->V  write: 41
+// work->vector->M   read: 42
+// work->vector->M  write: 43
+// work->vector->HA  read: 44
+// work->vector->HA write: 45
+// work->vector->HB  read: 46
+// work->vector->HB write: 47
+// work->vector->NA  read: 48
+// work->vector->NA write: 49
+// work->vector->NB  read: 50
+// work->vector->NB write: 51
+// work->vector->T   read: 52
+// work->vector->T  write: 53
+// number of Pebbles in forward: 54
+// number of Pebbles in reverse: 55
+// apath->tlen           : 56
+// bpath->tlen           : 57
+// total work->vector  reads: 00
+// total work->vector writes: 01
+
+18-9-2017:
+flexible debug print measurements with PRINTX, add_hist(10-53, hist_for):
+./generate.sh 1 1100 1
+bseq reads: 3522
+a    reads: 3517
+TABLE reads: 238
+SCORE reads: 80
+work  reads: 13
+work writes: 6
+V   reads: 2107
+V  writes: 2191
+M   reads: 2853
+M  writes: 1875
+HA  reads: 2851
+HA writes: 1875
+HB  reads: 2851
+HB writes: 1875
+NA  reads: 2798
+NA writes: 407
+NB  reads: 2810
+NB writes: 410
+T   reads: 2849
+T  writes: 1875
+Pebbles for: 15
+Pebbles rev: 44
+apath->tlen: 22
+bpath->tlen: 22
+work->vector  reads: 19119
+work->vector writes: 10508
+
+./generate.sh 1 1100 10
+bseq reads: 355680
+a    reads: 355280
+TABLE reads: 23690
+SCORE reads: 7890
+work  reads: 1102
+work writes: 6
+V   reads: 210670
+V  writes: 219100
+M   reads: 285360
+M  writes: 187500
+HA  reads: 285130
+HA writes: 187500
+HB  reads: 285130
+HB writes: 187500
+NA  reads: 280460
+NA writes: 40910
+NB  reads: 279500
+NB writes: 40590
+T   reads: 284900
+T  writes: 187500
+Pebbles for: 1430
+Pebbles rev: 4230
+apath->tlen: 2200
+bpath->tlen: 2200
+work->vector  reads: 1911150
+work->vector writes: 1050600
+
+./generate.sh 1 1100 100
+bseq reads: 31640605
+a    reads: 31604380
+TABLE reads: 2138590
+SCORE reads: 708690
+work  reads: 99552
+work writes: 6
+V   reads: 19065500
+V  writes: 19828550
+M   reads: 25825350
+M  writes: 16968750
+HA  reads: 25804400
+HA writes: 16968750
+HB  reads: 25804400
+HB writes: 16968750
+NA  reads: 25424580
+NA writes: 3723515
+NB  reads: 25463125
+NB writes: 3733520
+T   reads: 25783450
+T  writes: 16968750
+Pebbles for: 129575
+Pebbles rev: 350125
+apath->tlen: 199100
+bpath->tlen: 199100
+work->vector  reads: 173170805
+work->vector writes: 95160585
+
+./generate.sh 1 1100 10000
+bseq reads: 3316224490
+a    reads: 3312160115
+TABLE reads: 224981550
+SCORE reads: 75158050
+work  reads: 10430752
+work writes: 6
+V   reads: 1997715750
+V  writes: 2077615750
+M   reads: 2706125705
+M  writes: 1777968750
+HA  reads: 2703982205
+HA writes: 1777968750
+HB  reads: 2703982205
+HB writes: 1777968750
+NA  reads: 2662974390
+NA writes: 389358185
+NB  reads: 2663817430
+NB writes: 389582285
+T   reads: 2701838705
+T  writes: 1777968750
+Pebbles for: 13809550
+Pebbles rev: 38482360
+apath->tlen: 20861500
+bpath->tlen: 20861500
+work->vector  reads: 18140436390
+work->vector writes: 9968431220
+
+6.8MB:
+bseq reads: 8051078536
+a    reads: 8050958248
+TABLE reads: 27649788
+SCORE reads: 2398532
+work  reads: 1645010
+work writes: 44
+V   reads: 5588920520
+V  writes: 5628676873
+M   reads: 8879417325
+M  writes: 5494693265
+HA  reads: 8879343290
+HA writes: 5494693265
+HB  reads: 8879343290
+HB writes: 5494693265
+NA  reads: 6182695941
+NA writes: 254876726
+NB  reads: 6180324900
+NB writes: 255004561
+T   reads: 8879313185
+T  writes: 5494693265
+Pebbles for: 11897129
+Pebbles rev: 103100562
+apath->tlen: 1195268
+bpath->tlen: 1213428
+work->vector  reads: 53469358451
+work->vector writes: 28117331220
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bseq reads: 
+a    reads: 
+TABLE reads: 
+SCORE reads: 
+work  reads: 
+work writes: 
+V   reads: 
+V  writes: 
+M   reads: 
+M  writes: 
+HA  reads: 
+HA writes: 
+HB  reads: 
+HB writes: 
+NA  reads: 
+NA writes: 
+NB  reads: 
+NB writes: 
+T   reads: 
+T  writes: 
+Pebbles for: 
+Pebbles rev: 
+apath->tlen: 
+bpath->tlen: 
+work->vector  reads: 
+work->vector writes: 
+

@@ -1,0 +1,9 @@
+
+Notes on Dopa, Marijns thesis and the code from ACS lab 3
+
+sequences are coalesced by half-warp,
+sequences are padded to the longest sequence in the half-warp with blank symbols
+
+query is put in constant memory, each thread reads the same address
+
+substitution matrix was put in shared memory, but gave a slowdown due to bank conflicts, it is now put in texture memory, which is well suited to random access

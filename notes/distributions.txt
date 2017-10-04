@@ -1,0 +1,194 @@
+
+- LAsort:  0.01% time for 6.8MB
+- LAmerge: 0.03% time for 6.8MB
+
+- width d-wave (hgh-low):
+	- 6.8MB: forward:	max 154, median 31, total 17577563
+			 reverse:	max 146, median 35, total 14473649
+	- 130MB: forward:	max 190, median 25, total 3346212030
+			 reverse:	max 189, median 29, total 2234942039
+	-- without second trimming principle:
+	- 6.8MB: forward:	max 8272, median 125, total 17252390
+			 reverse:	max 8126, median 99, total 13707418
+	- 130MB: forward:	max 13522, median 429, total 3325172390
+			 reverse:	max 13530, median 215, total 1937437921
+
+
+- length snakes:
+	- 6.8MB: forward:	max 67, median 2, total 584227062, 75% equal to 0, 99.9% shorter than 10
+			 reverse:	max 82, median 2, total 515169705, 75% equal to 0, 99.9% shorter than 10
+	- 130MB: forward:	max 87, median 2, total 93950196676
+			 reverse:	max 78, median 2, total 69444221747
+
+- number of seed hits per read pair:
+	- 6.8MB: max 31973, median 7, 99% less than 80, total number of read pairs 441566
+	- 130MB: max 32733, median 5, 99% less than 40, total number of read pairs 72505856
+
+- number of read pairs with 3 seed hits:
+	- 6.8MB: 222908 + 218658
+	- 130MB: 36739805 + 35766051
+
+- impact of removing first trimming principle for both forward and reverse (whole if statement (c < besta) with TABLE and SCORE):
+	- 6.8MB: did not finish in 10h, normal execution time: 30s
+
+- impact of removing first trimming principle for both forward and reverse (if statement (m >= PATH_AVE) with TABLE and SCORE):
+	- 6.8MB: unix time: real 0m33.5s, 0m29.7s
+						user 0m33.0s, 0m29.3s
+			but output is empty
+	- 130MB: unix time: real 35m12s
+						user 34m55s
+			but output is empty
+
+- impact of removing first trimming principle for both forward and reverse (if statement (TABLE[b & TRIM_MASK] >= 0)):
+	- 6.8MB: unix time: real 1m41.2s, 1m39,5s
+						user 1m40.8s, 1m39.1s
+			about 3x slower
+	- 130MB: unix time: real 269m54s
+						user 269m20s
+			about 4x slower
+
+- impact of removing first trimming principle for both forward and reverse (if statement (TABLE[b & TRIM_MASK] >= 0)), but setting 'lesta=c' right after 'besty=y'
+	- 130MB -T1:	unix time:	real 771m 7s
+								user 767m40s
+					17501443 overlaps !?
+			-T4:	unix time:	real  89m0s
+								user 332m52s
+					5596632 overlaps !?
+			-T8:	unix time:	real 134m38s
+								user 990m 3s
+					11759548 overlaps !?
+
+- impact of removing second trimming principle for both forward and reverse (while (hgh >= low)):
+	- 6.8MB: unix time: real 4m43.9s, 5m45.8s
+						user 4m32.5s, 5m43.8s
+			about 9x slower
+			only has 6569 records instead of 7115
+	- 130MB: unix time: real 2159m, 37h
+						user 2156m
+			about 20x slower
+			has 3783341 records instead of 4282448
+
+- check if (hgh >= aclip) and if (low <= bclip) in forward and
+		if (low <= aclip) and if (hgh >= bclip) in reverse:
+	- 6.8MB: about 50% true for all 4 if statements
+
+- check if(more == 0) after each d-wave (test4-for-loop)
+	- 6.8MB: forward: true 0.10%
+			 reverse: true 0.15%
+
+- check if(bseq[besty]) != 4 && aseq[besta - besty] !=4):
+	- 6.8MB: forward: true 52.3%
+			 reverse: true 59.7%
+
+- if(low <= vmin || hgh >= vmax) then reorganise work->vector and V,M,T,... pointing to it
+	- 130MB: never happens for forward or reverse
+
+- max drift: |initial_diag - calculated_diag|
+	-6.8MB: forward: max 790, median 38, total alignments 149874
+			reverse: max 434, median 37, total alignments 149874
+	-130MB: forward: max 1938, median 41, total alignments 12891001
+			reverse: max 1323, median 37, total alignments 12891001
+
+- check occurrance of "Really"
+	-6.8MB: Only Really 4/5 are seen
+	-130MB: Really 5: 7615
+			Really 2: 12
+			other are 0, weird because 6.8MB does show Really 4
+
+- distribution of overlap lengths
+	-130MB: aepos-abpos: max 27240, median 628, total alignments 12891001
+			bepos-bbpos: max 26465, median 630, total alignments 12891001
+
+- each LAcall that passes if(apos>lastp[diag]) saves xxx other LAcalls:
+	-6.8MB: max 1940, median 1, 90%<10, 99%<40, total LAcalls 151378
+	-130MB: max 18384, median 2, 90%<15, 95.9%<30, 99.0%<70, total LAcalls 13248988
+
+- number of LAcalls with/without if(apos>lastp[diag]) filter:
+	-6.8MB, with: 77568 + 72306,    7115 records
+	-6.8MB, w/o : 555729 + 443750, 10417 records
+		increase of LAcalls by 6.67x
+	-130MB, with: 6617778 + 6273223,   4282448 records
+	-130MB, w/o : 53431634 + 50117288, 2835188 records, but 5867232 confirmed hits
+		increase of LAcalls by 8x
+
+- divergence distribution:
+	-130MB: forward: while (y+k >= NA[k]):        2338000113 (one iter) 2.5%
+					 else:                       91612196563
+					 if (cells[ha].mark < NA[k]): 1033835123 44.2%
+					 else:                        1304164990
+					 while (y >= NB[k]):          2337670008 (one iter) 2.5%
+					 else:                       91612526668
+					 if (cells[hb].mark < NB[k]):  983332974 42.1%
+					 else:                        1354337034
+					 if (c > besta):              6949730149 hits 7.4%
+					 else:                       87000466527 hits
+					 if (m >= PATH_AVE):          3616487122 hits 52.0%
+					 else:                        3333243027 hits
+					 if (TABLE[b >> TRIM_LEN]...): 390454918 hits 10.8%
+					 else:                        3226032204
+					 if (more == 0):                 4306389 hits 0.1%
+					 else:                        3341905641 hits
+			reverse: while (y+k <= NA[k]):        1673566136 (one iter) 2.4%
+					 else:                       67770655611
+					 if (cells[ha].mark > NA[k]):  754299462 45.1%
+					 else:                         919266674
+					 while (y <= NB[k]):          1677832141 (one iter) 2.4%
+					 else:                       67766389606
+					 if (cells[hb].mark > NB[k]):  714402290 42.6%
+					 else:                         963429851
+					 if (c < besta):               466672445 hits 0.7%
+					 else:                       64777497292 hits
+					 if (m >= PATH_AVE):          2009410156 hits 43.1%
+					 else:                        2657314299 hits
+					 if (TABLE[b >> TRIM_LEN]...): 177922020 hits 8.9 %
+					 else:                        1831488136
+					 if (more == 0):                 5144128 hits 0.2%
+					 else:                        2229797911 hits
+
+
+divergence
+if(ac < am){
+	if(am < ap){
+		A count %
+	}else{
+		B count %
+	}
+}else{
+	if(ac < ap){
+		C count %
+	}else{
+		D count %
+	}
+}
+
+best s1 reads: for: 0.0  39.9  39.9  20.2  rev: 0.0  48.8  48.8   2.4
+6_8MB:         for: 5.1  44.0  31.3  19.6  rev: 5.6  45.3  33.1  16.1
+
+
+
+- bytes alloced for work->vector (Enlarging DP vector)
+	-6.8MB: only seen 394000, 52240 enough (1100 elements) not moving, 80 elements enough when moving allowed
+	-130MB: only seen 394000, 125200 (3000 el) causes no moving, 2500 el causes moving once
+	-270MB: only seen 394000
+- bytes alloced for work->cells (stores Pebbles for current LAcall) (Reallocating trace cells)
+	-6.8MB: 49280 enough, 48640 not enough
+	-130MB: 78000 enough, 77072 not enough
+	-270MB: only seen 160000
+- bytes alloced for work->points (stores trace points for current LAcall) (Enlarging point vector)
+	-6.8MB: 14588 enough, 14550 not enough, min 12016, depends on longest read in DB
+	-130MB: 15529 enough, 15184 not enough, min 12726
+	-270MB: max 15049, min 10979
+- bytes alloced for match vector (stores alignments for current read pair) (Reallocating match vector)
+	-6.8MB: 19520 enough, 19200 not enough, min 7040, unpredictable
+	-130MB: 24960 enough, 24640 not enough, min 7040
+	-270MB: max 31712, min 7040
+- bytes alloced for trace vector (tbuf->trace stores trace points for current read pair) (Reallocating trace vector OR Allocating paths)
+	-6.8MB: 174428 enough, 174104 not enough, min 136230, unpredictable
+	-130MB: 247436 enough, 244784 not enough, min 136048
+	-270MB: max 284598, min 98014
+
+busy:
+
+
+done:
+h3, c_elegans, FALCON, failed after 10h

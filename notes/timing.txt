@@ -1,0 +1,38 @@
+
+
+
+Measurements on the h1 server
+compiler flags: -O3 -Wall -Wextra -fno-strict-aliasing
+
+130MB:
+see online excel
+
+270MB:
+-T1	:	real 163m
+		user 162m
+-T2	:	real  77m34s
+		user 144m53s
+-T4	:	real  43m50s
+		user 155m30s
+-T8	:	real  24m21s
+		user 159m10s
+-T16:	real  15m 5s
+		user 158m55s
+-T32:	real   8m12s
+		user 173m25s
+
+-------
+28-8-2017
+custom generated reads
+hpc2 server, -O3
+read_size:  8000
+avg from 4 runs
+num_reads:			 70000	 80000
+best:  T1:			670.55	837.89
+worst: T1:			708.88	902.28
+95% perfect: T1:	733.44	983.91
+100% perfect: T1:			930.88
+best:  T16:					 88.02
+worst: T16:					 90.87
+95% perfect: T16:			 92.50
+100% perfect: T16:			 96.97

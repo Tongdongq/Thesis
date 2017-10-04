@@ -1,0 +1,41 @@
+
+
+- implement load balancing: report_thread filters, but threads can have a very different number of LAcalls. These need to be balanced.
+- make sure all LAcalls from one read pair are in the same thread
+- maybe bring back test3/4/5() to reduce register usage
+- access to const memory is serialized when addresses to not match, put Binshift and TS in const memory
+
+- combine LAcalls of the same readpair into a new struct: ReadPair, which should hold the readIDs and all positions where a seed hit is found. This is difficult, since different readpairs have a different number of seed hits.
+
+- consider number of warps per threadblock
+- sort on longest consecutive snakes, calculated from seed hits
+- or preprocess seed hits: snakes longer than 14 cause seed hits with consecutive apos, the last N-1 seed hits will never result in an LAcall
+
+- use NVIDIA profiling tools to see memory, scheduling, etc.
+
+- move stuff (registers) from global memory to shared memory (48KB)
+
+- check if creating a new Pebble issues 4 mem transactions or 1
+
+---------
+
+- tbuf->trace can be prealloced instead of malloc each kernel invocation
+- GPUTHREADS when COALESCING can be volatile or not
+- limit CUDA error checking since it is overhead
+- stream data like bseq and LAcalls, not all of them are needed yet at the beginning, then overwrite some old data when they are done and not needed anymore.
+- maybe unmapping or LAcall array can go in constant memory
+- count number of global memory reads/writes to see which ones need to be coalesced for ideal situation
+- reduce number LAcalls, now its equal to kmer matches, there are 3 LAcalls for a synthetic starting point. Look ahead in filter.c to skip LAcallcreation when kmer match is very close to previous one.
+- reduce work->vector elements, 200 is enough for 130MB, no realloc, but moving
+- use cuda streams to parallelize memcpy and kernel calls
+-- optimize memory: https://stackoverflow.com/questions/12778949/cuda-memory-alignment
+- remove abread from LAcall struct, info is also in ovla and ovlb
+- array with LAcalls is dynamically Realloced, use report_thread nidx and eidx to estimate number of LAcalls
+- try to align the complement concurrently
+- look at nvcc compiler options for memory/caching, custom L1 size, 
+- look into options for constant SCORE/TABLE (64 KB constant memory), shared/global/texture/pinned/mapped memory
+- let kernel operate on arguments, or copy values to local variables?
+- coales memory: AoS vs SoA
+- look at SIMD on CPU for parallelization, but it works better for little divergence
+- remove trimming or not? can also just use old O(nd) algorithm
+

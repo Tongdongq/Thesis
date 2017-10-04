@@ -1,0 +1,153 @@
+
+29-9-2017
+
+baseline:
+cuda server bulk/original/DALIGNER
+best reads 1100 10000
+T16: real 4.7 s
+best reads 1100 20000
+T16: real 9.2 s
+best reads 1100 30000
+T16: real 13.3 s
+worst reads 1100 5000
+T16: real 8.4 s
+worst reads 1100 10000
+T16: real 16.3 s
+perfect reads 1100 30000
+T16: real 3.2 s
+
+1: with caching, base
+2: without caching, -dlcm=cg compiler option, results in 32B gmem reads
+3: with caching and COALESCE_MTHAB
+4: without caching and with COALESCE_MTHAB
+5: with caching, and VMTHAB
+6: with caching, and ABSEQ
+7: without caching, with ABSEQ
+8: with caching, and VMTHAB and ABSEQ
+
+TACC server ~/daligner
+./generate.sh 1 1100 10000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 12.6 s
+2: real 12.5 s
+3: real 10.6 s
+4: real 10.7 s
+5: real 10.6 s
+6: real 12.6 s
+7: real 12.8 s
+./generate.sh 1 1100 20000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 22.4 s
+3: real 17.4 s
+5: real 17.9 s
+6: real 22.2 s
+./generate.sh 1 1100 30000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 31.4 s
+3: real 25.7 s
+5: real 25.2 s
+6: real 32.2 s
+./generate.sh 1 5000 10000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 31.5 s
+3: real 23.4 s
+5: real 22.7 s
+./generate.sh 2 1100 5000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 28.0 s
+5: real 15.8 s
+./generate.sh 2 1100 10000, without complement
+CBTr 8 32 128 128, -O3:
+1: real 53.4 s
+5: real 29.0 s
+./generate.sh 3 1100 30000, without complement, 95%
+CBTr 8 8 128 128, -O3:
+1: real 5.3 s, fluctuates
+5: real 5.8 s, fluctuates
+
+profile with: --metrics gld_transactions,gst_transactions,gld_efficiency,gst_efficiency,gst_throughput,gld_throughput --events global_store_transaction,uncached_global_load_transaction
+
+without V in MTHAB
+other compiler flags: -O3 -lineinfo
+./generate.sh 1 1100 1000
+./profile.sh 8 32 128 128regs
+					1:			2:			3:			4:
+metric
+gld_transactions	23035680	23035238	20781671	20783052
+gst_transactions	10925332	10923469	9515637		9516304
+gld_efficiency		11.27%		11.27%		12.51%		12.51%
+gst_efficiency		13.66%		13.66%		15.70%		15.70%
+gst_throughput		16.84 GB/s	16.91 GB/s	21.75 GB/s	21.79 GB/s
+gld_throughput		35.45 GB/s	35.60 GB/s	47.44 GB/s	47.54 GB/s
+event
+gst_transactions	10925332				9515637
+uncached_gld_trans	23035680				20781671
+
+with V in MTHAB
+other compiler flags: -O3 -lineinfo
+./generate.sh 1 1100 1000
+./profile.sh 8 32 128 128regs
+					1:			2:			5:			5:
+metric
+gld_transactions	23048873	23050459	23042508	23042456
+gst_transactions	10925945	10927496	8105765		8106321
+gld_efficiency		11.27%		11.27%		11.27%		11.27%
+gst_efficiency		13.66%		13.66%		18.45%		18.45%
+gst_throughput		16.90 GB/s	16.93 GB/s	20.32 GB/s	20.23 GB/s
+gld_throughput		35.61 GB/s	35.65 GB/s	57.81 GB/s	57.76 GB/s
+event
+gst_transactions	10925945	10927496	8105765		8105590
+uncached_gld_trans	23048873	23050459	23042508	23042564
+
+with V in MTHAB
+other compiler flags: -O3 -lineinfo
+./generate.sh 2 1100 1000
+./profile.sh 8 32 128 128regs
+					1:			5:
+metric
+gld_transactions	189328356	189308533
+gst_transactions	94605799	61700097
+gld_efficiency		12.92%		12.92%
+gst_efficiency		14.62%		22.43%
+gst_throughput		15.69 GB/s	20.96 GB/s
+gld_throughput		31.39 GB/s	64.30 GB/s
+
+with V in MTHAB
+other compiler flags: -O3 -lineinfo
+./generate.sh 3 1100 15000, 95%
+./profile.sh 8 8 128 128regs
+					1:			5:
+metric
+gld_transactions	5728927		5727261
+gst_transactions	1989402		1511309
+gld_efficiency		8.93%		8.93%
+gst_efficiency		13.34%		17.57%
+gst_throughput		3.41 GB/s	2.68 GB/s
+gld_throughput		9.83 GB/s	10.17 GB/s
+
+
+-----------------------------
+
+COALESCE_ABSEQ:
+other compiler flags: -O3 -lineinfo
+./generate.sh 1 1100 1000
+./profile.sh 8 32 128 128regs
+					1:			6:			7:			8:
+metric
+gld_transactions	23030977	17778460	17777451					
+gst_transactions	10927348	10931386	10929447				
+gld_efficiency		11.28%		14.54%		14.54%				
+gst_efficiency		13.66%		13.66%		13.66%			
+gst_throughput		16.86 GB/s	16.72 GB/s	16.79 GB/s					
+gld_throughput		35.48 GB/s	27.28 GB/s	27.41 GB/s					
+events
+gld_inst_8bit		11385983	11385983	11385983					
+gld_inst_16bit		1186439		1186439		1186439				
+gld_inst_32bit		14291321	14291321	14291321					
+gld_inst_64bit		2406640		2406640		2406640				
+gld_inst_128bit		0			0			0			0
+
+
+
+
+

@@ -1,0 +1,84 @@
+
+Summary:
+- seed
+- filter
+- local alignment with trimming
+- polish
+
+DALIGNER is based on seed-and-extend. For each read a in database A, find a read b in database B that has a matching k-mer (default k=14). If the reads a and b have enough corresponding k-mers, start Local_Alignment() (extending the seed).
+
+Finding matching k-mers is done by sorting. First, a list of k-mers and reads: {kmer(A_a),a,i}, where A is a database, a a read, i the index of the end of the kmer, similar for B: {kmer(B_b,j),b,j}. Sort both lists using a fast and cache-coherent radix sort, merge them and sort them again. All entries with read pair (a,b) are in a contiguous segment. For each pair in that segment, place entry (a,b,i,j) in diagonal bands d = floor((i-j)/2^s) and d+1, and determine the number of bases in the A-read covered by k-mers in each pair of bands diagonal band: Count(a,b,d), if Count(a,b,d) >= h, then Local_Alignment() is called. This is a variation on the filter in [1].
+
+Local alignment is based on the O(ND)[2] algorithm. It uses an edit graph, and tries to find the shortest edit path from (0,0) to (N,M), where |a|=N and |b|=M. A diagonal represents a matching base, a vertical edge to an insertion, a horizontal edge to a deletion. For each diagonal k=i-j, a furthest reaching (fr) point that can be reached with exactly d differences is called F(d,k). For each d, there are 2d+1 diagonals with an fr-point. These points form a d-wave. This wave starts at (0,0) and moves towards (N,M), when a d-wave hits the endpoint, it is shown that there are d differences between read a and b.
+
+The O(ND) algorithm uses linear space of O(N+M), like Hirschberg[3]. It assumes a reverse edit graph, where the directions of edges are reversed. A divide-and-conquer strategy is used. First, the middle snake of an optimal d-path is found. This is done by running the forward and reverse directions simultaneously until the paths overlap. When a middle snake is found, report it as part of an optimal path.
+
+An inefficiency in Local_Alignment is that the whole wave is propagated/calculated. The d-wave will have 2d+1 fr-points in it, while only one point will be in the final alignment. The waves are trimmed by removing fr-points that are unlikely to be in the alignment. The desired alignment should not have any segments of a certain length with a certain low correlation. A bitvector B(d,k) represents the last C = 60 columns of the best path to the fr-point F(d,k) in the d-wave. A 0 or 1 is left-shifted in, and a count of matches is stored in M(d,k) by looking at the bit that is shifted out. Fr-points for which the last C columns have less than M matches are removed, where M is a constant that resembles 'regional alignment quality'.
+
+A second way of trimming is to remove fr-points which are more than L antidiagonals away from the maximal antidiagonal in that d-wave. Assume a fr-point (i,j) on diagonal k* on the desired path. This point is on a greater antidiagonal i+j than those on either side of it in the same wave. As the antidiagonal values decreases when moving away from diagonal k*, the wave looks like an arrow. The higher the correlation of the alignment, the narrower and sharper the arrowhead becomes. Points far enough behind the tip of the arrow are almost certainly not points in the desired path. So for each trimmed wave, points from [low-1, hgh+1] that either have M[j]<M or (2W[k*]+k*) - (2W[j]+j) > L are removed as well. A good value for L is 30.
+
+The calculation of d-waves ends because either (a) the boundary of the edit graph is reached, or (b) all the fr-points fail the regional alignment quality criterion (at least M matches in C columns for all consecutive C columns). In case all fr-points fail the criterion the two reads are assumed to no longer correlate with each other. Then the best point in the last wave should not yet be reported, since the last few columns could be all mismatches. Instead, a polished point with greatest anti-diagonal for which the last E <= C columns are such that every suffix of the last E columns have a correlation of 1-2e or better (e is error rate). The result is a suffix positive path (at rate e). We must keep track of the polished fr-point with the greatest antidiagonal, which can be done by testing the bit-vector B of the leading fr-points for the suffix positive property in each wave. This testing can be done in O(1) time: build a SP[e] table with 2^E elements. Score(empty) is 0, and Score(1b) = Score(b) + a and Score(0b) = Score(b) - b, where a = 2e and b = 1-2e. So if vector b has m matches and d differences, its score is am-bd, if this is non-negative, then m/(m+d)>=1-2e, i.e. the alignment of b has a correlation of 1-2e or better. Let SP[e] = min{Score(b):b is suffix of e}. This value is only 0 or higher if e is suffix positive (at rate e). The table SP can be build in linear time.
+	For the default setting of E (=30), this table is too big. A size D (=15) is chosen to decrease the size of the table. An E-bit vector e consists of X = E/D segments e_X, e_X-1,...,e_1, each segment is D bits long. The SP table is computed, but only for D bits. A table SC is also computed, where SC[b] = Score(b). With these two 2^D sized tables you can determine if the bit-vector e is suffix positive in O(X) time, by calculating whether Polish(X) is true:
+	Score(x) = Score(x-1) + SC[e_x] if x>=1 or 0 if x=0
+	Polish(x) = Polish(x-1) && Score(x-1) + SP[e_x] >= 0 if x>=1 or true if x=0
+
+Outputs alignments between reads, suitable for Overlap Layout Consensus afterwards
+
+[1] Rasmussen, Stoye, Myers, 'Efficient q-gram filter for finding all e-matches over a given length'
+[2] Myers, 'An O(ND) difference algorithm and its variations'
+[3] Hirschberg, 'A linear space algorithm for computing maximal common subsequences'
+
+-----------------------------------------
+- read_DB()
+- read database files into ablock and bblock (1/2. Build the lists of kmers), each entry is {kmer(A_a,i),a,i}, where A is a database file, a a read, i the index of the end of the kmer, also {kmer(B_b,j),b,j}.
+
+- Sort_Kmers()
+- sort Kmers in ablock and bblock lexicographically (3. Sort lists)
+
+- Match_Filter()
+-- count_thread()
+-- merge_thread() (4. Merge 2 sorted lists), {a,b,i,j} for kmer(A_a,i) = kmer(B_b,j), so store read IDs and positions.
+-- lex_sort() (5. Sort merged list), sort on a,b,i, a is most significant
+-- note1
+-- report_thread()
+--- Local_Alignment(Alignment*, Work_Data*, Align_Spec*, 5 ints)
+---- forward_wave()
+---- reverse_wave()
+
+note1: all entries with read pair (a,b) are in a contiguous segment. For each pair in that segment, place entry (a,b,i,j) in diagonal bands d = floor((i-j)/2^s) and d+1, and determine the number of bases in the A-read covered by k-mers in each pair of bands diagonal band: Count(a,b,d), if Count(a,b,d) >= h, then Local_Alignment() is called. This is a variation on the filter in 'Efficient q-gram filter for finding all e-matches over a given length' by Rasmussen, Stoye and Myers.
+
+-------------------------------------
+
+Each thread has its own _Work_Data instance
+
+Path struct:
+	void *trace
+	int tlen
+	int diffs
+	int abpos, bbpos, aepos, bepos
+A local alignment is specified by the point (abpos,bbpos), at which its path in the  underlying edit graph starts, and the point (aepos,bepos), at which it ends. There are 'diffs' differences.
+
+------------------------------
+16 May 2017:
+bseq in test5(): char *bseq = align->bseq - 1;, align is an Alignment*, coming through Local_Alignment() from report_thread().
+bseq in report_thread(): char *bseq = (char *) (MR_bblock->bases)
+MR_bblock is of type HITS_DB, and ->bases is of type void*, and points to bases file (to fetch reads from) or memory pointer to uncompressed block of all sequences
+Match_Filter(): MR_bblock = bblock, bblock is also HITS_DB*, comes from daligner.c:main. The bblock is read by read_DB(), Read_All_Sequences().
+
+Read_All_Sequences(): reads[i].boff = o; o += (len+1);
+a and bseq in reverse_wave(): the actual bases (0-3), 1 base per char, 
+
+ar and br: id of reads to align
+---------------
+14 June 2017:
+Pebble *cells:
+cells is traced back from the end to the beginning. It starts at cells[trimha] and cells[trimhb], these indicate the diagonal with the furthest/final point. Align->trace is filled from the beginning
+
+15 June 2017:
+trace: each diagonal has a furthest reaching apos and bpos, each diagonal has an entry in NA[k] and NB[k], indicating the next apos/bpos a new Pebble has to be made. Each cells[i].ptr points to the previous Pebble on the same diagonal (indicated by cells[i].diag).
+apath is to get the path from the point of view of an overlap between aread and bread, bpath is for a bread vs aread. The bpath and trace cells are overwitten with each new Local Alignment, unless copied to somewhere else.
+
+16 June 2017:
+Trimming 1: Regional Alignment Quality (RAQ).
+If there is no suitable candidate (m >= PATH_AVE) for at least TRIM_MLAG (200) antidiagonals, then stop because of low RAQ, instead of immediately stopping.
+If the end of the read is reaching before stopping because of the RAQ, then the end is included in the overlap. If stopping because of low RAQ, then trimx/y will indicate last polished f.r. point.
