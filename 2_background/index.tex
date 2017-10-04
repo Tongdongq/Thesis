@@ -1,4 +1,87 @@
 \documentclass[../main/thesis.tex]{subfiles}
 
+\begin{document}
+
 \chapter{Background}
+\ifdefined\main
 \acresetall
+MAIN IS TRUE
+\newcommand{\code}{../2_background/code/}
+\else
+MAIN IS NOT TRUE
+\input{../notmain.tex}
+\fi
+
+\section{DNA sequencing}
+
+
+%TODO also talk about OpenCL?
+%TODO why GPU in the first place? What do they look like, what are they good at?
+%TODO CUDA was released in 2006, source: programming guide
+
+
+\section{GPU processing}
+A GPU is a Graphics Processing Unit, it is a processor that is mainly used to perform video processing.
+This type of processing often includes rotation and translation of objects in a space, calculating shadows and rendering images to display on a monitor.
+They contain many cores that allow it to perform parallelizable tasks very quickly.
+A GPGPU, or General Purpose GPU can be programmed to perform tasks that are different from video processing.
+An algorithm like matrix addition is easily parallelized by assigning a matrix cell to each thread.
+Each thread can perform the addition in parallel, let this take one cycle.
+A sequential implementation would have taken $N\times M$ cycles, where $N$ and $M$ are the dimensions of the matrices.
+
+CPUs usually have large caches and a complex instruction set and execution that includes out-of-order execution and branch prediction \cite.
+
+GPUs cannot operate on their own, they must be guided by a CPU.
+A general workflow using a GPU is shown in Figure \ref{gpu:workflow}.
+
+%TODO include gpu:workflow
+
+\begin{itemize}
+\item Copy data from CPU to GPU
+\item Let GPU process the data
+\item Copy results from GPU to CPU
+\end{itemize}
+
+The functions that run on a GPU are called \textit{kernels}, and are usually launched by a CPU.
+Kernels can also be called from other kernels.
+
+
+
+\section{CUDA}
+CUDA is a parallel computing platform that allows people to use Nvidia GPUs for their own applications.
+Developers can write functions that will execute on the GPU called \textit{kernels}, these are launched from a CPU function.
+The GPU is referred to as \textit{device} and the CPU as \textit{host}.
+Kernels for CUDA are written in C++.
+
+Kernels can be launched from the CPU in a \textit{grid} with a certain number of thread blocks or \textit{blocks} and \textit{threads}.
+A grid is one-/two- or three-dimensional, and has an array of blocks in each direction.
+Each block itself is also one-/two- or three-dimensional, and has an array of threads in each direction.
+Figure \ref{cuda:hierarchy} shows a full grid.
+
+%TODO picture of hierarchy \label{cuda:hierarchy}
+
+Each thread executes the kernel, although they usually operate on different data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
