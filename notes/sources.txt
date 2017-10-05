@@ -1,5 +1,7 @@
 
 
+How to use cuda texture memory:
+http://cuda-programming.blogspot.nl/2013/02/texture-memory-in-cuda-what-is-texture.html
 
 CUDA memory alignment (error Misaligned Address)
 https://stackoverflow.com/questions/37323053/misaligned-address-in-cuda

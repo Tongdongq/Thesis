@@ -353,6 +353,8 @@ Did some profiling with ABSEQ coalescing.
 
 4-10-2017:
 More profiling with ABSEQ coalescing
+Created z_compile.sh
+
 
 
 

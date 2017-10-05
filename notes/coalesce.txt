@@ -16,31 +16,35 @@ T16: real 16.3 s
 perfect reads 1100 30000
 T16: real 3.2 s
 
-1: with caching, base
-2: without caching, -dlcm=cg compiler option, results in 32B gmem reads
-3: with caching and COALESCE_MTHAB
-4: without caching and with COALESCE_MTHAB
-5: with caching, and VMTHAB
-6: with caching, and ABSEQ
-7: without caching, with ABSEQ
-8: with caching, and VMTHAB and ABSEQ
+1: without L1 caching, base
+3: without L1 caching, and MTHAB
+5: without L1 caching, and VMTHAB
+7: without L1 caching, and ABSEQ
+8: without L1 caching, and VMTHAB and ABSEQ
+11: with L1 caching, -dlcm=ca option
+13: with L1 caching, and MTHAB
+15: with L1 caching, and VMTHAB
+17: with L1 caching, and ABSEQ
+18: with L1 caching, and VMTHAB and ABSEQ
 
 TACC server ~/daligner
 ./generate.sh 1 1100 10000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 12.6 s
-2: real 12.5 s
 3: real 10.6 s
-4: real 10.7 s
 5: real 10.6 s
-6: real 12.6 s
 7: real 12.8 s
+11: real 13.1 s
+13: real 10.7 s
+15: real 10.8 s
+17: real 13.1 s
+18: real 10.6 s
 ./generate.sh 1 1100 20000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 22.4 s
 3: real 17.4 s
 5: real 17.9 s
-6: real 22.2 s
+7: real 22.2 s
 ./generate.sh 1 1100 30000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 31.4 s
@@ -51,7 +55,7 @@ CBTr 8 32 128 128, -O3:
 CBTr 8 32 128 128, -O3:
 1: real 31.5 s
 3: real 23.4 s
-5: real 22.7 s
+7: real 22.7 s
 ./generate.sh 2 1100 5000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 28.0 s
@@ -95,9 +99,20 @@ gld_efficiency		11.27%		11.27%		11.27%		11.27%
 gst_efficiency		13.66%		13.66%		18.45%		18.45%
 gst_throughput		16.90 GB/s	16.93 GB/s	20.32 GB/s	20.23 GB/s
 gld_throughput		35.61 GB/s	35.65 GB/s	57.81 GB/s	57.76 GB/s
+gst_req_throughput	2.30 GB/s							3.73 GB/s
+gld_req_throughput	4.00 GB/s							6.48 GB/s
 event
 gst_transactions	10925945	10927496	8105765		8105590
 uncached_gld_trans	23048873	23050459	23042508	23042564
+gld_inst_8bit		11385983							11385983
+gld_inst_16bit		1186439								1186439
+gld_inst_32bit		14291321							14275476
+gld_inst_64bit		2406640								2414562
+gld_inst_128bit		0									0
+l1_gbl_ld_transacts	30265822							24422344
+l1_glb_st_transacts	10941392							8108591
+l1_lcl_ld_miss		470833								98685
+l1_gbl_ld_miss		0									0
 
 with V in MTHAB
 other compiler flags: -O3 -lineinfo
@@ -134,20 +149,52 @@ other compiler flags: -O3 -lineinfo
 ./profile.sh 8 32 128 128regs
 					1:			6:			7:			8:
 metric
-gld_transactions	23030977	17778460	17777451					
-gst_transactions	10927348	10931386	10929447				
-gld_efficiency		11.28%		14.54%		14.54%				
-gst_efficiency		13.66%		13.66%		13.66%			
-gst_throughput		16.86 GB/s	16.72 GB/s	16.79 GB/s					
-gld_throughput		35.48 GB/s	27.28 GB/s	27.41 GB/s					
+gld_transactions	23030977	17778460	17777451	17766461
+gst_transactions	10927348	10931386	10929447	8104122
+gld_efficiency		11.28%		14.54%		14.54%		14.54%
+gst_efficiency		13.66%		13.66%		13.66%		18.45%
+gst_throughput		16.86 GB/s	16.72 GB/s	16.79 GB/s	20.60 GB/s
+gld_throughput		35.48 GB/s	27.28 GB/s	27.41 GB/s	45.37 GB/s
+gst_req_throughput	2.30 GB/s	2.30 GB/s	2.30 GB/s	3.81 GB/s
+gld_req_throughput	4.00 GB/s	4.00 GB/s	4.00 GB/s	6.62 GB/s
+l2_read_transacts	25100097	19951758	19953842	18714438
 events
-gld_inst_8bit		11385983	11385983	11385983					
-gld_inst_16bit		1186439		1186439		1186439				
-gld_inst_32bit		14291321	14291321	14291321					
-gld_inst_64bit		2406640		2406640		2406640				
+gld_inst_8bit		11385983	11385983	11385983	11385983
+gld_inst_16bit		1186439		1186439		1186439		1186439
+gld_inst_32bit		14291321	14291321	14291321	14275476
+gld_inst_64bit		2406640		2406640		2406640		2414562
 gld_inst_128bit		0			0			0			0
+l1_gbl_ld_transacts	30265822	24147056	24922738	19140289
+l1_glb_st_transacts	10941392	10964711	10952838	8108226
+l1_lcl_ld_miss		470833		469223		469686		163682
+l1_gbl_ld_miss		0			0			0			0
 
+-----------------------
 
+other compiler flags: -O3 -lineinfo
+./generate.sh 1 1100 100
+./profile.sh 1 32 128 128regs
+					1:			3:			11:			13:			15:			17:			18:
+gld_transactions	25969394	23330618	25851697	22767344	25236568	19394100	19381588
+gst_transactions	12261724	10683129	12255230	10434461	8882871		11923164	8841528
+gld_efficiency		11.27%		12.51%		2.8%		3.14%		2.83%		3.67%		3.67%
+gst_efficiency		13.66%		15.70%		13.66%		15.70%		18.46%		13.66%		18.45%
+gst_throughput		16.43 GB/s	22.40 GB/s	14.21 GB/s	21.65 GB/s 	20.33 GB/s 	13.82 GB/s 	20.39 GB/s
+gld_throughput		34.59 GB/s	48.86 GB/s	119.51 GB/s	188.34 GB/s 230.62 GB/s 89.43 GB/s 	178.08 GB/s
+gst_req_throughput	2.24 GB/s	3.52 GB/s	1.94 GB/s	3.40 GB/s 	3.75 GB/s 	1.89 GB/s 	3.76 GB/s
+gld_req_throughput	3.90 GB/s	6.10 GB/s	3.37 GB/s	5.91 GB/s 	6.52 GB/s 	3.28 GB/s 	6.53 GB/s
+l2_read_transacts	28324780	24299993	96760076	68853971	69976668	76578381	52317833
 
+gld_inst_8bit		12786248	12786248	12786248	12531016	12531016	12391262	12391262
+gld_inst_16bit		1331057		1331057		1331057		1303536		1303536		1295056		1295056
+gld_inst_32bit		16032421	10968842	16032421	10728592	15666480	15591590	15573684
+gld_inst_64bit		2700050		5231839		2700050		5120368		2651424		2625425		2634378
+gld_inst_128bit		0			0			0			0			0			
+l1_gbl_ld_transacts	36940164	27514420	36680355	27897570	30347050	28381512	23484616
+l1_glb_st_transacts	12273992	10685774	12444330	10458749	8899884		12219977	8855217
+l1_lcl_ld_hit		110244		49913		43960		42721		39742		43673		41454
+l1_lcl_ld_miss		535289		191269		548614		192859		114279		531707		192237
+l1_gbl_ld_hit		0			0			2098690		5637472		7708788		673792		6389694
+l1_gbl_ld_miss		0			0			23546075	16930375	17328004	18516732	12791877
 
 
