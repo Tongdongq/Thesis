@@ -17,6 +17,22 @@
 \usepackage{epstopdf}      % TD custom cover
 \definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
 
+% usage: \fig{options}{fileName}{caption}{fig:label}
+
+\newcommand{\fig}[4]{%
+\begin{figure}[h]
+\includegraphics[#1]{\figPath #2}
+\caption{#3}
+\label{#4}
+\end{figure}}
+
+\newcommand{\figC}[4]{%
+\begin{figure}[h]
+\centering
+\includegraphics[#1]{\figPath #2}
+\caption{#3}
+\label{#4}
+\end{figure}}
 
 % structure
 % denovo vs reference based

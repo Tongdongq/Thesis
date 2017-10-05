@@ -6,7 +6,8 @@
 \ifdefined\main
 \acresetall
 MAIN IS TRUE
-\newcommand{\code}{../2_background/code/}
+\newcommand{\codePath}{../2_background/code/}
+\newcommand{\figPath}{../2_background/figures/}
 \else
 MAIN IS NOT TRUE
 \input{../notmain.tex}
@@ -46,7 +47,7 @@ The functions that run on a GPU are called \textit{kernels}, and are usually lau
 Kernels can also be called from other kernels.
 
 
-
+%TODO maybe divide into subsections
 \section{CUDA}
 CUDA is a parallel computing platform that allows people to use Nvidia GPUs for their own applications.
 Developers can write functions that will execute on the GPU called \textit{kernels}, these are launched from a CPU function.
@@ -59,17 +60,62 @@ Each block itself is also one-/two- or three-dimensional, and has an array of th
 Figure \ref{cuda:hierarchy} shows a full grid.
 
 %TODO picture of hierarchy \label{cuda:hierarchy}
+% possible source: http://international.download.nvidia.com/pdf/kepler/NVIDIA-Kepler-GK110-GK210-Architecture-Whitepaper.pdf
 
-Each thread executes the kernel, although they usually operate on different data.
+Each thread executes the kernel code, although they usually operate on different data.
+Threads in a block can communicate via shared memory.
+
+On a hardware level, an NVIDIA GPU is divided into Streaming Multiprocessors (SMX).
+Each SMX contains a number of cores, or Streaming Processors (SP), these are the basic building blocks and perform the actual calculations.
+Each block is assigned to at most one SMX.
+This block's threads are then executed as warps, with 32 threads per warp.
+Each SMX has multiple warp schedulers, so multiple warps can run in parallel on an SMX.
+All threads in a warp must execute the same instruction, if a thread is the only to take a branch, the other threads must wait until the branch is completed, this is called divergence.
+Memory operations are also executed in parallel, this means that all threads try to read/write to the memory in parallel.
+If the addresses are next to eachother, only one memory transaction is needed, since a transaction processes a whole memory line.
+This is known as coalescing.
+
+%TODO include figure of coalescing
+
+
+%TODO include figure of hardware
+%https://www.techpowerup.com/img/12-05-17/155a.jpg
+
+%Tesla-Fermi-Kepler-Maxwell-Pascal-Volta
+
+
+\subsection{Memory hierarchy}
+GPUs have several different memory types and levels.
+Not all of these are accessible from the host or from other components of the memory hierarchy.
+\begin{itemize}
+\item Global memory: The largest and slowest memory, located outside the chip. Can be read and written from the host. Best used for coalesced operations.
+\item Local memory: Each thread has private memory for when registers are not enough. It is stored in global memory, so accesses are very slow.
+\item Registers: The fastest memory available, located on-chip. A thread has a maximum number of registers available depending on Compute Capability.
+\item Shared memory: Each SMX has shared memory, it can be accesses by every thread in every block on the SMX. This can be used by threads in a block to communicate. It is located on-chip, so very fast.
+\item Constant memory: The host can initialize this memory, the kernel can only read it. Reading is as fast as reading a register, but only when all addresses of a half-warp are the same, otherwise reading is serialized. It resides off-chip, but is cached on-chip.
+\item Texture memory: Can only be written from the host. Resides off-chip, but is cached on-chip, like constant memory. The main feature about the texture memory is that it is cached for 2D spatial locality. Figure \ref{fig:texture_cache} shows an access pattern that would not be cached with a typical scheme.
+\item L2 cache: Behaves as cache for device memory and is shared among all SMXs. The cache line size is 32.
+\item L1 cache: 
+\end{itemize}
+
+%TODO include figure of memory hierarchy
+
+%\includegraphics[scale=.2]{\fig texture_cache.png}
+\figC{scale=.2}{texture_cache.png}{This access pattern has spatial locality, and would be cached in the texture cache.}{fig:texture_cache}
+
+\subsection{Streams}
+When copying data to or from the GPU, there are usually no kernels running in a naive implementation.
+This means that if the copy time is large, the overall efficiency is quite low.
+These operations can be overlapped or pipelined by using streams.
+%TODO include picture of streams/pipelining
 
 
 
 
 
-
-
-
-
+%TODO include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation
+\section{Heterogeneous computing}
+%\cite{hetero_survey}
 
 
 
