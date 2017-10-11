@@ -355,6 +355,28 @@ Did some profiling with ABSEQ coalescing.
 More profiling with ABSEQ coalescing
 Created z_compile.sh
 
+5-10-2017:
+L1 cache is opt-in, redone profiling
+Started to coalesce whole work struct, including vector, cells and points.
+
+6-10-2017:
+Talked to Nauman about compressing. He has 4 bit per symbol, compressed 8 into 32-bit ints. Gave him 200x speedup. His uncompressed bit-array has no sequence delimiters, uses a table with offsets for that. Also uses padding if seq-length is not a multiple of 8, to make sure a 32-bit int has data for only 1 sequence.
+
+9-10-2017:
+Fixed bug that screwed up COALESCE_WORK, it seems to work now for 1 thread.
+Multiple threads cause misaligned address error at bpath->trace = ... in Local_Alignment
+Bug: bpath points to the begin of work->points, proposed solution: remove bpath from work->points, put into seperate array
+Invalidated LAcall_thread() and post_thread() by removing bpath from LAcall struct (parallel.h).
+
+10-10-2017:
+At the end of reverse_wave(), abpath->trace is redirected to point at the first trace point.
+Fixed major bug: NA[low] was not coalesced at a few points.
+COALESCE_WORK now works for 300kb dataset.
+COALESCE_WORK now works for 2.1MB dataset.
+
+11-10-2017:
+Created benchmark.py to benchmark for wallclock speed.
+Changed time seed in generate.c to constant seed '1946162915'
 
 
 
@@ -400,7 +422,7 @@ typedef struct{             // size(LAcall) == 168
   Path      *bpath;
 } LAcall;
 
-struct Alignment{
+struct Alignment{	// sizeof(Alignment) = 40
 	Path *path;		// points to apath/ovla->path
 	uint32 flags;	// this either 0 or 1 for complement DB
 	char *aseq;		// pointer to aseq
@@ -409,7 +431,7 @@ struct Alignment{
 	int blen;
 }
 
-struct Path{
+struct Path{		// sizeof(Path) = 32
 	void *trace;	// vector of trace cells, actually points to work->points
 	int tlen;
 	int diffs;
@@ -417,7 +439,7 @@ struct Path{
 	int aepos, bepos;
 }
 
-struct Overlap{
+struct Overlap{		// sizeof(Overlap) = 48
 	Path path;
 	uint32 flags;
 	int aread;		// index of read (ar + afirst(constant))
@@ -428,9 +450,9 @@ typedef void Work_Data;
 
 struct _Work_Data{
 	int vecmax;
-	void *vector;	// contains V,M,NA,NB,HA,HB
+	void *vector;	// contains V,M,NA,NB,HA,HB, sizeof(VectorEl) = 32
 	int celmax;
-	void *cells;	// actually holds Pebbles
+	void *cells;	// actually holds Pebbles, sizeof(Pebble) = 16
 	int pntmax;
 	void *points;	// actually holds trace cells
 	int tramax;
