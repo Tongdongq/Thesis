@@ -1,4 +1,18 @@
 
+31 okt
+Memory statistics, profiling
+https://docs.nvidia.com/gameworks/content/developertools/desktop/analysis/report/cudaexperiments/kernellevel/memorystatisticsshared.htm
+
+31 okt
+8 byte bank size for smem was removed after CC3.x because it gave no performance speedup:
+https://devtalk.nvidia.com/default/topic/834795/shared-memory-bank-size-mode-4-byte-vs-8-byte-kepler-/
+https://devtalk.nvidia.com/default/topic/925171/64-bit-shared-memory-with-minimal-bank-conflict-/
+
+31 okt
+How to use cuda shared memory:
+- bank size 4 or 8 bytes
+- choose 16kB or 48kB shared memory
+https://devblogs.nvidia.com/parallelforall/using-shared-memory-cuda-cc/
 
 How to use cuda texture memory:
 http://cuda-programming.blogspot.nl/2013/02/texture-memory-in-cuda-what-is-texture.html

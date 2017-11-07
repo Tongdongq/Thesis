@@ -378,7 +378,64 @@ COALESCE_WORK now works for 2.1MB dataset.
 Created benchmark.py to benchmark for wallclock speed.
 Changed time seed in generate.c to constant seed '1946162915'
 
+12-10-2017:
+More benchmarks
+Plan: implement caching in smem, even though there is very little space
+Plan: preallocate space for a lot of less-used variables, so that often used variables can be put in registers
 
+13-10-2017:
+Started caching often-used variables in smem.
+
+23-10-2017:
+Profiled some more with 200k reads no crosstalk
+Made timeline for 200k reads no crosstalk, WORK and ABSEQ, 8 32 128 64r
+Massive bug discovered: wrong number of diffs for 1100 length reads
+Fixed: a line 'mored = diffs' was accidentally deleted, put it back now
+
+25-10-2017:
+Fixed smem for two variables (c and d)
+Made extra macros for variables in smem, to replace #ifdef CACHE_VARS constructs
+Variables in smem: c,d,y,m,ha,hb,b for CACHE_VARS option
+Profiling shows that this CACHE_VARS option has no real influence on runtime or any of the profiled metrics/events.
+Base version spills 1264 stores and 1228 loads for 64r, 624st 924ld for 128r
+CACHE_VARS spills 1208 stores and 1212 loads for 64r, 684st 1156ld for 128r
+WORK spills, non-volatile: 640st 912ld 128r, volatile: 616 844
+
+26-10-2017:
+Profiled CACHE_VARS:
+				with WORK and ABSEQ	without WORK
+read_misses		-25%				-6%
+read_queries	-7%					-3%
+gst_req_BW		-23%				-10%
+gld_req_BW		-21%				-10%
+Influence of COALESCE_WORK: hitrate L2 cache: 30% -> 70% and 45% -> 80%
+Influence of WORK and ABSEQ: total L2 read queries: -70%
+
+31-10-2017:
+CACHE_DIAGS works with 32 threads, not more, need a new layout.
+Initial tests indicate CACHE_DIAGS is slower than base.
+
+6-11-2017:
+Profiled stuff:
+CACHE_DIAGS5 wrt to base causes most metrics to worsen a bit.
+DIAGS5 WORK ABSEQ wrt WORK ABSEQ:
+gst_req_BW: -14%
+gls_red_BW: -10%
+l2_s0_read_miss_ratio: +24% (27.7 -> 34.3)
+l2_s0_reads: +2%
+DIAGS9 WORK ABSEQ wrt WORK ABSEQ:
+gst_req_BW: -40%
+gls_red_BW: -40%
+l2_s0_read_miss_ratio: -67% (27.7 -> 9.1)
+l2_s0_reads: +3%
+
+
+
+
+
+TODO: 	redo profiling CACHE_VARS
+		make variables volatile and measure register pressure
+		implement CACHE_DIAGS
 
 TODO: find out relation between number of seed hits, etc. and overlaps. This can be used to preprocess the readpairs and possibly decrease divergence. First check if the threads really have a lot of divergence.
 

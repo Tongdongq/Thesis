@@ -19,6 +19,7 @@
 
 ---------
 
+- reimplement compressing trace vectors before sending them via GPUout
 - tbuf->trace can be prealloced instead of malloc each kernel invocation
 - GPUTHREADS when COALESCING can be volatile or not
 - limit CUDA error checking since it is overhead

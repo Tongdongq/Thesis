@@ -9,6 +9,8 @@ best reads 1100 20000
 T16: real 9.2 s
 best reads 1100 30000
 T16: real 13.3 s
+best reads 1100 200000 1 1 (no crosstalk)
+T16: real 23.58, 19.95, 17.02, 16.16, 16.70, 16.49, 
 worst reads 1100 5000
 T16: real 8.4 s
 worst reads 1100 10000
@@ -27,11 +29,23 @@ T16: real 3.2 s
 17: with L1 caching, and ABSEQ
 18: with L1 caching, and VMTHAB and ABSEQ
 21: without L1 caching, with WORK
+22: without L1 caching, with WORK and ABSEQ
+23: without L1 caching, with CACHE_VARS
+24: without L1 caching, with WORK and CACHE_VARS
+25: without L1 caching, with WORK, CACHE_VARS and ABSEQ
+26: without L1 caching, with CACHE_DIAGS5
+27: without L1 caching, with WORK and CACHE_DIAGS5
+28: without L1 caching, with WORK, CACHE_DIAGS5 and ABSEQ
+29: without L1 caching, with WORK, CACHE_DIAGS9 and ABSEQ
+30: without L1 caching, with WORK, CACHE_DIAGS17 and ABSEQ
+31: without L1 caching, 48KB L1, CACHE_VARS
+32: without L1 caching, 48KB L1, WORK and CACHE_VARS
 
 TACC server ~/daligner
+times with the same letter behind them are benchmarked during the same session
 ./generate.sh 1 1100 10000, without complement
 CBTr 8 32 128 128, -O3:
-1: real 12.6 s
+1: real 12.66, 11.82a s
 3: real 10.6 s
 5: real 10.6 s
 7: real 12.8 s
@@ -40,58 +54,149 @@ CBTr 8 32 128 128, -O3:
 15: real 10.8 s
 17: real 13.1 s
 18: real 10.6 s
-21: real 9.3 s
+21: real 9.24, 8.86 s
+22: real 9.11 s
+23: real 11.73 s
+24: real 8.99 s
+26: real 11.83a s
+27: real 8.98a s
+28: real 8.77a s
+29: real 10.43a s
+31: real 13.30 s
+32: real 9.97 s
+CBTr 8 64 64 128, -O3:
+22: real 8.67a s
+28: real 8.76a s
+29: real 9.75a s
+30: real 12.46a s
+CBTr 8 48 96 128, -O3:
+22: real 8.71a s
+28: real 8.38a s
+29: real 9.65a s
+30: real 11.10a s
+CBTr 8 32 128 64, -O3:
+1: real 12.22a s
+22: real 9.03a s
+28: real 9.19a s
+29: real 11.0a s
+30: error, too much smem per block
+CBTr 8 32 128 255, -O3:
+1: real 12.85a s
+22: real 9.16a s
+23: real 13.29a s
+25: real 9.58a s
+28: real 9.32a s
+29: real 10.33a s
+30: error, too much smem per block
+CBTr 8 48 96 255, -O3:
+1: real 11.60a s
+22: real 9.39a s
+28: real 9.29a s
+29: real 9.23a s
+30: real 10.96a s
 ./generate.sh 1 1100 20000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 22.4 s
 3: real 17.4 s
 5: real 17.9 s
 7: real 22.2 s
-21: real 16.0 s
+21: real 15.81 s
+22: real 15.29 s
 ./generate.sh 1 1100 30000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 31.4 s
 3: real 25.7 s
 5: real 25.2 s
 6: real 32.2 s
-21: real 22.5 s
+21: real 22.64 s
+22: real 21.80 s
 ./generate.sh 1 5000 10000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 31.5 s
 3: real 23.4 s
 7: real 22.7 s
-21: real 17.0 s
+21: real 17.05 s
+22: real 16.40 s
 ./generate.sh 2 1100 5000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 27.7 s
 5: real 15.8 s
-21: real 8.8 s
+21: real 8.87, 8.64a s
+22: real 8.52 s
+24: real 9.22a s
+27: real 9.25a s
 ./generate.sh 2 1100 10000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 53.4 s
 5: real 29.0 s
-21: real 15.2 s
+21: real 15.35 s
+22: real 14.31 s
 ./generate.sh 3 5000 10000, without complement, 95%
 CBTr 8 8 128 128, -O3:
-1: real 7.2 s, fluctuates
-5: real 7.7 s, fluctuates
-21: real 7.1 s, fluctuates
+1: real 6.45a s
+5: real 6.03 s
+7: real 6.68a s
+21: real 5.97a s
+22: real 6.45a s
+23: real 6.28a s
+26: real 6.24a s
+27: real 6.10a s
 ./generate.sh 1 1100 50000 1 1, without complement
 CBTr 8 32 128 128, -O3:
-1: real 4.88 s
+1: real 4.71a s
 5: real 4.79 s
 7: real 5.10 s
-21: real 4.76 s
+21: real 4.75, 4.59a s
+22: real 4.74a s
+28: real 4.82a s
+29: real 4.93a s
+30: too much smem per block
+CBTr 8 32 128 255, -O3:
+1: real 4.70a s
+22: real 4.72a s
+28: real 4.88a s
+29: real 4.89a s
+30: too much smem per block
+CBTr 8 48 96 255, -O3:
+1: real 4.69a s
+22: real 4.71a s
+28: real 4.78a s
+29: real 4.79a s
+30: real 4.86a s
+./generate.sh 1 1100 200000 1 1, without complement
+CBTr 8 32 128 64, -O3:
+1: real 14.63 s
+21: real 13.86 s
+22: real 14.47 s
+CBTr 8 64 128 64, -O3:
+22: real 14.53 s
 ./generate.sh 1 3000 50000 1 1, without complement
 CBTr 8 32 128 128, -O3:
 1: real 10.02 s
 5: real 9.75 s
 7: real 10.55 s
 21: real 9.70 s
+22: real 10.03 s
 ./generate.sh 2 1100 50000 1 1, without complement
 CBTr 8 32 128 128, -O3:
-1: real 16.68 s
-21: real 16.51 s
+1: real 7.27 s
+21: real 5.58 s
+22: real 5.62 s
+28: real 
+29: real 
+30: real 
+CBTr 8 64 64 128, -O3:
+1: real 7.03a s
+22: real 5.38a s
+28: real 5.51a s
+29: real 5.86a s
+30: real 7.59a s
+CBTr 8 48 96 128, -O3:
+1: real 7.21a s
+22: real 5.15a s
+28: real 5.35a s
+29: real 5.74a s
+30: real 6.68a s
 ./convert 2 (2.1MB)
 no diff in runtime, but could depend on configuration
 
@@ -224,36 +329,199 @@ l1_gbl_ld_hit		0			0			2098690		5637472		7708788		673792		6389694
 l1_gbl_ld_miss		0			0			23546075	16930375	17328004	18516732	12791877
 
 ----------------
-COALESCE_WORK
+COALESCE_WORK and CACHE_VARS
 1: base, 21: with WORK
 other compiler flags: -O3 -lineinfo
 ./generate.sh 1 1100 5000 1 1 (no crosstalk)
 ./profile.sh 1 32 128 128regs
-					1:			21:
+						1:			7:			21:			22:			23:			24:
 metric
-gld_transactions	13095791	5653388		
-gst_transactions	5065531		505097
-gld_efficiency		10.74%		17.25%	
-gst_efficiency		13.65%		47.00%
-gst_throughput		5.80 GB/s	3.05 GB/s
-gld_throughput		14.99 GB/s	18.69 GB/s
-gst_req_throughput	810 MB/s	1.97 GB/s
-gld_req_throughput	1.46 GB/s	3.66 GB/s
-l2_read_transacts	13919254	7337321
+gld_transactions		13095791	8332207		5653388		887616		13384693	5663210		
+gst_transactions		5065531		5073186		505097		506254		5068167		504008	
+gld_efficiency			10.74%		14.45%		17.25%		51.19%		10.78%		17.53%	
+gst_efficiency			13.65%		13.65%		47.00%		46.98%		13.65%		47.04%	
+gst_throughput			5.80 GB/s	6.48 GB/s	3.05 GB/s	3.83 GB/s	5.48 GB/s	2.76 GB/s		
+gld_throughput			14.99 GB/s	10.65 GB/s	18.69 GB/s	6.36 GB/s	14.48 GB/s	17.06 GB/s		
+gst_req_throughput		810 MB/s	905 MB/s	1.97 GB/s	2.48 GB/s	765.5 MB/s	1.79 GB/s		
+gld_req_throughput		1.46 GB/s	1.63 GB/s	3.66 GB/s	4.60 GB/s	1.42 GB/s	3.41 GB/s		
+l2_read_transacts		13919254	9136980		7337321		2341143		13727651	6871778		
+l2_write_transacts		6137239		6036465		1255214		1265557		6146104		1236281	
 events
-gld_inst_8bit		5291715		5291715
-gld_inst_16bit		550752		534085
-gld_inst_32bit		6650728		6720753
-gld_inst_64bit		1105224		1105224
-gld_inst_128bit		0			0
-l1_gbl_ld_transacts	17581287	5655458
-l1_glb_st_transacts	5071358		503096
-l1_lcl_ld_miss		46166		172091
-l1_gbl_ld_miss		172030		157551
+gld_inst_8bit			5291715		5291857		5291715		5291857		5291715		5291715	
+gld_inst_16bit			550752		550750		534085		534083		550752		534085	
+gld_inst_32bit			6650728		6651152		6720753		6721177		6934154		7004179	
+gld_inst_64bit			1105224		1105310		1105224		1105310		1105224		1105224	
+l1_gbl_ld_transacts		17581287	10606886	5655458		884878		16778138	5668175		
+l1_gbl_st_transacts		5071358		5084666		503096		502601		5070846		505145	
+l1_lcl_ld_hit			46166		50489		172091		280547		27123		36760	
+l1_lcl_ld_miss			172030		168178		157551		99375		52113		31735	
+l2_s0_read_misses		1992396					357565					1869958		267754	
+l2_s0_tot_read_query	3534876					1853136					3447416		1728258	
 
 
 
 
 
+./generate.sh 1 1100 5000 1 1
+./profile.sh 1 32 128 64regs
+						1:			21:			22:			23:			24:
+metric
+gld_transactions		13098034	5649223		882225		
+gst_transactions		5071396		500263		502570		
+gld_efficiency			10.74%		17.25%		51.22%		
+gst_efficiency			13.65%		47.04%		47.02%		
+gst_throughput			5.44 GB/s	2.54 GB/s	3.00 GB/s	
+gld_throughput			14.08 GB/s	15.57 GB/s	4.98 GB/s	
+gst_req_throughput		760.8 MB/s	1.64 GB/s	1.94 GB/s	
+gld_req_throughput		1.37 GB/s	3.05 GB/s	3.60 GB/s	
+l2_read_transacts		16071616	9642773		4957717		
+l2_write_transacts		7759736		2682652		2748349		
+events
+gld_inst_8bit			5291715		5291715		5291857		
+gld_inst_16bit			550752		534085		534083		
+gld_inst_32bit			6647394		6717419		6717843		
+gld_inst_64bit			1105224		1105224		1105310		
+l1_gbl_ld_transacts		15918840	5667208		885564		
+l1_gbl_st_transacts		5072626		508066		504738		
+l1_lcl_ld_hit			152664		248901		350745		
+l1_lcl_ld_miss			708764		733327		757744		
+l2_s0_read_misses		2365740		688913		266630		
+l2_s0_tot_read_query	4024499		2426927		1251800		
+
+./generate.sh 1 1100 200000 1 1
+./profile.sh 1 32 128 64regs
+						1:			7:			21:			22:
+metric
+gld_transactions		32184600				13942052	2403625
+gst_transactions		12460604				1274042		1284954
+gld_efficiency			9.75%					19.52%		63.91%
+gst_efficiency			13.66%					63.82%		63.62%
+gst_throughput			7.96 GB/s				2.85 GB/s	2.88 GB/s
+gld_throughput			20.56 GB/s				17.33 GB/s	5.31 GB/s
+gst_req_throughput		1.09 GB/s				1.83 GB/s	1.83 GB/s
+gld_req_throughput		2.00 GB/s				3.38 GB/s	3.41 GB/s
+l2_read_transacts		39852889				23822067	13077893
+l2_write_transacts		19841552				6691108		6901909
+events
+gld_inst_8bit			12976840				12976840	12982224
+gld_inst_16bit			1348892					1308075		1308099
+gld_inst_32bit			16338696				16510261	16526905
+gld_inst_64bit			2718176					2718176		2721535
+l1_gbl_ld_transacts		39503630				13973611	2409996
+l1_gbl_st_transacts		12465085				1276315		1286744
+l1_lcl_ld_hit			440739					666259		904747
+l1_lcl_ld_miss			1836645					1824885		1939002
+l2_s0_read_misses		6951883					1927208		868975
+l2_s0_tot_read_query	9987362					6002541		3323269
+
+./generate.sh 1 1100 200000 1 1
+./profile.sh 8 32 128 64regs
+						1:			7:			21:			22:
+metric
+gld_transactions		28159429				12200562	2010442		
+gst_transactions		10901690				1115522		1086850	
+gld_efficiency			9.75%					19.50%		62.55%	
+gst_efficiency			13.65%					63.51%		61.38%	
+gst_throughput			7.24 GB/s				2.55 GB/s	2.51 GB/s		
+gld_throughput			18.72 GB/s				15.50 GB/s	4.52 GB/s		
+gst_req_throughput		0.99 GB/s				1.63 GB/s	1.60 GB/s		
+gld_req_throughput		1.82 GB/s				3.03 GB/s	2.96 GB/s		
+l2_read_transacts		34871539				20810391	10930902		
+l2_write_transacts		17197017				5840026		5822658	
+events
+gld_inst_8bit			11354735				11354735	10968342		
+gld_inst_16bit			1180281					1144566		 1105121	
+gld_inst_32bit			14289728				14446990	13964867		
+gld_inst_64bit			2378404					2378404		 2299601	
+l1_gbl_ld_transacts		34735020				12227050	 2017246		
+l1_gbl_st_transacts		10904315				1117397		 1088346	
+l1_lcl_ld_hit			389047					594090		  786683	
+l1_lcl_ld_miss			1609690					1588372		 1628890	
+l2_s0_read_misses		5913930					1666079		  704727	
+l2_s0_tot_read_query	8722712					5235738		 2770925	
 
 
+./generate.sh 1 1100 100000 1 1
+./profile.sh 1 32 128 128regs
+					1:			21:			22:			23:			25:			26:			28:			29:
+metric
+gld_transactions	24608288	10645339	1610429		25147012	1635213		25556773	1631026		1602980
+gst_transactions	9524998		963611		891773		9526178		898586		9525307		891123		862358
+gld_efficiency		9.76%		19.45%		60.70%		9.81%		61.15%		9.91%		61.92%		61.97%
+gst_efficiency		13.66%		62.95%		58.17%		13.66%		58.17%		13.66%		58.17%		58.17%
+gst_throughput		7.88 GB/s	3.11 GB/s	3.24 GB/s	6.88 GB/s	2.49 GB/s	7.29 GB/s	2.77 GB/s	1.87 GB/s
+gld_throughput		20.37 GB/s	19.02 GB/s	5.60 GB/s	18.19 GB/s	4.38 GB/s	19.58 GB/s	4.97 GB/s	3.38 GB/s
+gst_req_throughput	1.08 GB/s	2.00 GB/s	2.08 GB/s	962.2 MB/s	1.60 GB/s	1.00 GB/s	1.78 GB/s	1.20 GB/s
+gld_req_throughput	1.98 GB/s	3.72 GB/s	3.87 GB/s	1.78 GB/s	3.06 GB/s	1.94 GB/s	3.49 GB/s	2.36 GB/s
+l2_read_transacts	26549373	14038299	4374257		25786504	3687705		27721905	4439781		4552473
+l2_write_transacts	11820384	2380589		2243980		11823656	2138282		12778743	2363758		2952844
+events
+gld_inst_8bit		9928900		9928900		9082673		9928900		9082673		9928900		9082673		9082673
+gld_inst_16bit		1032705		1001454		915636		1032705		915636		1032705		915636		915636
+gld_inst_32bit		12484133	12615462	11549359	13021910	12041222	13315508	12307715	12354202
+gld_inst_64bit		2077100		2077100		1902065		2077100		1902065		2193729		2008094		2019716
+l1_gbl_ld_transacts	33251093	10654807	1614243		31424026	1640165		31422871	1635816		1602422
+l1_gbl_st_transacts	9530433		963050		891906		9530053		898948		9528998		891998		861065
+l1_lcl_ld_hit		88376		323782		485288		39265		121868		97840		448974		599339
+l1_lcl_ld_miss		424604		356279		217717		99541		27641		480277		204697		92109
+l2_s0_read_misses	4374062		789042		309987		4157231		170977		4771720		390323		104186
+l2_s0_tot_read_quer	6669960		3539734		1120145		6492196		949488		6966486		1137972		1149339
+
+
+
+
+
+./generate.sh 1 1100 200000 1 1
+./profile.sh 8 32 128 128regs
+						1:			21:			22:			23:			24:			25:
+metric
+gld_transactions		28159906	12199632	2012406		28774917	12222632	2038256		
+gst_transactions		10901164	1114536		1088010		10902399	1115035		1092366	
+gld_efficiency			9.75%		19.49%		62.58%		9.81%		19.92%		63.08%
+gst_efficiency			13.65%		63.57%		61.44%		13.65%		63.57%		61.44%
+gst_throughput			8.36 GB/s	2.93 GB/s	2.98 GB/s	7.13 GB/s	2.16 GB/s	2.17 GB/s				
+gld_throughput			21.60 GB/s	17.84 GB/s	5.37 GB/s	18.82 GB/s	13.24 GB/s	3.99 GB/s				
+gst_req_throughput		1.14 GB/s	1.88 GB/s	1.90 GB/s	996.1 MB/s	1.39 GB/s	1.39 GB/s				
+gld_req_throughput		2.11 GB/s	3.48 GB/s	3.53 GB/s	1.84 GB/s	2.64 GB/s	2.65 GB/s				
+l2_read_transacts		30389606	16075158	5458412		29540739	14837705	4680478			
+l2_write_transacts		13525793	2736958		2719182		13540926	2703505		2609230	
+events
+gld_inst_8bit			11354735	11354735	10968342	11354735	11354735	10968342					
+gld_inst_16bit			1180281		1144566		1105121		1180281		1144566		1105121
+gld_inst_32bit			14289728	14439848	13957971	14904598	15054717	14551826					
+gld_inst_64bit			2378404		2378404		2299601		2378404		2378404		2299601
+l1_gbl_ld_transacts		37944235	12210369	2019693		37377681	12230942	2047490				
+l1_gbl_st_transacts		10904220	1115264		1090967		10905256	1117136		1096141		
+l1_lcl_ld_hit			114541		393546		608371		53754		75102		168062
+l1_lcl_ld_miss			487824		406401		262168		121395		74792		44757
+l2_s0_read_misses		5026743		898598		402633		4704893		665305		248578
+l2_s0_tot_read_query	7644857		4045709		1393332		7413335		3736432		1200899	
+
+
+
+-----------
+empty template
+
+					1:			7:			21:			22:
+metric
+gld_transactions			
+gst_transactions			
+gld_efficiency				
+gst_efficiency				
+gst_throughput				
+gld_throughput				
+gst_req_throughput			
+gld_req_throughput			
+l2_read_transacts			
+l2_write_transacts			
+events
+gld_inst_8bit				
+gld_inst_16bit				
+gld_inst_32bit				
+gld_inst_64bit				
+l1_gbl_ld_transacts			
+l1_gbl_st_transacts			
+l1_lcl_ld_hit				
+l1_lcl_ld_miss				
+l2_s0_read_misses			
+l2_s0_tot_read_query		
