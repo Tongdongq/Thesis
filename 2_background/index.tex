@@ -13,6 +13,54 @@ MAIN IS NOT TRUE
 \input{../notmain.tex}
 \fi
 
+
+\section{Cell and Molecular biology}
+The most basic unit for a living organism is a \textit{cell}, often called the 'building blocks of life'.
+Each living thing consists of one or more cells.
+Cells can have different shapes, sizes and functions, but they all have some things in common.
+Each cells consists of cytoplasm surrounded by a membrane.
+This membrane is the boundary between the exterior and the inside of the cell and acts as a filter to allow certain molecules to enter or exit the cell.
+A cell can grow by taking nutrients from the environment, and using them to create other molecules, or letting them interact with existing molecules \cite{bioinformatics}.
+Cells can also reproduce when there are enough components in the original call to produce a duplicate cell.
+Many processes in the cell are driven by \textit{proteins}.
+Proteins are long chains of \textit{amino acids}.
+These amino acids are joined by peptide bonds to form polypeptides.
+When these polypeptides are folded by the forces between the atoms, it is called a protein.
+The exact form of the protein is crucial to its function \cite{protein_misfolding}.
+Examples of protein functions are breaking down molecules like other proteins, fat or carbyhydrates, fighting off foreign particles like viruses or bacteria, and assisting in a chemical reaction, in which case the protein is called an \textit{enzyme} \cite{protein_function}.
+Enzymes bind to the reagents of the reaction to lower the activation energy and increase the speed of the reaction, but they are not consumed during the reaction and can be reused.
+Enzymes are usually highly specific, meaning that they will only catalyze certain reactions \cite{enzyme_specificity1}\cite{enzyme_specificity2}.
+
+It is clear that proteins play a huge role in sustaining a cell.
+The information needed to create proteins is stored in \textit{DNA} or deoxyribonucleic acid.
+DNA can be \textit{translated} to create new proteins (this proces is called \textit{genetic expression}), or \textit{replicated} to allow for reproduction.
+A section of DNA that codes a certain protein is called a \textit{gene}.
+A DNA molecule consists of two long chains of nucleotides (also called strands), which are intertwined with eachother in a double helix.
+Each nucleotide is composed of a nucleobase, a sugar called deoxyribose and a phosphate group \cite{dna_structure}.
+The four different nucleobases are: adenine (A), thymine (T), cytosine (C) and guanine (G).
+The bases of one strand bond with bases in the opposite strand, but adenine can only bond with thymine, and cytosine only with guanine.
+
+\figC{width=\textwidth}{dna_structure.jpeg}{Structure of DNA \cite{dna_structure_fig}}{fig:dna_structure}
+
+Each strand has two ends: the \textit{5'-end} (pronounced five-prime) and the \textit{3'-end}.
+The 5'-positions can bind a phosphate group, the 3'-positions can bind a sugar.
+This leads to a \textit{backbone} of alternating sugar and phosphate groups.
+The two strands are \textit{antiparallel}, this means one strands 5'-end is matched to the others 3'-end.
+The orientation of the strand is significant: replication and translation can only be done in 5'$\rightarrow$3' direction.
+
+Creating new proteins from DNA is done via messenger RNA or \textit{mRTA}, which looks like DNA, but has only one strand.
+It has the same structure as DNA, but thymine (T) is replaced by uracil (U), and the sugar is \textit{ribose} instead of deoxyribose.
+When reading the DNA, three bases are considered together, and are called a \textit{codon}.
+Each codon describes an amino acid, but since there are only 20 different amino acids, and $4^3=64$ different codons, multiple codons map to the same amino acid, and some codons have special functions, like start (ATG) and stop (TAA, TAG, TGA) \cite{codons}.
+
+The process starts with the enzyme \textit{RNA polymerase} binding to the correct place on the DNA with the help of a \textit{promotor}, which indicates the start of a gene.
+The RNA strand will look like the \textit{coding (or sense) strand} of the DNA, the other DNA strand is called the \textit{template (or antisense) strand}.
+The RNA polymerase create a so-called \textit{transcription bubble}, which is a short section of seperated DNA, where the RNA polymerase can access the bases of the coding strand.
+The polymerase now adds RNA nucleotides to the template strand, creating an RNA strand.
+This strand is seperated from the DNA template strand, allowing the DNA strands to join back together.
+
+
+
 \section{DNA sequencing}
 
 
@@ -86,7 +134,7 @@ This is known as coalescing.
 
 \subsection{Memory hierarchy}
 GPUs have several different memory types and levels.
-Not all of these are accessible from the host or from other components of the memory hierarchy.
+Not all of these are accessible from the host or from other components of the memory hierarchy \cite{cuda}. Figure \ref{fig:memory_hierarchy} shows three types of memory.
 \begin{itemize}
 \item Global memory: The largest and slowest memory, located outside the chip. Can be read and written from the host. Best used for coalesced operations.
 \item Local memory: Each thread has private memory for when registers are not enough. It is stored in global memory, so accesses are very slow.
@@ -94,20 +142,21 @@ Not all of these are accessible from the host or from other components of the me
 \item Shared memory: Each SMX has shared memory, it can be accesses by every thread in every block on the SMX. This can be used by threads in a block to communicate. It is located on-chip, so very fast.
 \item Constant memory: The host can initialize this memory, the kernel can only read it. Reading is as fast as reading a register, but only when all addresses of a half-warp are the same, otherwise reading is serialized. It resides off-chip, but is cached on-chip.
 \item Texture memory: Can only be written from the host. Resides off-chip, but is cached on-chip, like constant memory. The main feature about the texture memory is that it is cached for 2D spatial locality. Figure \ref{fig:texture_cache} shows an access pattern that would not be cached with a typical scheme.
-\item L2 cache: Behaves as cache for device memory and is shared among all SMXs. The cache line size is 32.
-\item L1 cache: 
+\item L2 cache: Behaves as cache for device memory and is shared among all SMXs. The cache line size is 32B.
+\item L1 cache: Cache line size is 128B. Its default behaviour is to only cache local memory, not global memory. However, for certain architectures applications can opt-in to cache both global and local loads in L1 \cite{L1cache}.
 \end{itemize}
 
-%TODO include figure of memory hierarchy
+\figC{scale=.5}{memory_hierarchy.png}{Memory hierarchy \cite{cuda}}{fig:memory_hierarchy}
 
 %\includegraphics[scale=.2]{\fig texture_cache.png}
-\figC{scale=.2}{texture_cache.png}{This access pattern has spatial locality, and would be cached in the texture cache.}{fig:texture_cache}
+\figC{scale=.2}{texture_cache.png}{This access pattern has spatial locality, and could be cached in the texture cache \cite{texture_cache}}{fig:memory_hierarchy}
 
 \subsection{Streams}
 When copying data to or from the GPU, there are usually no kernels running in a naive implementation.
 This means that if the copy time is large, the overall efficiency is quite low.
-These operations can be overlapped or pipelined by using streams.
-%TODO include picture of streams/pipelining
+These operations can be overlapped or pipelined by using streams. Figure \ref{fig:streams} shows how the execution time can decrease by overlapping copying and computing.
+
+\figC{scale=.2}{streams.png}{Different versions of the same computation \cite{streams}}{fig:streams}
 
 
 
