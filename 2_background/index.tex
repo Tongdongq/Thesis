@@ -48,17 +48,24 @@ This leads to a \textit{backbone} of alternating sugar and phosphate groups.
 The two strands are \textit{antiparallel}, this means one strands 5'-end is matched to the others 3'-end.
 The orientation of the strand is significant: replication and translation can only be done in 5'$\rightarrow$3' direction.
 
-Creating new proteins from DNA is done via messenger RNA or \textit{mRTA}, which looks like DNA, but has only one strand.
+Creating new proteins from DNA is done via messenger RNA or \textit{mRNA}, which looks like DNA, but has only one strand.
 It has the same structure as DNA, but thymine (T) is replaced by uracil (U), and the sugar is \textit{ribose} instead of deoxyribose.
 When reading the DNA, three bases are considered together, and are called a \textit{codon}.
 Each codon describes an amino acid, but since there are only 20 different amino acids, and $4^3=64$ different codons, multiple codons map to the same amino acid, and some codons have special functions, like start (ATG) and stop (TAA, TAG, TGA) \cite{codons}.
 
 The process starts with the enzyme \textit{RNA polymerase} binding to the correct place on the DNA with the help of a \textit{promotor}, which indicates the start of a gene.
-The RNA strand will look like the \textit{coding (or sense) strand} of the DNA, the other DNA strand is called the \textit{template (or antisense) strand}.
+The mRNA strand will look like the \textit{coding (or sense) strand} of the DNA, the other DNA strand is called the \textit{template (or antisense) strand}.
 The RNA polymerase create a so-called \textit{transcription bubble}, which is a short section of seperated DNA, where the RNA polymerase can access the bases of the coding strand.
-The polymerase now adds RNA nucleotides to the template strand, creating an RNA strand.
+The polymerase now adds RNA nucleotides to the template strand, creating an mRNA strand.
 This strand is seperated from the DNA template strand, allowing the DNA strands to join back together.
+The mRNA strand now looks like the DNA coding strand, with the exception that thymine is replaced by uracyl.
 
+The mRNA strand is now ready to be translated into a protein, this is done by a \textit{ribosome}, a very complex molecule consisting of several ribosomal RNA molecules and dozens of proteins \cite{DNA_translation}.
+The ribosome binds to the start of the mRNA strand.
+The codons of the mRNA strand are interpreted by \textit{transfer RNA} (tRNA).
+The first tRNA molecule binds to the start codon (AUG), and always carries the amino acid methionine.
+The ribosome then keeps finding tRNA molecules that fit the mRNA codons, and adds their amino acids to the growing chain, creating the protein.
+The tRNA molecules are not consumed during the process and can, after picking up a new amino acid, be reused.
 
 
 \section{DNA sequencing}
@@ -67,6 +74,12 @@ This strand is seperated from the DNA template strand, allowing the DNA strands 
 %TODO also talk about OpenCL?
 %TODO why GPU in the first place? What do they look like, what are they good at?
 %TODO CUDA was released in 2006, source: programming guide
+
+
+
+
+
+
 
 
 \section{GPU processing}
