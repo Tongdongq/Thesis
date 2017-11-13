@@ -45,7 +45,7 @@ TACC server ~/daligner
 times with the same letter behind them are benchmarked during the same session
 ./generate.sh 1 1100 10000, without complement
 CBTr 8 32 128 128, -O3:
-1: real 12.66, 11.82a s
+1: real 12.66, 11.82a, 11.83b. 12.19c s
 3: real 10.6 s
 5: real 10.6 s
 7: real 12.8 s
@@ -55,20 +55,22 @@ CBTr 8 32 128 128, -O3:
 17: real 13.1 s
 18: real 10.6 s
 21: real 9.24, 8.86 s
-22: real 9.11 s
+22: real 9.11, 8.73b, 9.15c s
 23: real 11.73 s
 24: real 8.99 s
-26: real 11.83a s
-27: real 8.98a s
-28: real 8.77a s
-29: real 10.43a s
+25: real 9.31c s
+26: real 12.36b s
+27: real 9.09b s
+28: real 8.91b s
+29: real 10.91b s
 31: real 13.30 s
 32: real 9.97 s
 CBTr 8 64 64 128, -O3:
-22: real 8.67a s
-28: real 8.76a s
-29: real 9.75a s
-30: real 12.46a s
+1: real 11.76a
+22: real 8.78a s
+28: real 8.98a s
+29: real 10.13a s
+30: real 13.41a s
 CBTr 8 48 96 128, -O3:
 22: real 8.71a s
 28: real 8.38a s
@@ -141,6 +143,25 @@ CBTr 8 8 128 128, -O3:
 23: real 6.28a s
 26: real 6.24a s
 27: real 6.10a s
+./generate.sh 3 5000 10000 1 1 15, 85% fidelity
+CBTr 8 4 128 128, -O3:
+1: real 9.20a s
+22: real 8.59a s
+28: real 9.28a s
+29: real 9.38a s
+30: too much smem per block
+CBTr 8 4 128 255, -O3:
+1: real 9.18a s
+22: real 8.28a s
+28: real 9.14a s
+29: real 9.20a s
+30: too much smem per block
+CBTr 8 4 96 255, -O3:
+1: real 10.34a s
+22: real 9.34a s
+28: real 10.39a s
+29: real 10.62a s
+30: real 10.64a s
 ./generate.sh 1 1100 50000 1 1, without complement
 CBTr 8 32 128 128, -O3:
 1: real 4.71a s
@@ -179,24 +200,37 @@ CBTr 8 32 128 128, -O3:
 22: real 10.03 s
 ./generate.sh 2 1100 50000 1 1, without complement
 CBTr 8 32 128 128, -O3:
-1: real 7.27 s
+1: real 7.10a s
 21: real 5.58 s
-22: real 5.62 s
-28: real 
-29: real 
-30: real 
+22: real 5.35a s
+28: real 5.60a s
+29: real 6.48a s
+30: too much smem per block
 CBTr 8 64 64 128, -O3:
 1: real 7.03a s
 22: real 5.38a s
 28: real 5.51a s
 29: real 5.86a s
 30: real 7.59a s
+CBTr 8 32 128 256, -O3:
+1: real 7.36a s
+22: real 5.48a s
+28: real 5.69a s
+29: real 6.36a s
+30: too much smem per block
 CBTr 8 48 96 128, -O3:
 1: real 7.21a s
 22: real 5.15a s
 28: real 5.35a s
 29: real 5.74a s
 30: real 6.68a s
+CBTr 8 48 96 256, -O3:
+1: real 6.90a s
+22: real 5.44a s
+28: real 5.56a s
+29: real 5.69a s
+30: real 6.68a s
+
 ./convert 2 (2.1MB)
 no diff in runtime, but could depend on configuration
 
@@ -468,6 +502,35 @@ l2_s0_read_misses	4374062		789042		309987		4157231		170977		4771720		390323		104
 l2_s0_tot_read_quer	6669960		3539734		1120145		6492196		949488		6966486		1137972		1149339
 
 
+./generate.sh 1 1100 92160 1 1
+./profile.sh 1 48 96 128regs
+					1:			22:			28:			29:			30:
+metric
+gld_transactions	34261118	2518218		2636062		2594741		3084419
+gst_transactions	13264711	1351448		1362239		1317421		1306178
+gld_efficiency		9.88%		62.41%		66.30%		66.40%		74.71%
+gst_efficiency		13.65%		61.90%		62.66%		62.64%		62.63%
+gst_throughput		9.39 GB/s	3.72 GB/s	2.86 GB/s	2.39 GB/s	1.99 GB/s		
+gld_throughput		24.27 GB/s	6.84 GB/s	5.74 GB/s	4.81 GB/s	5.47 GB/s		
+gst_req_throughput	1.28 GB/s	2.39 GB/s	1.84 GB/s	1.53 GB/s	1.28 GB/s		
+gld_req_throughput	2.36 GB/s	4.43 GB/s	3.91 GB/s	3.27 GB/s	4.19 GB/s		
+l2_read_transacts	36994850	7116223		7862849		8625852		9260855
+l2_write_transacts	16721586	3419287		4324691		5414817		4033974
+s_ld_throughput		0.00 B/s	0.00 B/s	6.50 GB/s	5.10 GB/s	4.25 GB/s		
+s_st_throughput		0.00 B/s	0.00 B/s	7.26 GB/s	5.77 GB/s	7.25 GB/s		
+events
+gld_inst_8bit		13814122	13818932	13945475	13945818	13946098		
+gld_inst_16bit		1436807		1393350		1406364		1406370		1406374
+gld_inst_32bit		17368138	17565694	20960534	21103957	32202994		
+gld_inst_64bit		2889878		2892871		3249997		3285744		6060420
+l1_gbl_ld_transacts	50267487	2531765		2645849		2597399		3086003
+l1_gbl_st_transacts	13274386	1356052		1363365		1318780		1306924
+l1_lcl_ld_hit		115976		681849		582233		849996		1058420
+l1_lcl_ld_miss		600177		377845		431077		444129		59547
+l2_s0_read_misses	6616585		671954		748863		459382		177862
+l2_s0_tot_read_quer	9285997		1817758		2015714		2158344		2343605
+shared_load			0			0			824510		768260		765108
+shared_store		0			0			915718		866290		1297872
 
 
 
