@@ -6,7 +6,8 @@
 \ifdefined\main
 \acresetall
 MAIN IS TRUE
-\newcommand{\code}{../3_concept/code/}
+\newcommand{\codePath}{../3_concept/code/}
+\newcommand{\figPath}{../3_concept/figures/}
 \else
 MAIN IS NOT TRUE
 \input{../notmain.tex}
@@ -161,7 +162,7 @@ Each pass is done with a bucket sort \cite{sorting} with $2^B$ buckets.
 Instead of a linked list, the integers in the list $src$ are moved in precomputed segments $trg[bucket[b]...bucket[b+1]-1]$ of an array $trg[0...N-1]$ with the same size as $src$.
 For the $p^{th}$ pass, $bucket[b] = \{i: src[i]_p < b\}$ for each $b \in [0,2^B-1]$.
 
-\lstinputlisting{\code radix1.c}
+\lstinputlisting{\codePath radix1.c}
 
 The algorithm takes $O(P(N+2^B))$ time, but $B$ and $P$ are small fixed numbers so it is effectively $O(N)$.
 There are a lot of parallel sorting algorithms \cite{parRadix1}\cite{parRadix2}, but Daligner uses a new method that needs half the number of passes that traditional methods use.
@@ -174,7 +175,7 @@ To do this we need to count the number of these events in $next[j/part][i/part][
 If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
 This algorithm takes $O(N/T+T^2)$ time, assuming $B$ and $P$ are fixed.
 
-\lstinputlisting{\code radix2.c}
+\lstinputlisting{\codePath radix2.c}
 
 This algorithm is particularly cache efficient because each bucket sort uses two small arrays $bucket$ and $next$ that will usually fit in the L1 cache.
 Each bucket sort makes one sweep through $src$ and $2^B$ sweeps through the bucket segments of $trg$.
@@ -205,7 +206,7 @@ The number of matches $M(d,k)$ can be tracked by observing the bit that is shift
 Listing \ref{code:LA} shows pseudo-code that computes $W_\rho(d+1)[low-1,hgh+1]$ from $W_\rho(d)[low,hgh]$ assuming $[low,hgh] \subseteq [\kappa-d,\kappa+d]$ is the trimmed result of the wave $W_\rho(d)$.
 Note that the array $W$ only holds the $B$-coordinate $j$ of each f.r. point $(i,j)$, since $i = j + k$.
 
-\lstinputlisting[caption=Local Alignment, label=code:LA]{\code la.c}
+\lstinputlisting[caption=Local Alignment, label=code:LA]{\codePath la.c}
 
 The second trimming principle involves only keeping f.r. points which are within $\mathcal{L}$ anti-diagonals of the maximal anti-diagonal reached by its wave.
 It makes sense that the f.r. point on diagonal $k^*$ that will be in the final alignment is on a greater anti-diagonal $i+k$ than points that are not.
