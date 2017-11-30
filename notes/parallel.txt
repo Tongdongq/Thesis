@@ -429,9 +429,62 @@ gls_red_BW: -40%
 l2_s0_read_miss_ratio: -67% (27.7 -> 9.1)
 l2_s0_reads: +3%
 
+13-11-2017:
+New idea: coalesce Pebbles, since they are an array of structs, should be a struct of arrays (or just seperate arrays), also compress them:
+Pebble compression: pb->ptr: 14b, pb->diag: 18b, pb->diag: 15b, pb->mark: 17b
+pb->diag can be negative, so give it an offset of 2^17=131072
+Pebble are now coalesced and compressed, speedup still around 10% vs base, so no apparent improvement by coalescing and compressing Pebbles
+work->vector compression: HAB: 14b, NAB: 18b, M: 11b, V: 21b
+NAB is 18b, but is stored in pb->mark, which is 17b, maybe give an extra bit to HAB.
+
+16-11-2017:
+HAB and V have a min value of -1, so they have an offset of +1 to make it unsigned
+gridDim.x and blockDim.x are probably unsigned, multiplying with an idx of -1 will cause trouble.
+
+20-11-2017:
+Switched V and M in compression, V is now upper 21b, M lower 11b.
+Removed -1 offset for compressed V.
+Max value of V is not INT32_MAX, but (1<<20)-1, when compressing.
+
+22-11-2017:
+Profiling of compressed and coalesced Pebbles and compressed work->vector (41):
+41 wrt 22:
+gld_eff: 72.14% -> 81.11% = +12%
+gst_eff: 66.71% -> 73.07% = +10%
+gst_req_BW: -3%
+gld_req_BW: +20%
+l2_reads: -13%
+l2_writes: -15%
+32b_instructions: +30%
+l1_lcl_ld_hit: -13%
+l1_lcl_ld_miss: -91%
+l2_s0_read_miss: -57%
+l2_s0_tot_read: -13%
+
+Changed clock() timestamps to gettimeofday() timestamps in cuda_host.cu
+Created kernel_time.txt
+
+27-11-2017:
+Implemented CPU streaming cuda functions, initial tests show 10-30% speedup wrt to 41.
+
+28-11-2017:
+Benchmarked streaming cuda functions, is 5-25% faster than 41.
+Compressed and coalesced Pebbles are slower when using non crosstalk worst reads.
+
+29-11-2017:
+Timestamps show that cuda functions overlap.
+Pinned memory is not faster.
+Created branch 60 to compress/cache ABSEQ.
+
+30-11-2017:
+Measured number of times a base is actually read to predict whether caching will be beneficial, number is not too high, estimated 1-5x.
+Measured difference between first read a[y] in wave vs lowest address a[y] in wave (for_wave). When the first read a[y] is higher, it cannot be used as an anchor to start caching bases from.
+Also measured the difference with the highest address a[y] in for_wave.
+A width of 45 cached bases is probably the best range.
 
 
 
+Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs
 
 TODO: 	redo profiling CACHE_VARS
 		make variables volatile and measure register pressure
