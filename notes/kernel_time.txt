@@ -1,0 +1,87 @@
+
+22-11-2017:
+Timings of the kernel loop in cuda_host.cu, values are in ms.
+
+23-11-2017:
+Doing tdiff measurements (printed in filter.c) to measure the duration of cuda_caller() and cuda_host_function().
+Version b has compressed and coalesced Pebbles.
+
+1a: without L1 caching, base
+1b: without L1 caching, with compressed and coalesced Pebbles
+22: without L1 caching, with WORK and ABSEQ
+41: without L1 caching, with WORK and ABSEQ, Pebbles and work->vector are compressed
+
+./generate.sh 1 1100 50000 1 1
+./run.sh 1 32 128 128r, -O3:
+1: 630a, 598b
+22: 435a
+41: 520b
+./run.sh 2 32 128 128r, -O3:
+1: 635a, 533b
+22: 386a
+41: 460b
+
+./generate.sh 2 1100 50000 1 1
+./run.sh 1 32 128 128r, -O3:
+1: 3083a, 4826b ms
+22: 946a ms
+41: 5604b ms
+
+./generate.sh 3 1100 10000
+./run.sh 1 32 128 128r, -O3:
+1: 229a, 227b
+22: 230a
+41: 237b
+
+./generate.sh 3 1100 10000 1 1 15
+./run.sh 1 32 128 128r, -O3:
+1: 307a, 323b
+22: 266a
+41: 313b
+
+-----------------------
+tdiff measurements for cuda_caller() and cuda_host_function(), in ms
+
+./generate.sh 1 1100 50000 1 1
+./run.sh 1 32 128 128r, -O3:
+1: 1733a, 1698b
+22: 2363a
+41: 2417b
+./run.sh 8 32 128 128r, -O3:
+1: 1802a, 1788b
+22: 1820a
+41: 1928b
+
+./generate.sh 2 1100 50000 1 1
+./run.sh 1 32 128 128r, -O3:
+1: 4185a, 5937b
+22: 2856a
+41: 7523b
+./run.sh 8 32 128 128r, -O3:
+1: 4216a, 6691b
+22: 2501a
+41: 8174b
+
+./generate.sh 3 1100 50000
+./run.sh 1 32 128 128r, -O3:
+1: 1503a, 3165b
+22: 4088a
+41: 4138b
+./run.sh 8 32 128 128r, -O3:
+1: 2303a, 2357b
+22: 2544a
+41: 2594b
+
+./generate.sh 3 1100 50000 1 1 15
+./run.sh 1 32 128 128r, -O3:
+1: 2537a, 2627b
+22: 3016a
+41: 3319b
+./run.sh 1 64 128 128r, -O3:
+1: 2876b
+22: 
+41: 3406b
+./run.sh 8 32 128 128r, -O3:
+1: 2437a, 2523b
+22: 2401a
+41: 2601b
