@@ -6,6 +6,10 @@ the first (in time) accessed a[y] is does not always have the lowest address (in
 
 Other measurements include the max distance from the first a[y] and the highest address (in forward wave), see bottom of the page.
 
+----------------------------
+----------------------------
+Distance from first observed a[y] in wave to lowest address a[y] in for_wave
+
 ./generate.sh 3 1100 10000
  283388 diff: 1   55.1
  105581 diff: 2   20.5
@@ -260,3 +264,144 @@ Distance between first read a[y] and a[y] with highest address in the wave.
 4613118
 
  
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+
+Distance first bseq[y] and lowest address bseq[y] in for_wave
+
+
+./generate.sh 3 1100 10000
+./generate.sh 3 1100 10000 1 1 15
+./generate.sh 1 1100 10000
+./generate.sh 4 3000 10000 5000 1 1
+./generate.sh 4 3000 10000 5000 16 1
+ 
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+
+
+Distance first bseq[y] and highest address bseq[y] in for_wave
+
+./generate.sh 3 1100 10000
+  50365 diff: 000-004    9.4
+  66555 diff: 005-009   12.4
+  72579 diff: 010-014   13.5
+  78017 diff: 015-019   14.5
+  62955 diff: 020-024   11.7
+  46410 diff: 025-029    8.6
+  36690 diff: 030-034    6.8
+  28624 diff: 035-039    5.3
+  22077 diff: 040-044    4.1
+  17102 diff: 045-049    3.2
+  13268 diff: 050-054    2.5
+  10287 diff: 055-059    1.9  93.9% t/m hier
+   7767 diff: 060-064    1.4
+   5926 diff: 065-069    1.1
+   4481 diff: 070-074    0.8  97.2% t/m hier
+   3532 diff: 075-079
+   2690 diff: 080-084
+   2061 diff: 085-089
+   1624 diff: 090-094
+   1198 diff: 095-099
+    926 diff: 100-104
+    760 diff: 105-109
+    560 diff: 110-114
+    397 diff: 115-119
+    337 diff: 120-124
+    252 diff: 125-129
+    205 diff: 130-134
+    136 diff: 135-139
+    123 diff: 140-144
+     70 diff: 145-149
+     87 diff: 150-154
+     52 diff: 155-159
+     28 diff: 160-164
+     29 diff: 165-169
+     24 diff: 170-174
+     16 diff: 175-179
+     11 diff: 180-184
+      8 diff: 185-189
+     10 diff: 190-194
+      6 diff: 195-199
+      3 diff: 200-204
+      4 diff: 205-209
+      4 diff: 210-214
+      1 diff: 215-219
+      4 diff: 220-224
+      1 diff: 230-234
+      1 diff: 265-269
+538263
+
+./generate.sh 3 1100 10000 1 1 15
+  84599 diff: 000-004    5.4
+ 149496 diff: 005-009    9.6
+ 276556 diff: 010-014   17.8
+ 498150 diff: 015-019   32.0
+ 308935 diff: 020-024   19.9
+ 131314 diff: 025-029    8.4
+  59018 diff: 030-034    3.8
+  26356 diff: 035-039    1.7  98.6% t/m hier
+  11458 diff: 040-044
+   5026 diff: 045-049
+   2308 diff: 050-054
+   1017 diff: 055-059
+    411 diff: 060-064
+    190 diff: 065-069
+     86 diff: 070-074
+     37 diff: 075-079
+     19 diff: 080-084
+      7 diff: 085-089
+      2 diff: 090-094
+      1 diff: 095-099
+      2 diff: 100-104
+      1 diff: 105-109
+1554989
+
+./generate.sh 1 1100 10000
+   26144 diff: 010-014   0.2
+  818912 diff: 015-019   5.0
+   74280 diff: 020-024   0.5
+15260320 diff: 025-029  92.5
+  310840 diff: 030-034   1.9  100% t/m hier
+16490496
+
+  29696 a_diff_high for: 010-014
+  18056 a_diff_high for: 020-024
+ 267800 a_diff_high for: 025-029
+1543736 a_diff_high rev: 000-004
+  17448 a_diff_high rev: 005-009
+ 314744 a_diff_low for: 000-004
+   4680 a_diff_low for: 005-009
+  39376 a_diff_low rev: 010-014
+  39216 a_diff_low rev: 015-019
+  83184 a_diff_low rev: 020-024
+1403984 a_diff_low rev: 025-029
+   2376 b_diff_high for: 010-014
+  27320 b_diff_high for: 015-019
+   1072 b_diff_high for: 020-024
+ 289984 b_diff_high for: 025-029
+   3216 b_diff_high for: 030-034
+1571232 b_diff_high rev: 000-004
+ 327104 b_diff_low for: 000-004
+  25600 b_diff_low rev: 010-014
+  52992 b_diff_low rev: 015-019
+   5960 b_diff_low rev: 020-024
+1492344 b_diff_low rev: 025-029
+
+
+./generate.sh 4 3000 10000 5000 1 1
+
+
+
+
+
+./generate.sh 4 3000 10000 5000 16 1
+
+
+
+
+
