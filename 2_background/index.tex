@@ -97,18 +97,53 @@ The cells produces more heat shock proteins when it is exposed to heat \cite{cha
 \section{DNA sequencing}
 
 
-%TODO also talk about OpenCL?
-%TODO why GPU in the first place? What do they look like, what are they good at?
-%TODO CUDA was released in 2006, source: programming guide
+
+\subsection{Sanger sequencing}
+%TODO since 19xx, also called chain-termination, Human Genome Project
+The DNA sample is mixed in a tube with: a \textit{primer}, DNA polymerase, normal DNA nucleotides (dATP, dTTP, dGTP and dCTP), and dye-labeled, chain-terminating dideoxynucleotides.
+The primer is a piece of DNA that can fit onto a specific spot of a DNA strand.
+Primers usually contains 18 to 24 bases \cite{sanger_primer_size}.
+The chain-terminating nucleotides are ddATP, ddTTP, ddGTP and ddCTP.
+They consist of a normal nucleotide, but with an oxygen atom removed, as shown in Figure \ref{fig:ddNTP}.
+This small difference means that no new nucleotide can be attached to it, thus ending the chain.
+Sometimes the mixture is split among four different tubes, each with their own unique dideoxynucleotide.
+The mixture is heated to split the two DNA strands.
+Once the primer is bound, the DNA polymerase can start adding nucleotides to form a chain.
+At one point, a dideoxynucleotide is added, and the chain cannot grow anymore.
+The distribution of chain lengths is determined by the ratio of normal and dideoxynucleotides \cite{sanger_ratio}.
+
+After a certain period, most of the dideoxynucleotides have terminated a chain, and the next phase can begin.
+The chains are sorted by length by means of \textit{cappilary electrophoresis} (CE).
+During CE, the chains are run through a long glass capillary filled with a gel polymer.
+An electrical field is applied and the DNA fragments move through the capillary.
+The speed of the fragment is inversely proportional to its weight, so the shortest chains arrive earliest at the end.
+The resolution is high enough to seperate chains that differ in length by one base.
+A laser excites the dye-labeled dideoxynucleotides, which emits a light at a characteristic wavelength.
+These lights are detected and interpreted to get the actual DNA sequence.
+
+Sanger sequencing gives high-quality sequences, but only up to about 900 basepairs.
+It is typically used to sequence short or individual pieces of DNA.
+For longer pieces, more primers must be created, increasing the cost dramatically.
+
+\figC{scale=.5}{ddNTP.png}{Normal nucleotides and dideoxynucleotides, source: \cite{sanger_sequencing2}}{fig:ddNTP}
+\figC{scale=.5}{sanger_sequencing.png}{Workflow of Sanger sequencing, source: \cite{sanger_sequencing2}}{fig:sanger_sequencing}
+
+\subsection{Next Generation Sequencing}
 
 
 
 
+\subsection{Long read sequencing}
 
 
 
 
 \section{GPU processing}
+
+%TODO also talk about OpenCL?
+%TODO why GPU in the first place? What do they look like, what are they good at?
+%TODO CUDA was released in 2006, source: programming guide
+
 A GPU is a Graphics Processing Unit, it is a processor that is mainly used to perform video processing.
 This type of processing often includes rotation and translation of objects in a space, calculating shadows and rendering images to display on a monitor.
 They contain many cores that allow it to perform parallelizable tasks very quickly.
