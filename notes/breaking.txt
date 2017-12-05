@@ -1,0 +1,144 @@
+
+4-12-2017:
+This file contains results on breaking (removing) components from the main while loop, and checking their performance and accuracy impact.
+
+A git branch called 'breaking' has been created to this end, based on commit 83c50096816c1bf7da236460653e1b6c5d37def0
+
+101: base, no coalesce_work
+102: TRACE_SPACE=125
+103: no Pebble-creation in main while loops and no trace writing in for/rev wave, note: LAshow gives 1 diff more, and 0 trace points
+104: COALESCE_WORK
+105: COALESCE_WORK, and NOPEBBLE (like 103)
+106: NOTRIM1: remove first trimming principle, polished, TABLE[]
+107: COALESCE_WORK, and NOTRIM1, like 106
+108: NOTRIM2: remove second trimming principle, wave-width reduction
+109: COALESCE_WORK, and NOTRIM2, like 108
+
+6.8MB:
+base T8: 3.4
+130MB, no complement:
+T8 base: 5m40s, 5m37, 5m20, 5m23
+T8 TRACE_SPACE=125: 5m24, 5m27, 5m27
+T8 NOPEBBLES: 4m27, 4m24, 4m25, 4m23, 4m27, 4m25, 4m25, 
+
+./generate.sh 1 1100 10000
+./benchmark.py 8 32 128 128r
+101: 12.48a
+102: 12.24a
+103: 10.44a
+104: 9.34a
+105: 8.05a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 1 5000 5000
+./benchmark.py 8 32 128 128r
+101: 17.46a
+102: 16.98a
+103: 13.00a
+104: 9.58a
+105: 6.93a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 1 1100 50000 1 1
+./benchmark.py 8 32 128 128r
+101: 4.74a
+102: 4.77a
+103: 4.58a
+104: 4.57a
+105: 4.44a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 2 1100 5000
+./benchmark.py 8 32 128 128r
+101: 27.70a
+102: 27.57a
+103: 23.81a
+104: 8.85a
+105: 7.18a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 2 1100 50000 1 1
+./benchmark.py 8 32 128 128r
+101: 7.14a
+102: 7.15a
+103: 6.49a
+104: 5.44a
+105: 5.10a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 3 1100 10000
+./benchmark.py 8 8 128 128r
+101: 3.85a
+102: 3.82a
+103: 3.80a
+104: 3.68a
+105: 3.66a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 3 5000 10000
+./benchmark.py 8 8 64 128r
+101: 7.62a
+102: 7.69a
+103: 7.68a
+104: 7.17a
+105: 7.33a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 3 1100 10000 1 1 15
+./benchmark.py 8 8 128 128r
+101: 3.67a
+102: 3.68a
+103: 3.52a
+104: 3.54a
+105: 3.45a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 4 3000 10000 5000 1
+./benchmark.py 8 32 32 128r
+101: 6.93a
+102: 6.90a
+103: 6.24a
+104: 6.97a
+105: 6.51a
+106: 
+107: 
+108: 
+109: 
+
+./generate.sh 4 3000 10000 5000 16
+./benchmark.py 8 32 128 128r
+101: 20.62a
+102: 20.44a
+103: 16.76a
+104: 21.05a
+105: 17.50a
+106: 
+107: 
+108: 
+109: 
+
+

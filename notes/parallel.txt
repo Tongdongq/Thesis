@@ -482,6 +482,16 @@ Measured difference between first read a[y] in wave vs lowest address a[y] in wa
 Also measured the difference with the highest address a[y] in for_wave.
 A width of 45 cached bases is probably the best range.
 
+1-12-2017:
+Created view_results.py to format measurings of distance between first ab[y] read, and other ab[y] reads to determine CACHE_ABSEQ pattern.
+To cache 95% of ABSEQ bases, 40 bases are needed for aseq and bseq. 32 for bseq probably hits 90%.
+Zaid: remove stuff to see where the bottleneck is, ignore accuracy for now
+
+4-12-2017:
+Created breaking.txt and git branch 'breaking'.
+
+
+
 
 
 Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs
