@@ -99,14 +99,18 @@ The cells produces more heat shock proteins when it is exposed to heat \cite{cha
 
 
 \subsection{Sanger sequencing}
-%TODO since 19xx, also called chain-termination, Human Genome Project
-The DNA sample is mixed in a tube with: a \textit{primer}, DNA polymerase, normal DNA nucleotides (dATP, dTTP, dGTP and dCTP), and dye-labeled, chain-terminating dideoxynucleotides.
+Sanger sequencing, also called chain-termination sequencing, is the first major DNA sequencing technique.
+It is published in 1977 \cite{Sanger}, and later improvements led to the development of commercial DNA sequencing machines in 1991 \cite{sequencing_history}.
+It is also the technique used by the Human Genome Project \cite{sanger_sequencing2}, a project to sequence the whole genome of a human.
+The project start around 1990, and finished in 2003 \cite{human_genome_project}.
+Since Sanger sequencing has a maximum chain length of about 900 basepairs \cite{sanger_sequencing2}, the resulting pieces of DNA had to be assembled after sequencing.
+
+To sequence a DNA sample, it is mixed in a tube with: a \textit{primer}, DNA polymerase, normal DNA nucleotides (dATP, dTTP, dGTP and dCTP), and dye-labeled, chain-terminating dideoxynucleotides.
 The primer is a piece of DNA that can fit onto a specific spot of a DNA strand.
 Primers usually contains 18 to 24 bases \cite{sanger_primer_size}.
 The chain-terminating nucleotides are ddATP, ddTTP, ddGTP and ddCTP.
 They consist of a normal nucleotide, but with an oxygen atom removed, as shown in Figure \ref{fig:ddNTP}.
 This small difference means that no new nucleotide can be attached to it, thus ending the chain.
-Sometimes the mixture is split among four different tubes, each with their own unique dideoxynucleotide.
 The mixture is heated to split the two DNA strands.
 Once the primer is bound, the DNA polymerase can start adding nucleotides to form a chain.
 At one point, a dideoxynucleotide is added, and the chain cannot grow anymore.
@@ -121,17 +125,31 @@ The resolution is high enough to seperate chains that differ in length by one ba
 A laser excites the dye-labeled dideoxynucleotides, which emits a light at a characteristic wavelength.
 These lights are detected and interpreted to get the actual DNA sequence.
 
-Sanger sequencing gives high-quality sequences, but only up to about 900 basepairs.
-It is typically used to sequence short or individual pieces of DNA.
-For longer pieces, more primers must be created, increasing the cost dramatically.
-
 \figC{scale=.5}{ddNTP.png}{Normal nucleotides and dideoxynucleotides, source: \cite{sanger_sequencing2}}{fig:ddNTP}
 \figC{scale=.5}{sanger_sequencing.png}{Workflow of Sanger sequencing, source: \cite{sanger_sequencing2}}{fig:sanger_sequencing}
 
 \subsection{Next Generation Sequencing}
+Next Generation Sequencing (NGS) involves a number of different techniques.
+They are different from the previous Sanger sequencing in that they are massively parallel, have high throughput at a much lower cost \cite{ngs_history}.
 
+% Pyro
+% SOLiD
+% Illumina, reversible dye terminators
 
+The most used NGS method is probably \textit{pyrosequencing} \cite{pyro_sequencing1}, shown in Figure \ref{fig:pyro_sequencing}.
+Like Sanger sequencing, it is a \textit{sequence-by-synthesis} method, because it relies on DNA polymerase to recreate the DNA.
+The DNA strand is split, and fragmented to pieces, which are attached to microscopic beads.
+The strands are cloned using Polymerase Chain Reaction (PCR) \cite{dna_cloning}, such that each bead has about 10 million identical copies of its fragment \cite{pyro_sequencing2}.
+Each bead is place into a separate well, and each well is given a mixture that contains DNA polymerase, adenosine phosphosulfate (APS), ATP sulfurylase, luciferin, and luciferase.
+ATP sulfurylase is an enzyme that combines APS and pyrophosphate (PPi) into ATP, an energy carrier.
+For one cycle, one type of nucleotide is added to each of the wells.
+When a nucleotide is added to the chain by DNA polymerase, it releases PPi.
+This is converted to ATP by ATP sulfurylase, this energy is used by luciferase to oxidize luciferin and create light.
+The amount of light is proportional to the amount of nucleotides added, and since it is known which type of nucleotide is added, the bases can be read.
+The wells are cleaned by the enzyme apyrase, which degrades ATP and the unused nucleotides.
+Now, the next type of nucleotide can be added.
 
+\figC{scale=.5}{pyro_sequencing.png}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
 \subsection{Long read sequencing}
 
