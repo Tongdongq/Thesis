@@ -136,10 +136,10 @@ They are different from the previous Sanger sequencing in that they are massivel
 % SOLiD
 % Illumina, reversible dye terminators
 
-The most used NGS method is probably \textit{pyrosequencing} \cite{pyro_sequencing1}, shown in Figure \ref{fig:pyro_sequencing}.
+The first NGS method is \textit{pyrosequencing}, developed in 2005 \cite{history_sequencing}.
 Like Sanger sequencing, it is a \textit{sequence-by-synthesis} method, because it relies on DNA polymerase to recreate the DNA.
 The DNA strand is split, and fragmented to pieces, which are attached to microscopic beads.
-The strands are cloned using Polymerase Chain Reaction (PCR) \cite{dna_cloning}, such that each bead has about 10 million identical copies of its fragment \cite{pyro_sequencing2}.
+The strands are cloned using Polymerase Chain Reaction (PCR) \cite{dna_cloning}\cite{ngs_sequencing_atdbio}, such that each bead has about 10 million identical copies of its fragment \cite{pyro_sequencing2}.
 Each bead is place into a separate well, and each well is given a mixture that contains DNA polymerase, adenosine phosphosulfate (APS), ATP sulfurylase, luciferin, and luciferase.
 ATP sulfurylase is an enzyme that combines APS and pyrophosphate (PPi) into ATP, an energy carrier.
 For one cycle, one type of nucleotide is added to each of the wells.
@@ -148,8 +148,51 @@ This is converted to ATP by ATP sulfurylase, this energy is used by luciferase t
 The amount of light is proportional to the amount of nucleotides added, and since it is known which type of nucleotide is added, the bases can be read.
 The wells are cleaned by the enzyme apyrase, which degrades ATP and the unused nucleotides.
 Now, the next type of nucleotide can be added.
+The whole sequencing process is shown in Figure \ref{fig:pyro_sequencing}.
 
-\figC{scale=.5}{pyro_sequencing.png}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
+The newest pyrosequencing machines can produce readlenghts up to 700 basepairs.
+
+\figC{scale=.5}{pyro_sequencing.jpg}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
+
+The most popular NGS method is created by Illumina \cite{most_popular_ngs}, released in 2007.
+It is similar to Sanger sequencing, but uses \textit{reversible terminators}.
+Another major difference is that instead of emulsion PCR, bridge PCR is used, which is more efficient \cite{ngs_sequencing_atdbio}.
+Bridge PCR is further explained in Figures \ref{fig:bridge_pcr} and \ref{fig:bridge_pcr_comp}.
+At the end of the PCR step, the reverse strands are washed away \cite{bridge_pcr_reverse}.
+The reversible terminators are regular nucleotides, but fluorescent dye occupies the 3' end.
+First, the reversible terminators are added, and bound by the DNA polymerase.
+The unused nucleotides are washed away, and the dye of the bound nucleotides is released by an enzyme, allowing the bases to be read, and the chain to be extended during the next cycle.
+
+Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history}\cite{pyro_sequencing1}).
+
+\figC{scale=.5}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
+\figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{sequencing_history}}{fig:bridge_pcr_comp}
+
+
+
+The third major NGS method is Sequencing by Oligonucleotide Ligation and Detection (SOLiD), released by Applied Biosystems Instruments (ABI), which later became Life Technologies \cite{history_sequencing}.
+SOLiD relies on ligation to chain nucleotides.
+DNA ligase is able to ligate double-stranded DNA \cite{ngs_sequencing_atdbio}, whereas DNA polymerase only adds one base to a growing chain, complementary to a template strand \cite{dna_replication}.
+
+A single strand DNA piece, known as an adapter, is merged with the template strand on one side, and attached to a bead on the other.
+A primer of length N is connected to the adapter.
+Now the DNA ligase can add oligonucleotides, these are strands of eight nucleotides, with fluorescent dye at the 5' end, shown in Figure \ref{fig:solid_color_coding}.
+The first two bases have to be complementary to the bases in the template strand.
+The degenerate and universal bases are not used.
+Silver ions are used to cleave the link between bases five and six, allowing the dye to be observed.
+The cleave leave a normal 5' end, which can be used to bind new oligonucleotides.
+After the first round of sequencing, the new chain is removed, and a second round is started, but with a primer of length N-1.
+Multiple rounds with primers with different lengths ensure that each bases is measured twice.
+After the rounds, the colors can be decoded to get the actual bases, like in Figure \ref{solid_color_decoding}.
+The total workflow in shown in Figure \ref{fig:solid_workflow}.
+
+Because each base is measured twice, the accuracy can go up to 99.999\% with six primers, which is the highest of the NGS methods \cite{ngs_sequencing_atdbio}.
+A downside is that the read lengths are usually short, 50 to 75 basepairs \cite{ngs_history}.
+
+\figC{scale=.5}{solid_color_coding.jpg}{Color coding of SOLiD sequencing results, source: \cite{solid_color_coding}}{fig:solid_color_coding}
+\figC{scale=.3}{solid_color_decoding.png}{Color decoding of SOLiD sequencing results, source: \cite{solid_color_decoding}}{fig:solid_color_decoding}
+\figC{scale=.5}{solid_sequencing.png}{Workflow of SOLiD sequencing, source: \cite{ngs_sequencing_atdbio}}{fig:solid_workflow}
+
 
 \subsection{Long read sequencing}
 
