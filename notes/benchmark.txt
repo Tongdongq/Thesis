@@ -1,0 +1,65 @@
+Created: 
+15-12-2017
+
+TACC: branch '60', options: STREAM WORK ABSEQ (option 51)
+./benchmark.py 8 32 128 128r unless stated otherwise
+
+./generate.sh 4 3000 200000 6000 1
+50.93 s, -46%
+./generate.sh 4 3000 100000 6000 1
+23.30 s, -26%
+./generate.sh 4 3000 100000 5000 1, 99039 rpairs
+25.38 s, -21%
+./generate.sh 4 3000 100000 5000 2, 198015 rpairs
+36.11 s, +3%
+./generate.sh 4 5000 10000 40000 256, 555k rpairs
+80.32 s, +234%
+./generate.sh 1 1100 100000 1 1, 100009 rpairs
+6.63 s, -4%
+./generate.sh 1 1100 100000 1 2, 200010 rpairs
+6.99 s, -0.5%
+./generate.sh 1 1100 200000 1 1, 200029 rpairs
+11.65 s, -30%
+./generate.sh 1 1100 200000 1 2, 400034 rpairs
+12.09 s, -30%
+./generate.sh 2 1100 100000 1 1, 100002 rpairs
+12.92 s, +60%
+./generate.sh 4 3000 5000 200000 5001, 554667 rpairs
+49.31 s, +242%
+./generate.sh 3 1100 100000 1 1 15, 100003 rpairs
+8.41 s, +13%
+./generate.sh 3 1100 200000 1 1 15, 200021 rpairs
+14.70 a, -19%
+
+--------------------
+ce-cuda server:
+./run.sh 8 unless stated otherwise
+
+./generate.sh 4 3000 200000 6000 1
+1m35, run on hpc1, because of large index sizes
+./generate.sh 4 3000 100000 6000 1
+31.6 s
+./generate.sh 4 3000 100000 5000 1, 99039 rpairs
+32.3 s
+./generate.sh 4 3000 100000 5000 2, 198015 rpairs
+35.0 s
+./generate.sh 4 5000 10000 40000 256, 555k rpairs
+24.0 s
+./generate.sh 1 1100 100000 1 1, 100009 rpairs
+6.92 s
+./generate.sh 1 1100 100000 1 2, 200010 rpairs
+7.03 s
+./generate.sh 1 1100 200000 1 1, 200029 rpairs
+17.0 s
+./generate.sh 1 1100 200000 1 2, 400034 rpairs
+17.3 s
+./generate.sh 2 1100 100000 1 1, 100002 rpairs
+8.17 s
+./generate.sh 4 3000 5000 200000 5001, 554667 rpairs
+14.4 s
+./generate.sh 3 1100 100000 1 1 15, 100003 rpairs
+7.46 s
+./generate.sh 3 1100 200000 1 1 15, 200021 rpairs
+18.15 s
+
+
