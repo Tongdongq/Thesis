@@ -110,6 +110,12 @@ CBTr 8 48 96 255, -O3:
 28: real 9.29a s
 29: real 9.23a s
 30: real 10.96a s
+CBTr 8 32 128 32, -O3:
+1: real 13.34a s
+22: real 9.81a s
+CBTr 8 64 128 32, -O3:
+1: real 14.17a s
+22: real 9.45a s
 ./generate.sh 1 1100 20000, without complement
 CBTr 8 32 128 128, -O3:
 1: real 22.4 s
@@ -687,7 +693,56 @@ l2_s0_read_misses	4567408		116899		50533				3881068		111683		51009
 l2_s0_tot_read_quer 7217818		1436724		1252642				6656768		1433721		1247094
 
 
+branch: 60, measuring register spilling impact on l1
+./generate.sh 1 1100 5000
+./profile.sh 8 64 128 128r
+						51 (16KB L1):	51 (48KB L1):	51 (64regs,16KBL1):	51 (64regs,48KBL1):
+metric
+gld_transactions		3533305			3542758			3730343				3711585		
+gst_transactions		2178778			2188441			2337258				2321477		
+gld_efficiency			72.10%			72.10%			72.10%				72.10%		
+gst_efficiency			66.71%			66.71%			66.71%				66.71%		
+gst_throughput			11.94 GB/s		12.63 GB/s		12.36 GB/s			13.83 GB/s					
+gld_throughput			19.28 GB/s		20.39 GB/s		19.95 GB/s			22.33 GB/s						
+gst_req_throughput		7.97 GB/s		8.42 GB/s		8.24 GB/s			9.23 GB/s						
+gld_req_throughput		13.90 GB/s		14.70 GB/s		14.39 GB/s			16.10 GB/s					
+l2_read_transacts		12226004		9322592			24605016			17835295			
+l2_write_transacts		5887454			5690227			13183942			9774937			
+events
+inst_executed			39054421		38957191		45562224			45369926				
+gld_inst_8bit			24851041		24851041		24851041			24851041					
+gld_inst_16bit			2510022			2510022			2510022				2510022		
+gld_inst_32bit			31487573		31487573		31487573			31487573					
+gld_inst_64bit			5179973			5179973			5179973				5179973		
+l1_gbl_ld_transacts		3563967			3574012			3773405				3751024		
+l1_gbl_st_transacts		2180279			2192055			2337085				2331782		
+l1_lcl_ld_hit			818139			1547726			557531				2248241		
+l1_lcl_ld_miss			870877			141058			3936033				2244112		
+l1_lcl_st_hit			45434			68670			214761				337194		
+l1_lcl_st_miss			116264			95856			1949721				1832507		
+l2_s0_read_misses		984821			551040			2302555				1783538		
+l2_s0_tot_read_query	3093639			2399178			6287113				4605665		
+l2_reads_bc_of_l1_ld_miss	3.5%		2.9%			16%					6%	
 
+./generate.sh 1 1100 10000
+./benchmark.py 8 64 128 256r
+51 16KBL1: 8.49a s
+51 48KBL1: 8.46a s
+./benchmark.py 8 32 128 256r
+51 16KBL1: 8.37a s
+51 48KBL1: 8.37a s
+./benchmark.py 8 64 128 128r
+51 16KBL1: 8.47a s
+51 48KBL1: 8.47a s
+./benchmark.py 8 32 128 128r
+51 16KBL1: 8.26a s
+51 48KBL1: 8.17a s
+./benchmark.py 8 64 128 64r
+51 16KBL1: 8.42a s
+51 48KBL1: 8.44a s
+./benchmark.py 8 32 128 64r
+51 16KBL1: 8.52a s
+51 48KBL1: 8.31a s
 
 
 
