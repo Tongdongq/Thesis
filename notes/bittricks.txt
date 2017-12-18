@@ -1,0 +1,89 @@
+
+Created:
+18-12-2017
+
+A:00
+T:01
+C:10
+G:11
+
+A T C G
+00011011
+A T G G
+00011111
+-------- ^
+00000100   6th bit wrong, __ffs() returns 3, sizeof(char)-3 = 5, 5>>1=2 -> snakelength = 2
+
+A T C G
+00011011
+A T A G
+00010011
+-------- ^
+00001000   5th bit wrong, __ffs() returns 4, 8-4 = 4, 4>>1 = 2 -> snakelength = 2
+
+A T C G
+00011011
+A T G C
+00011110
+-------- ^
+00000101   6,8th bit wrong, __ffs() returns 1, 8-1=7, 7>>1 = 3 -> snakelength = 3 INCORRECT
+
+A T C G
+00011011
+A T G C
+00011110
+-------- ^
+00000101, __clz() returns 5, 5>>1=2, snakelength = 2
+
+A T C G
+00011011
+A T A G
+00010011
+-------- ^
+00001000, __clz() returns 4, 4>>1=2, snakelength = 2
+
+For k == 1:
+A T C G
+00011011
+T A G x
+010011xx
+-------- ^
+010101xx
+11111100 = -1 << (2*abs(k)) = -1 << (2*__sad(k,0,0)) = -1 << (__sad(k,-k,0))
+-------- &
+01010100, __clz() returns 1, 1>>1=0, snakelength = 0
+
+
+How to keep track of match/mismatch in bitvector b:
+x = snakelength
+b = (b << x) | !(-1 << x) = (b << x) | 0b000000111 with 'x' ones
+No need to shift a '0' in, this is done before the while loop
+
+
+
+__clz() returns the number of leading zeroes in a 32 bit int
+__clzll() returns the number of leading zeroes in a 64 bit int
+__sad(int x, int y, uint z) returns |x - y| + z
+
+Source: http://docs.nvidia.com/cuda/cuda-math-api/group__CUDA__MATH__INTRINSIC__INT.html
+
+---------------------------------------------
+---------------------------------------------
+---------------------------------------------
+
+Implementation details:
+.db files have compressed reads, these are read by DB.c:Read_All_Sequences.
+They need to be uncompressed first, because of the kmer matching in the algorithm.
+The reads[i].coff is normally used for .qvs or .hds files, now it contains the offset between the start of the big char* cbases and the start of the read.
+The start of a read has an address that is a multiple of 32.
+So the offset, after a read is read, is rounded up to the nearest multiple of 32. The loss per read is at most 30 bits, which corresponds to 15 compressed bases.
+
+
+
+
+
+
+
+
+
+
