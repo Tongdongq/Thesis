@@ -49,6 +49,7 @@ T16: real 3.2 s
 60: without L1 caching, ABSEQ is cached in smem
 61: without L1 caching, ABSEQ is compressed and cached in smem
 62: without L1 caching, ABSEQ is compressed
+80: without L1 caching, ABSEQ is compressed and XORed to find snakes
 
 TACC server ~/daligner
 times with the same letter behind them are benchmarked during the same session

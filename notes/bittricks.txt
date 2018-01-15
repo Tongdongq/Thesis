@@ -42,6 +42,56 @@ A T A G
 -------- ^
 00001000, __clz() returns 4, 4>>1=2, snakelength = 2
 
+
+How to keep track of match/mismatch in bitvector b:
+x = snakelength
+b = (b << x) | !(-1 << x) = (b << x) | 0b000000111 with 'x' ones
+No need to shift a '0' in, this is done before the while loop
+
+How to keep track of number of matches in m:
+x = snakelength
+y = number of matches in x rightmost bits in b
+m += x - y
+Get x rightmost bits in b:
+mask = 0b111000000 = (-1 << (32-x)) = __brev(-1 << x)
+Get number of matches/ones in x rightmost bits in b:
+y = __popc(b & mask)
+
+__clz() returns the number of leading zeroes in a 32 bit int
+__clzll() returns the number of leading zeroes in a 64 bit int
+__sad(int x, int y, uint z) returns |x - y| + z
+__popc() returns the number of ones in a 32 bit int
+__ffs() returns the position of the least significant bit set to 1
+
+Source: http://docs.nvidia.com/cuda/cuda-math-api/group__CUDA__MATH__INTRINSIC__INT.html
+
+---------------------------------------------
+---------------------------------------------
+---------------------------------------------
+
+Implementation details:
+18-12-2017:
+.db files have compressed reads, these are read by DB.c:Read_All_Sequences.
+They need to be uncompressed first, because of the kmer matching in the algorithm.
+The reads[i].coff is normally used for .qvs or .hds files, now it contains the offset between the start of the big char* cbases and the start of the read.
+The start of a read has an address that is a multiple of 32.
+So the offset, after a read is read, is rounded up to the nearest multiple of 32. The loss per read is at most 30 bits, which corresponds to 15 compressed bases.
+
+HITS_DB:cbases is at the bottom, because DB.c:Open_DB():441 tries to read sizeof(HITS_DB) bytes from the index file.
+
+snakelength = __clz(a1 ^ b1) / 2 - t2, because each matching base has two leading zeros, and t2 indicates the start of the snake inside the integer, so some leading zeros have to be ignored.
+If snakelength + t2 == 16, then the snake does not end in the current integer, and a next one has to be evaluated.
+
+20-12-2017:
+To keep track of the number of matches 'm', we can look at the snakelength, this is how many matches should be added. The MSB part of bitvector 'b' contains the part that is shifted out, snakelength bits are shifted out. To count the number of matches in these snakelength bits, mask them, invert them, and use popcount to get the number of ones, this indicates the number of mismatches. Then add that number of mismatches to m, to get the new number of matches.
+The new value for b is: shift snakelength bits to the left, then set the rightmost snakelength bits. Setting those bits is done by reversing the mask used to get the leftmost snakelength bits with __brev().
+
+For k != 0:
+problem when apos % 4 != bpos % 4, because one int has to be rightshifted and masked. But the last bases of the unshifted read are ignored, they need to be compared too!
+
+21-12-2017:
+Printing a 64bit int in hex format is done with %lx, not %016x.
+
 For k == 1:
 A T C G
 00011011
@@ -53,37 +103,114 @@ T A G x
 -------- &
 01010100, __clz() returns 1, 1>>1=0, snakelength = 0
 
+k = 0:
+T T C G  T G A G
+01011011 01110011
+T C G T  G A G C
+01101101 11001110
+-------- -------- ^
+00110110 10111101
+11111111 = -1 << (2*abs(k))
+-------- &
+00110110, __clz() returns 2, 2>>1 = 1, snakelength = 1
 
-How to keep track of match/mismatch in bitvector b:
-x = snakelength
-b = (b << x) | !(-1 << x) = (b << x) | 0b000000111 with 'x' ones
-No need to shift a '0' in, this is done before the while loop
+k = 1, ideal:
+T C G T  G A G x
+01101101 110011xx
+T C G T  G A G C
+01101101 11001110
+-------- ^
+00000000, __clz() returns 8, 8>>1 = 4, snakelength = 4 -> check next int
 
+k = 1, current:
+apos = 1, bpos = 0
+T C G x  a rightshifted 1
+011011xx
+T C G T
+01101101
+-------- ^
+000000xx
+11111100 = -1 << (2*abs(k or apos))
+-------- &
+00000000, __clz() returns 8, 8>>1 = 4, snakelength = 4-ashift = 4-1 = 3
+it should continue with:
+x x x T  2nd byte a leftshifted 3=4-apos
+xxxxxx01
+x x x T
+xxxxxx01
+-------- ^
+xxxxxx00
+00000011 = ~(-1 << (2*abs(k or apos))) = (1 << 2*apos) - 1
+-------- &
+00000000, __clz() returns 8, 8>>1 = 4, snakelength = 4-3 = 1
+then continue with:
+G A G x  2nd byte a leftshifted 1 (=apos)
+110011xx
+G A G C
+11001110
+-------- ^
+000000xx
+11111100 = -1 << (2*abs(k or apos))
+-------- &
+00000000, __clz() returns 8, 8>>1 = 4, snakelength = 4-ashift
 
+./generate.sh 3 160 2 1 1 15 has two readpairs
 
-__clz() returns the number of leading zeroes in a 32 bit int
-__clzll() returns the number of leading zeroes in a 64 bit int
-__sad(int x, int y, uint z) returns |x - y| + z
+22-12-2017:
+The bases have to be read from the other side in reverse_wave(). They can be duplicated from the host, but that doubles the required memory for the bases (still low though).
+One option is to reverse the incoming ints with __brev(), and calculate like in forward_wave().
+Another is to use __ffs() to count the number of matches from the LSB side.
 
-Source: http://docs.nvidia.com/cuda/cuda-math-api/group__CUDA__MATH__INTRINSIC__INT.html
+Masking abseq: only the rightmost t2 bases should be xored, or kept from the xored result. This means the leftmost 32-2*t2 bits should be removed.
 
----------------------------------------------
----------------------------------------------
----------------------------------------------
+If t2 is 0, no bases from the current int are needed.
+if(t2 == 0){
+	t1--;
+	t2 = 15;
+}
 
-Implementation details:
-.db files have compressed reads, these are read by DB.c:Read_All_Sequences.
-They need to be uncompressed first, because of the kmer matching in the algorithm.
-The reads[i].coff is normally used for .qvs or .hds files, now it contains the offset between the start of the big char* cbases and the start of the read.
-The start of a read has an address that is a multiple of 32.
-So the offset, after a read is read, is rounded up to the nearest multiple of 32. The loss per read is at most 30 bits, which corresponds to 15 compressed bases.
+apos: 2, bpos: 2
+A T C G
+00011011
+A T G G
+00011111
+-------- shift both right by 4-pos-1
+x A T C
+00000110
+x A T G
+00000111
+-------- ^
+00000001, __ffs()-1 returns 0, __clz(__brev()) returns 0, 0>>1 = 0, snakelength = 0
 
+apos: 1, bpos: 1
+A T C G
+00011011
+A T G G
+00011111
+-------- shift both right by 4-pos-1
+x x A T
+00000001
+x x A T
+00000001
+-------- ^
+00000000, __ffs()-1 returns -1, snakelength = apos+1 = 2, need new int
+          __clz(__brev()) returns 32, snakelength = apos+1 = 2, need new int
 
-
-
-
-
-
-
+apos: 1, bpos: 2
+A T C G
+00011011
+C A T G
+10000111
+-------- shift both right by 4-pos-1
+x x A T
+00000001
+x C A T
+00100001
+-------- ^
+00100000
+00001111 mask, because of shifts
+-------- &
+00000000, __ffs()-1 returns 32, snakelength = apos+1 = 2, need new int
+          __clz(__brev()) returns 32, snakelength = apos+1 = 2, need new int
 
 

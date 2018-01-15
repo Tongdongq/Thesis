@@ -1,3 +1,12 @@
+14 dec
+Register spilling
+Pawel Pomorski, University of Waterloo, 2015, CSE746
+http://ppomorsk.sharcnet.ca/CSE746/lecture6_CSE746_2015.pdf
+
+14 dec
+Register spilling, how to solve
+Paulius Micikevicius
+http://developer.download.nvidia.com/CUDA/training/register_spilling.pdf
 
 31 okt
 Memory statistics, profiling
