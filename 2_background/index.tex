@@ -197,7 +197,8 @@ There are two other popular NGS techniques: DNA Nanoball Sequencing (DNBS) and I
 DNBS relies on Rolling Circle Amplification to clone the DNA strands that need to be sequenced.
 The cloned strands are sequenced like in SOLiD sequencing \cite{ngs_history}.
 Ion Torrent is very similar to pyrosequencing, but uses hydrogen ions instead of fluorescent dye to detect bases \cite{ngs_sequencing_atdbio}.
-The number of ions is proportional to the number bases that was attached.
+The number of ions is proportional to the number bases that was attached, however, at large repeating sections the accuracy decreases.
+Ion Torrent produces reads of up to 400 basepaires, but the error rate is relatively high at 1.5\%.
 
 
 \subsection{Long read sequencing}
