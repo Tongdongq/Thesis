@@ -505,7 +505,7 @@ Created branch 'min2', to reduce min(ac,ap,am) to min(a1,a2).
 14-12-2017:
 Worksizes 10000, 10000, 1000 works for ./generate.sh 4 3000 10000 5000 16
 Measured impact of register spilling
-./generate.sh 4 3000 100000 5000 [1|2] is faster than CPU implementation!!!
+./generate.sh 4 3000 100000 5000 [1|2] is faster than CPU implementation!!! (ce-cuda only)
 Created 'benchmark.txt'
 
 18-12-2017:
@@ -531,6 +531,51 @@ Current compression: 1       2       3       4       5       6       7       8
 Proposed:			 1       2       3       4       5       6       7       8
 					 5 6 7 8 1 2 3 4
 This compression is done in cuda_host:compress()
+
+int = idx % 16
+byte = 4 - idx % 4
+
+TACC CPU and ce-cuda CPU have very different runtimes!!
+
+16-1-2018:
+Reimplemented CACHE_DIAGS from branch justLA, it had a big bug, which is fixed now.
+Reordered clz usage, no speedup
+
+17-1-2018:
+Combining CACHE_DIAGS with COMPRESS_ABSEQ is (much) slower
+Base: 214r, 82: 197r
+83: 82+DIAGS5: 232r, possibly due to pointers to smem
+82 cat 1 reads:
+- uses about 55% of global ld/st BW vs 22, same ratio for l2 ld/st instructions
+- L1 hitrate (48KB L1) is 99%, vs 70% with option 22
+82 vs 22 has little diffs in cat 4 reads
+
+22-1-2018:
+Removed Pebbles again, but more thoroughly, still ~35% speedup.
+Removed SCORE and TABLE usage, overwrite trimX variables each time now, no speedup.
+Still a lot of memory dependencies.
+Made abseq const and __restrict__, no speedup.
+
+23-1-2018:
+Made VMTHAB arrays __restrict__, no speedup.
+Use inline PTX to find max of ac,ap,am (only in for wave), no speedup.
+
+24-1-2018:
+Inline PTX for loading m and b from gmem works seperately.
+Inline PTX for loading m and b from gmem works together, but only with -O0 or -O3 -G
+
+25-1-2018:
+Added 'volatile' to make it work without -G
+Inline PTX for loading m and b from gmem works together with ptx to find max of ac,am,ap in both for and rev wave, small slowdown (1-2%).
+Changing 'am>ap' to 'am>=ap' introduces differences in the results.
+Put SCORE and TABLE usage back, no difference in runtime, slight increase in register spillage
+Made SCORE and TABLE const and restricted, no speedup.
+./run.sh 8 128 32 is 5% faster than 8 32 128
+Caching align->ablen in registers, 9-13% speedup.
+Inline PTX for keep track of besta and besty, no speedup.
+Small reorder for 'min>>=1;a1&=mask' in snakefinding, <1% speedup.
+
+
 
 
 TODO: create type 5 reads that have a AT/GC imbalance.

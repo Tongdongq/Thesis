@@ -50,6 +50,9 @@ T16: real 3.2 s
 61: without L1 caching, ABSEQ is compressed and cached in smem
 62: without L1 caching, ABSEQ is compressed
 80: without L1 caching, ABSEQ is compressed and XORed to find snakes
+81: compressed ABSEQ and XORed, STREAM
+82: compressed ABSEQ and XORed, STREAM, COALESCE_WORK
+83: compressed ABSEQ and XORed, STREAM, COALESCE_WORK and DIAGS5
 
 TACC server ~/daligner
 times with the same letter behind them are benchmarked during the same session
@@ -669,29 +672,32 @@ l2_s0_tot_read_quer 7760511		1562954		1374816				5825923		940408		805111		803612
 
 ./generate.sh 1 1100 5000
 ./profile.sh 1 32 128 128r 										./profile.sh 2 32 128 128r
-					1:			22:			41:					1:			22:			41:
-metric
-gld_transactions	25928519	1779994		1847171				25923023	1779841		1850768
-gst_transactions	12326277	1154662		1085107				12325594	1153615		1087534
-gld_efficiency		11.25%		72.14%		81.11%				11.25%		72.15%		81.12%
-gst_efficiency		13.65%		66.71%		73.07%				13.65%		66.71%		73.07%
-gst_throughput		16.53 GB/s	12.23 GB/s	10.86 GB/s			16.98 GB/s	12.30 GB/s	10.86 GB/s
-gld_throughput		34.78 GB/s	19.74 GB/s	20.96 GB/s			35.70 GB/s	19.85 GB/s	20.95 GB/s
-gst_req_throughput	2.26 GB/s	8.16 GB/s	7.94 GB/s			2.32 GB/s	8.20 GB/s	7.93 GB/s
-gld_req_throughput	3.91 GB/s	14.24 GB/s	17.00 GB/s			4.02 GB/s	14.32 GB/s	17.00 GB/s
-l2_read_transacts	28392374	5571120		4821893				26448889	5561869		4822192
-l2_write_transacts	15115230	3021443		2577747				14808989	3017836		2577267
-events			
-gld_inst_8bit		12885725	12885725	12885725			12885725	12885725	12885725
-gld_inst_16bit		1342127		1301493		1301493				1342127		1301493		1301493
-gld_inst_32bit		16156075	16326738	21117424			16147948	16326738	21117424
-gld_inst_64bit		2685912		2685912		2689975				2685912		2685912		2689975
-l1_gbl_ld_transacts	36647251	1787268		1860717				41407834	1788224		1859334
-l1_gbl_st_transacts	12341499	1156783		1092189				12397124	1155800		1089440
-l1_lcl_ld_hit		56299		569929		497156				42656		571503		497217
-l1_lcl_ld_miss		539661		283082		24099				56245		281458		24105
-l2_s0_read_misses	4567408		116899		50533				3881068		111683		51009
-l2_s0_tot_read_quer 7217818		1436724		1252642				6656768		1433721		1247094
+					1:			22:			41:			82:			1:			22:			41:
+metric	
+gld_transactions	25928519	1779994		1847171		1895852		25923023	1779841		1850768
+gst_transactions	12326277	1154662		1085107		377486		12325594	1153615		1087534
+gld_efficiency		11.25%		72.14%		81.11%		46.05%		11.25%		72.15%		81.12%
+gst_efficiency		13.65%		66.71%		73.07%		76.93%		13.65%		66.71%		73.07%
+gst_throughput		16.53 GB/s	12.23 GB/s	10.86 GB/s	5.64 GB/s	16.98 GB/s	12.30 GB/s	10.86 GB/s
+gld_throughput		34.78 GB/s	19.74 GB/s	20.96 GB/s	16.00 GB/s	35.70 GB/s	19.85 GB/s	20.95 GB/s
+gst_req_throughput	2.26 GB/s	8.16 GB/s	7.94 GB/s	4.29 GB/s	2.32 GB/s	8.20 GB/s	7.93 GB/s
+gld_req_throughput	3.91 GB/s	14.24 GB/s	17.00 GB/s	7.36 GB/s	4.02 GB/s	14.32 GB/s	17.00 GB/s
+l2_read_transacts	28392374	5571120		4821893		2914011		26448889	5561869		4822192
+l2_write_transacts	15115230	3021443		2577747		1122622		14808989	3017836		2577267
+events				
+gld_inst_8bit		12885725	12885725	12885725	71808		12885725	12885725	12885725
+gld_inst_16bit		1342127		1301493		1301493		559977		1342127		1301493		1301493
+gld_inst_32bit		16156075	16326738	21117424	8404219		16147948	16326738	21117424
+gld_inst_64bit		2685912		2685912		2689975		1150464		2685912		2685912		2689975
+l1_gbl_ld_transacts	36647251	1787268		1860717		1899838		41407834	1788224		1859334
+l1_gbl_st_transacts	12341499	1156783		1092189		378003		12397124	1155800		1089440
+l1_lcl_ld_hit		56299		569929		497156		336050		42656		571503		497217
+l1_lcl_ld_miss		539661		283082		24099		4807		56245		281458		24105
+l2_s0_read_misses	4567408		116899		50533		86789		3881068		111683		51009
+l2_s0_tot_read_quer 7217818		1436724		1252642		751700		6656768		1433721		1247094
+
+
+
 
 
 branch: 60, measuring register spilling impact on l1
@@ -744,6 +750,35 @@ l2_reads_bc_of_l1_ld_miss	3.5%		2.9%			16%					6%
 ./benchmark.py 8 32 128 64r
 51 16KBL1: 8.52a s
 51 48KBL1: 8.31a s
+
+
+./generate.sh 4 3000 50000 5000 1
+./profile.sh 8 32 128 128r, 48KB L1
+						1:			21:			82:
+gld_transactions		200488966	178690085	157717915					
+gst_transactions		86040193	71081420	71082366					
+gld_efficiency			11.95%		12.23%		14.56%				
+gst_efficiency			14.70%		15.22%		15.22%				
+gst_throughput			7.72 GB/s	7.10 GB/s	7.63 GB/s					
+gld_throughput			17.99 GB/s	17.05 GB/s	16.11 GB/s					
+gst_req_throughput		1.13 GB/s	1.10 GB/s	1.18 GB/s					
+gld_req_throughput		2.11 GB/s	2.08 GB/s	2.35 GB/s					
+l2_read_transacts		201827332	195384749	171743713					
+l2_write_transacts		96196144	97961608	111580996					
+inst_executed			311349403	438176795	400959732					
+gld_inst_8bit			46496911	46498176	429519					
+gld_inst_16bit			2923864		2882873		2882873				
+gld_inst_32bit			127112301	129380388	150605301					
+gld_inst_64bit			24018332	24019122	24017287					
+l1_gbl_ld_transacts		208405038	182843071	162079465					
+l1_gbl_st_transacts		86040727	71081706	71082778					
+l1_lcl_ld_hit			6592964		15630585	15664676					
+l1_lcl_ld_miss			266800		11234		9347				
+l1_lcl_st_hit			15533		11843		11531				
+l1_lcl_st_miss			5678		3655		3535				
+l2_s0_read_misses		28089432	40397247	42299918					
+l2_s0_tot_read_query	50605965	48845885	42909957					
+
 
 
 

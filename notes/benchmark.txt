@@ -7,12 +7,13 @@ TACC: branch '60', options: STREAM WORK ABSEQ (option 51)
 ce-cuda server:
 ./run.sh 8 unless stated otherwise
 
-./generate.sh			rpairs	LAcalls		LA/pair	TACC(s)	ce-cuda(s)	TACC relative
+./generate.sh			rpairs	LAcalls		LA/pair	TACC 80	ce-cuda(s)	TACC 80
 4 3000 300000 6000 1	275457	8692686	
 4 3000 200000 6000 1	183377	5791057		32		50.93	95 (hpc1)	-46%
 4 3000 100000 6000 1	91533	2897982		32		23.30	31.6		-26%
 4 3000 100000 5000 1	99039	3457300		35		25.38	32.3		-21%
 4 3000 100000 5000 2	198015	6935489		35		36.11	35.0		+3%
+4 3000 100000 5000 4	396045	13862107	35		42.4	
 4 5000 10000 40000 256	555233	24342218	44		80.32	24.0		+234%
 1 1100 100000 1 1		100009	300162		3		6.63 	6.92		-4%
 1 1100 100000 1 2		200010	600274		3		6.99 	7.03		-0.5%
@@ -22,3 +23,65 @@ ce-cuda server:
 4 3000 5000 200000 5001	554667	15618337	28		49.31	14.4		+242%
 3 1100 100000 1 1 15	100003	11187742	112		8.41 	7.46		+13%
 3 1100 200000 1 1 15	200021	22363062	112		14.70	18.15		-19%
+
+./generate.sh			TACC 80	TACC C8	TACC C1	TACC 82
+4 3000 200000 6000 1	50.93	31.5	x		x
+4 3000 100000 6000 1	23.30	11.8	51.7	18.4
+4 3000 100000 5000 1	25.38	12.4	55.4	19.8
+4 3000 100000 5000 2	36.11	15.8	1m17	28.1
+4 3000 100000 5000 4	42.4	22.0	2m1		42.0
+4 5000 10000 40000 256	80.32	22.7	2m34	58.6
+1 1100 100000 1 1		6.63 	3.6		10.1	5.9
+1 1100 100000 1 2		6.99 	3.8		11.0	6.4
+1 1100 200000 1 1		11.65	7.3		23.9	9.8
+1 1100 200000 1 2		12.09	8.3		26.7	10.6
+2 1100 100000 1 1		12.92	4.6		19.5	6.4
+4 3000 5000 200000 5001	49.31	14.4	x		35.1
+3 1100 100000 1 1 15	8.41 	3.9		13.3	6.9
+3 1100 200000 1 1 15	14.70	8.6		30.9	11.9
+
+82: CABSEQ, WORK, STREAM, STABLE
+83: CABSEQ, WORK, STREAM, STABLE, DIAGS5
+84: CABSEQ, WORK, STREAM, STABLE, DIAGS9
+85: CABSEQ, WORK, STREAM, STABLE, DIAGS17
+82 NP: normal 82, but with NOPEBBLES
+86 NP: CABSEQ, WORK, STREAM, STABLE, no Pebbles, abseq is const restrict, VMTHAB is restrict
+87 NP: CABSEQ, WORK, STREAM, STABLE, DIAGS5, no Pebbles, abseq is const restrict, VMTHAB is restrict
+88: CABSEQ, WORK, STREAM, STABLE, no Pebbles, abseq/TABLE const restrict, VMT restrict, inline PTX for max and loading b,m,c
+./generate.sh 1 1100 10000	83:		84:		85:
+./run.sh 8 32 128 128r		10.6	10.6	x
+./run.sh 8 32 128 255r		10.4	10.4	x
+./run.sh 8 64 64 128r		10.3	11.9	12.7
+./run.sh 8 96 48 128r		11.1	12.8	11.9
+./run.sh 8 64 32 128r		
+./run.sh 8 64 32 255r				12.7	17.8
+
+./generate.sh 4 3000 100000 5000 4
+						smem: 	82:		83:		84:		85:		82 NP:	86 NP:	87 NP:
+./run.sh 8 32 128 128r	16KB	50.2	1m29	1m30	x		35.7
+./run.sh 8 64  64 128r	16KB	49.8	1m28	2m15	2m25	35.9	37
+./run.sh 8 128 32 128r  16KB	49.3							36.3
+./run.sh 8 32 128 128r	48KB	50.2	56.0	1m31	x
+./run.sh 8 64  64 128r	48KB	49.5	55.2	1m12	2m25
+./run.sh 8 32 128  64r	16KB	52.0	1m30	1m34	x		36.8	37.4	1m2
+./run.sh 8 64  64  64r	16KB	52.2	1m29	2m16	2m26	37.0	37.4	49.1
+./run.sh 8 128 32  64r  16KB	50.0							35.9	35.9	49.0
+./run.sh 8 32 128  64r	48KB	53.0	58.7	1m34	x
+./run.sh 8 64  64  64r	48KB	53.1	58.2	1m15	2m26
+./run.sh 8 32 128  32r	16KB	1m8		1m37	1m58	x		44.5
+./run.sh 8 64  64  32r	16KB	1m4		1m36	2m30	2m38	45.6
+./run.sh 8 128 32  32r	16KB	57.4	1m35	2m27	4m6		38.8	
+./run.sh 8 32 128  32r	48KB	1m10	1m13	1m57	x			
+./run.sh 8 64  64  32r	48KB	1m6		1m12	1m35	2m38	
+./run.sh 8 128 32  32r  48KB	1m2		1m12	1m33	1m54
+
+
+88a: normal 88, but caching align->ablen in regs
+88b: normal 88a, but removed SCORE and TABLE usage
+88c: normal 88b, but inline PTX for besta/besty tracking
+88d: normal 88c, but small reordering with 'min>>=1;a1&=mask' in snakefinding
+./generate.sh 4 3000 100000 5000 4	88:		88a:	88b:	88c:	88d:
+./run.sh 8 32 128 64r 				38.0	34.5	33.8	34.0	34.0	
+./run.sh 8 128 32 64r 				36.0	33.1	32.9	32.9	32.7
+
+

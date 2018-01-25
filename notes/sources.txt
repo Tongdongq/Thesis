@@ -1,3 +1,16 @@
+
+24 jan
+cuda-gdb manual
+http://lutgw1.lunet.edu/cuda/pdf/cuda-gdb.pdf
+
+23 jan
+PTX full instruction set manual
+https://www.nvidia.com/content/CUDA-ptx_isa_1.4.pdf
+
+23 jan
+Inline ptx, multiple predicate registers
+https://www.cs.uaf.edu/2011/spring/cs641/lecture/03_03_CUDA_PTX.html
+
 14 dec
 Register spilling
 Pawel Pomorski, University of Waterloo, 2015, CSE746
