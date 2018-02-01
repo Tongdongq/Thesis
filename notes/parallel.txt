@@ -575,6 +575,36 @@ Caching align->ablen in registers, 9-13% speedup.
 Inline PTX for keep track of besta and besty, no speedup.
 Small reorder for 'min>>=1;a1&=mask' in snakefinding, <1% speedup.
 
+26-1-2018:
+Previous nvprofs show that removing Pebbles results in 10% less global loads, and 40% less global stores, this is mainly due to not reading/writing to HABNAB arrays and Pebble *cells array.
+
+Compress VM: V: 21b, M: 11b, both are unsigned
+When trimming the wavewidth, n is shifted right by 11 bits, otherwise V[] has to be shifted back each time.
+
+Do not use predicated instructions to write to an output in inline ptx, rather predicate write then to a temporary register, and then write then unpredicated to the output.
+
+29-1-2018:
+Made lots of scripts suitable for TACC and ce-cuda, export TACC=1 in .profile_user on TACC.
+
+30-1-2018:
+Made CPU implementation without Pebbles, synced align.c manually on TACC/original and ce-cuda/bulk/original. Git commits: TACC:062818d, ce-cuda:8a78ff0
+Both CPU implementations have the same output with and without Pebbles.
+TACC GPU (STREAM CABSEQ WORK, no args) and CPU implementations have the same output with Pebbles.
+Benched CPU implementations on TACC and ce-cuda.
+
+31-1-2018:
+Fixed misaligned addresses when NP, worksizes were no multiple of 8.
+TACC GPU (NP, NP WORK, NP CABSEQ, NP WORK CABSEQ, NP WORK CABSEQ STREAM) and CPU implementations have the same output without Pebbles, commit da78a9cc.
+CVM and NP are not compatible at this moment.
+Also benched C16 and C32 on CPU, both TACC and ce-cuda.
+Confirmed output CPU and GPU on TACC and ce-cuda.
+Merged COALESCE_WORK code using __X.
+
+Changed COMPRESS_VM into COMPRESS_WORK.
+Plan: first implement compression, then caching via registers (vm_curr, etc.)
+NA is used more often, so put it in MSB, HA will have an offset.
+work->vector compression: HAB: 14b, NAB: 18b, M: 11b, V: 21b
+NAB is 18b, but is stored in pb->mark, which is 17b when compressed, maybe give an extra bit to HAB.
 
 
 

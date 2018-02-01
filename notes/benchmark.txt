@@ -40,6 +40,8 @@ ce-cuda server:
 3 1100 100000 1 1 15	8.41 	3.9		13.3	6.9
 3 1100 200000 1 1 15	14.70	8.6		30.9	11.9
 
+80: CABSEQ
+81: CABSEQ, STREAM
 82: CABSEQ, WORK, STREAM, STABLE
 83: CABSEQ, WORK, STREAM, STABLE, DIAGS5
 84: CABSEQ, WORK, STREAM, STABLE, DIAGS9
@@ -76,12 +78,53 @@ ce-cuda server:
 ./run.sh 8 128 32  32r  48KB	1m2		1m12	1m33	1m54
 
 
-88a: normal 88, but caching align->ablen in regs
+88a: normal 88, but caching align->ablen in regs, 9-13% speedup
 88b: normal 88a, but removed SCORE and TABLE usage
 88c: normal 88b, but inline PTX for besta/besty tracking
 88d: normal 88c, but small reordering with 'min>>=1;a1&=mask' in snakefinding
-./generate.sh 4 3000 100000 5000 4	88:		88a:	88b:	88c:	88d:
-./run.sh 8 32 128 64r 				38.0	34.5	33.8	34.0	34.0	
-./run.sh 8 128 32 64r 				36.0	33.1	32.9	32.9	32.7
+89: normal 88d, but with different compression and revint
+89a: normal 89, but with max() intrinsic for bclip tracking
+89b: normal 89a, but with small reorder in xorring to find snakelength in rev wave
+./generate.sh 4 3000 100000 5000 4
+						88:		88a:	88b:	88c:	88d:	89:		89a:	89b:
+./run.sh 8 32 128 64r 	38.0	34.5	33.8	34.0	34.0	33.73	33.68	33.61
+./run.sh 8 128 32 64r 	36.0	33.1	32.9	32.9	32.81	32.74	32.65	32.63
 
+82: 930307ac, CABSEQ, WORK, STREAM
+90: 930307ac, normal 89b: but with compressed VM arrays and vm_prev, no Pebbles, 14% speedup vs 89b, CVM WORK STREAM CABSEQ NP
+./generate.sh 4 3000 100000 5000 4, all avg of 10 runs, tdiff between ()
+TACC, CPU 062818d:
+						82:			90:					
+./run.sh 8 32 128 128r 	53.59 (38)	28.04 (16)				
+./run.sh 8 64  64 128r 	52.73 (38)	27.97 (15)					
+./run.sh 8 128 32 128r 	51.97 (38)	26.98 (14)				
+C1: 2m0, Pebbles
+C1: 1m31, no Pebbles, -25% vs Pebbles
+C2: 1m3.5, Pebbles, 1.9x vs C1
+C2: 48.49, no Pebbles, -24% vs Pebbles
+C4: 35.86, Pebbles, 3.3x vs C1
+C4: 28.09, no Pebbles, -22% vs Pebbles
+C8: 22.29, Pebbles, 5.4x vs C1
+C8: 17.92, no Pebbles, -20% vs Pebbles
+C16: 15.45, Pebbles, 7.8x vs C1
+C16: 12.42, no Pebbles, -20% vs Pebbles
+C32: 14.63, Pebbles, 8.2x vs C1
+C32: 12.04, no Pebbles, -18% vs Pebbles
+C64: segfault
 
+ce-cuda, CPU 8a78ff0:	82:			90:		
+./run.sh 8 32 128 128r 	77.03 (36)	53.08 (16)				
+./run.sh 8 64  64 128r 	76.74 (37)	52.13 (16)					
+./run.sh 8 128 32 128r 	76.65 (37)	51.34 (15)
+C1: 3m47, Pebbles
+C1: 3m18.6,no Pebbles, -13% vs Pebbles
+C2: 1m59.7, Pebbles, 1.9x vs C1
+C2: 1m46.8, no Pebbles, -11% vs Pebbles
+C4: 1m9.8, Pebbles, 3.3x vs C1
+C4: 1m0.9, no Pebbles, -13% vs Pebbles
+C8: 45.14, Pebbles, 5.0x vs C1
+C8: 38.44, no Pebbles, -15% vs Pebbles
+C16: 30.98, Pebbles, 7.3x vs C1
+C16: 26.87, no Pebbles, -13% vs Pebbles
+C32: 27.34, Pebbles, 8.3x vs C1
+C32: 23.91, no Pebbles, -13% vs Pebbles

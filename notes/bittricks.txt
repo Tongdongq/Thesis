@@ -213,4 +213,19 @@ x C A T
 00000000, __ffs()-1 returns 32, snakelength = apos+1 = 2, need new int
           __clz(__brev()) returns 32, snakelength = apos+1 = 2, need new int
 
+-----------------------------------------
+26-1-2018:
+In rev wave, __brev(as[t1]) << (30-t2) is used to prepare the ints for xorring.
+Instead of using __brev on both ints, the xorred result should be reversed.
+This also means the shift is different.
+Old:
+int a1 = __brev(as[t1]) << (30-t2)
+int b1 = __brev(bs[t3]) << (30-t4)
+a1 ^= b1
+New:
+int a1 = as[t1] >> (30-t2)
+int b1 = bs[t3] >> (30-t4)
+a1 ^= b1
+a1 = __brev(a1)
+
 
