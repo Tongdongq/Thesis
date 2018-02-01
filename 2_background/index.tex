@@ -100,7 +100,7 @@ The cells produces more heat shock proteins when it is exposed to heat \cite{cha
 
 \subsection{Sanger sequencing}
 Sanger sequencing, also called chain-termination sequencing, is the first major DNA sequencing technique.
-It is published in 1977 \cite{Sanger}, and later improvements led to the development of commercial DNA sequencing machines in 1991 \cite{sequencing_history}.
+It is published in 1977 \cite{Sanger}, and later improvements led to the development of commercial DNA sequencing machines in 1991 \cite{history_sequencing}.
 It is also the technique used by the Human Genome Project \cite{sanger_sequencing2}, a project to sequence the whole genome of a human.
 The project start around 1990, and finished in 2003 \cite{human_genome_project}.
 Since Sanger sequencing has a maximum chain length of about 900 basepairs \cite{sanger_sequencing2}, the resulting pieces of DNA had to be assembled after sequencing.
@@ -166,7 +166,7 @@ The unused nucleotides are washed away, and the dye of the bound nucleotides is 
 Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history}\cite{pyro_sequencing1}).
 
 \figC{scale=.5}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
-\figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{sequencing_history}}{fig:bridge_pcr_comp}
+\figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
 
 
@@ -191,7 +191,7 @@ A downside is that the read lengths are usually short, 50 to 75 basepairs \cite{
 
 \figC{scale=.5}{solid_color_coding.jpg}{Color coding of SOLiD sequencing results, source: \cite{solid_color_coding}}{fig:solid_color_coding}
 \figC{scale=.3}{solid_color_decoding.png}{Color decoding of SOLiD sequencing results, source: \cite{solid_color_decoding}}{fig:solid_color_decoding}
-\figC{scale=.5}{solid_sequencing.png}{Workflow of SOLiD sequencing, source: \cite{ngs_sequencing_atdbio}}{fig:solid_workflow}
+\figC{scale=.4}{solid_sequencing.png}{Workflow of SOLiD sequencing, source: \cite{ngs_sequencing_atdbio}}{fig:solid_workflow}
 
 There are two other popular NGS techniques: DNA Nanoball Sequencing (DNBS) and Ion Torrent.
 DNBS relies on Rolling Circle Amplification to clone the DNA strands that need to be sequenced.
@@ -201,8 +201,40 @@ The number of ions is proportional to the number bases that was attached, howeve
 Ion Torrent produces reads of up to 400 basepaires, but the error rate is relatively high at 1.5\%.
 
 
-\subsection{Long read sequencing}
+\subsection{Third Generation Sequencing}
+There is no clear division between Next Generation Sequencing and Third Generation Sequencing (TGS).
+The technological improvements follow eachother quickly, and do not usually fit into welldefined timescales \cite{window_tgs}.
+However, an often used definition is that TGS approaches are able to sequence a single DNA molecule, thus eliminating the need for amplification \cite{history_sequencing}\cite{ngs_sequencing_atdbio}.
 
+The first TGS method is created by Helicos Biosciences, a company that went backrupt in 2012 \cite{history_sequencing}.
+DNA template strings are attached to a surface.
+Fluorescent nucleotides called Virtual Terminators are added, the dye is then cleaved off and detected.
+The samples are washed, and a new type of nucleotide can be added.
+The sequencing time for this method is relatively high, because only one type of nucleotide can be read at once, like with most NGS methods.
+The read lengths are also quite short: about 32 nucleotides \cite{window_tgs}.
+
+The other TGS are roughly placed into three categories: (a) sequencing by synthesis, (b) sequencing by nanopore, (c) direct imaging \cite{window_tgs}.
+
+Probably the most used TGS platform is the Single Molecule RealTime (SMRT) sequencing platform from Pacific Biosciences.
+A very important part of SMRT sequencing is the Zero-Mode Waveguide (ZMW) technology.
+A ZMW is a very tiny well, with a diameter of 60-100 nm, and a height of 100 nm \cite{zmw}.
+The metal that the wells are created in is placed on a glass substrate.
+At the bottom of each well is a DNA polymerase molecule attached.
+The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
+The diameter of the well is important, because it is smaller than the wavelength of the used light, the light penetrating the bottom of the well decays exponentionally, such that only the bottom of the well is illuminated.
+There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer.
+This creates a high signal-to-noise ratio \cite{window_tgs}.
+The wells are illuminated from beneath, by a laser with a wavelength of approximately 600 nm \cite{history_sequencing}.
+As the polymerase does not have to wait for the nucleotides to be washed away, the process is realtime, which greatly increases the sequencing speed.
+Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}.
+
+\figC{scale=.5}{pacbio.jpg}{A: a ZMW with DNA polymerase and a DNA template strand, B: a C nucleotide is added to the chain, the next one is an A, source: \cite{pacbio}}{fig:pacbio}
+
+\figC{scale=.5}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength}}{fig:pacbio_readlength}
+
+PacBio's SMRT sequencing also has some disadvantages: throughput and error rate.
+Only 23-46\% of the ZMWs produce succesful reads \cite{history_sequencing}.
+This can be caused by failing to attach a polymerase molecule to the bottom of a ZMW, or by loading more than one DNA strand in a ZMW.
 
 
 
