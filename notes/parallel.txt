@@ -606,11 +606,34 @@ NA is used more often, so put it in MSB, HA will have an offset.
 work->vector compression: HAB: 14b, NAB: 18b, M: 11b, V: 21b
 NAB is 18b, but is stored in pb->mark, which is 17b when compressed, maybe give an extra bit to HAB.
 
+1-2-2018:
+Compressed VM, HNA, HNB with option COMPRESS_WORK in for wave, output ok 9e7ebe0
+
+2-2-2018:
+Changed work->vector pointer when COALESCE_WORK is active, all threads now point to the same address.
+(no args, WORK) have good output in commit 6c115d4c, runtime 1m15
+
+3-2-2018:
+Fixed bug: GPU_THREADS ipv __X used, wrong result when not using WORK.
+
+4-2-2018:
+Benched CWORK
+Started with CACHE_WORK (option CAWORK) in for wave, 92667911
+(no args, CAWORK) same output end of for wave
+(CWORK, CWORK CAWORK) same output end of for wave
+(CWORK NP, CWORK CAWORK NP) same output end of for wave
+(NP, CAWORK NP) same output end of for wave
+Implemented CACHE_WORK in both waves, output ok for (no args, CWORK, CAWORK, CWORK CAWORK), aee92a5a
+
+7-2-2018:
+FALCON does not use tracepoints: https://github.com/PacificBiosciences/FALCON/wiki/Manual
 
 
 TODO: create type 5 reads that have a AT/GC imbalance.
 	  create type 6 reads that are a subset from real reads, but with nice lengths, etc.
 
+./generate 4 1000 161 1200 1 has 128 rpairs
+./generate 4 300 1 400 1 has 1 rpair
 
 
 Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs
