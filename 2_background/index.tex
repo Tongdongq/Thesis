@@ -48,6 +48,14 @@ This leads to a \textit{backbone} of alternating sugar and phosphate groups.
 The two strands are \textit{antiparallel}, this means one strands 5'-end is matched to the others 3'-end.
 The orientation of the strand is significant: replication and translation can only be done in 5'$\rightarrow$3' direction.
 
+%TODO add DNA replication
+% use picture from http://academic.pgcc.edu/~kroberts/Lecture/Chapter%207/replication.html
+% as source
+
+During DNA replication, DNA polymerase...
+
+\figC{width=\textwidth}{dna_replication.jpg}{Molecules involved in DNA replication, source \cite{dna_replication_fig}}{fig:dna_replication_fig}
+
 Creating new proteins from DNA is done via messenger RNA or \textit{mRNA}, which looks like DNA, but has only one strand.
 It has the same structure as DNA, but thymine (T) is replaced by uracil (U), and the sugar is \textit{ribose} instead of deoxyribose.
 When reading the DNA, three bases are considered together, and are called a \textit{codon}.
@@ -154,6 +162,8 @@ The newest pyrosequencing machines can produce readlenghts up to 700 basepairs.
 
 \figC{scale=.5}{pyro_sequencing.jpg}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
+%%%%%%%%
+
 The most popular NGS method is created by Illumina \cite{most_popular_ngs}, released in 2007.
 It is similar to Sanger sequencing, but uses \textit{reversible terminators}.
 Another major difference is that instead of emulsion PCR, bridge PCR is used, which is more efficient \cite{ngs_sequencing_atdbio}.
@@ -168,7 +178,7 @@ Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history
 \figC{scale=.5}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
 \figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
-
+%%%%%%%%
 
 The third major NGS method is Sequencing by Oligonucleotide Ligation and Detection (SOLiD), released by Applied Biosystems Instruments (ABI), which later became Life Technologies \cite{history_sequencing}.
 SOLiD relies on ligation to chain nucleotides.
@@ -215,27 +225,52 @@ The read lengths are also quite short: about 32 nucleotides \cite{window_tgs}.
 
 The other TGS are roughly placed into three categories: (a) sequencing by synthesis, (b) sequencing by nanopore, (c) direct imaging \cite{window_tgs}.
 
-Probably the most used TGS platform is the Single Molecule RealTime (SMRT) sequencing platform from Pacific Biosciences.
+One of the most used TGS platforms is the Single Molecule RealTime (SMRT) sequencing platform from Pacific Biosciences.
+It is based on sequencing by synthesis.
 A very important part of SMRT sequencing is the Zero-Mode Waveguide (ZMW) technology.
-A ZMW is a very tiny well, with a diameter of 60-100 nm, and a height of 100 nm \cite{zmw}.
-The metal that the wells are created in is placed on a glass substrate.
+A ZMW is a very tiny hole, with a diameter of 60-100 nm, and a height of 100 nm \cite{zmw}.
+The metal that the holes are created in is placed on a glass substrate, giving the holes a glass bottom.
 At the bottom of each well is a DNA polymerase molecule attached.
-The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
-The diameter of the well is important, because it is smaller than the wavelength of the used light, the light penetrating the bottom of the well decays exponentionally, such that only the bottom of the well is illuminated.
-There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer.
-This creates a high signal-to-noise ratio \cite{window_tgs}.
 The wells are illuminated from beneath, by a laser with a wavelength of approximately 600 nm \cite{history_sequencing}.
+The diameter of the well is important, because it is smaller than the wavelength of the used light, the light penetrating the bottom of the well decays exponentionally, such that only the bottom of the well is illuminated.
+The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
+There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer, this creates a high signal-to-noise ratio \cite{window_tgs}.
 As the polymerase does not have to wait for the nucleotides to be washed away, the process is realtime, which greatly increases the sequencing speed.
 Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}.
+The fluorescent dyes are attached to the phosphate chain, which is cleaved off naturally when incorporated into the DNA strand, as shown in Figures \ref{fig:dna_replication_fig} \ref{fig:pacbio_dye}.
+
+\figC{scale=.4}{pacbio_dye.jpeg}{(a) A zero-mode waveguide with a DNA polymerase molecule at the bottom (b) a dyed base is incorporated into the strand, and the phosphate groups with tye dye are cleaved off, source: \cite{pacbio_dye}}{fig:pacbio_dye}
 
 \figC{scale=.5}{pacbio.jpg}{A: a ZMW with DNA polymerase and a DNA template strand, B: a C nucleotide is added to the chain, the next one is an A, source: \cite{pacbio}}{fig:pacbio}
 
-\figC{scale=.5}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength}}{fig:pacbio_readlength}
+\figC{scale=.5}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:pacbio_readlength}
+
+A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}.
+The double-stranded DNA region and single-stranded loops are called insert and hairpins respectively.
+The insert can be of any length, where lengths from 40 bp to 25000 bp have been tested \cite{SMRTbell}.
+The hairpins contain a sequence to which a primer can bind to.
+When the whole SMRTbell is sequenced, the DNA polymerase arrives at the 5' end of the primer.
+The primer is seperated from the SMRTbell, and the sequencing can continue.
+This means that length of the sequence can become much larger than the length of the insert.
+After sequencing, the reads can be split up by removing the hairpin regions, to obtain subreads.
+Since each base can be sequenced multiple times, a consensus sequence can be constructed from all subreads, with a quality score for each base.
+
+\figC{scale=.5}{SMRTbell.jpeg}{(a) A SMRTbell template has a double-stranded region (insert) and two hairpin loops on the side. The orange part is a primer. (b) As the regions split, a circular template is formed, which is sequenced from both template and coding strand. The seperated part contains the orange primer, source: \cite{SMRTbell}}{fig:SMRTbell}
+
+\figC{scale=.5}{SMRTbell2.jpg}{Since the SMRTbell is circular, the insert can be sequenced multiple times, the resulting read is split, and a consensus sequence is created, source: \cite{SMRTbell2} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:SMRTbell2}
 
 PacBio's SMRT sequencing also has some disadvantages: throughput and error rate.
 Only 23-46\% of the ZMWs produce succesful reads \cite{history_sequencing}.
 This can be caused by failing to attach a polymerase molecule to the bottom of a ZMW, or by loading more than one DNA strand in a ZMW.
+The throughput of the older RS II system is about 2 billion bases per day, but the newer Sequel System can produce 20 billion bases per day \cite{pacbio_throughput}.
+Still, this is much lower than the high throughput offered by Illumina HiSeq 2500, with HiSeq SBS v4 reagent kits, it can produce about 167 billion bases per day in High Output Run Mode \cite{pacbio}.
 
+%%%%%%%%
+
+A nanopore is a small opening through which a DNA molecule can move, one base at a time.
+While doing this, these bases can be detected by an electrical or optical signal.
+The nanopore are usually made of biological proteins, or synthetic structures like carbon nanotubes \cite{nanotubes}.
+Oxford Nanopore Technologies (ONT) has build a system for DNA sequencing where three natural biological molecules form a nanopore.
 
 
 \section{GPU processing}
