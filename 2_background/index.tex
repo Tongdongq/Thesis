@@ -251,7 +251,7 @@ The insert can be of any length, where lengths from 40 bp to 25000 bp have been 
 The hairpins contain a sequence to which a primer can bind to.
 When the whole SMRTbell is sequenced, the DNA polymerase arrives at the 5' end of the primer.
 The primer is seperated from the SMRTbell, and the sequencing can continue.
-This means that length of the sequence can become much larger than the length of the insert.
+This means that length of the sequence can become much larger than the length of the insert, depending on the lifetime of the polymerase \cite{pacbio}.
 After sequencing, the reads can be split up by removing the hairpin regions, to obtain subreads.
 Since each base can be sequenced multiple times, a consensus sequence can be constructed from all subreads, with a quality score for each base.
 
@@ -271,7 +271,29 @@ A nanopore is a small opening through which a DNA molecule can move, one base at
 While doing this, these bases can be detected by an electrical or optical signal.
 The nanopore are usually made of biological proteins, or synthetic structures like carbon nanotubes \cite{nanotubes}.
 Oxford Nanopore Technologies (ONT) has build a system for DNA sequencing where three natural biological molecules form a nanopore.
+This system is called MinION and is a tiny portable DNA sequencer, shown in Figure \ref{fig:minION}.
+The nanopore is put in a synthetic lipid bilayer, which consists of two sheets of lipid molecules forming a thin polar membrane.
+A voltage is applied accross the bilayer, causing an ionic current through the nanopore.
+The double-stranded DNA is extended with a lead adaptor with a molecular motor, a hairpin adaptor, and a trailing adaptor.
+These adaptors enable the nanopore and DNA molecule to bond.
+The motor includes a processive enzyme, which denatures the DNA strands, and moves one strand through the nanopore at sufficient speed.
+The adaptors also concentrate the DNA around the nanopore, increasing the DNA capture rate by several thousand-fold \cite{minION}.
+As the bases move through the nanopore, they disrupt the ionic current flowing through the pore.
+Since the nucleotides have different shapes, the disruption they cause is also different.
+The exact change on the ionic current must be measured to determine the nucleotide.
 
+Figures \ref{fig:nanopore} and \ref{fig:nanopore2} show the working of the nanopore.
+
+\figC{scale=.5}{minION.jpg}{A MinION device connected to a USB 3.0 cable, source: \cite{minION_fig}}{fig:minION}
+
+\figC{scale=.5}{nanopore.jpg}{Double-stranded DNA gets denatured by an enzyme (1), one of the strands moves through the nanopore (2), adapted from: \cite{history_sequencing}}{fig:nanopore}
+\figC{scale=.5}{nanopore2.gif}{(i) nanopore is empty, (ii) dsDNA with lead adaptor (blue), molecular motor (orange) and hairpin adaptor (red), (iii) lead adaptor, (iv) template strand (gold), (v) hairpin adaptor, (vi) complement strand (dark blue), (vii) trailing adaptor (brown), (viii) nanopore is empty again, adapted from: \cite{minION}}{fig:nanopore2}
+
+Oxford Nanopore boasts very long reads, over 200 kilobases, but a disadvantage of using this system is the error rate is very high: 12-38\% \cite{minION_error1}\cite{minION_error2}.
+
+%%%%%%%%
+
+Direct imaging using a electron microscope
 
 \section{GPU processing}
 
