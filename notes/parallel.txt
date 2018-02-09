@@ -628,13 +628,21 @@ Implemented CACHE_WORK in both waves, output ok for (no args, CWORK, CAWORK, CWO
 7-2-2018:
 FALCON does not use tracepoints: https://github.com/PacificBiosciences/FALCON/wiki/Manual
 
+8-2-2018:
+Manual caching of NAB values while creating Pebbles, small slowdown, 3a49ebda
+Started with COMPRESS_PEB and COALESCE_PEB.
+Pebble compression: pb->ptr: 14b, pb->diag: 18b, pb->diag: 15b, pb->mark: 17b
+
+9-2-2018:
+
+
 
 TODO: create type 5 reads that have a AT/GC imbalance.
 	  create type 6 reads that are a subset from real reads, but with nice lengths, etc.
 
 ./generate 4 1000 161 1200 1 has 128 rpairs
 ./generate 4 300 1 400 1 has 1 rpair
-
+./generate 4 3000 33096 5000 1 has 32768 rpairs
 
 Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs
 
