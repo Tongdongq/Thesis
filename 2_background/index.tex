@@ -328,10 +328,25 @@ At least, that is the theory.
 The reality is that DNA has a low conductivity when attached to a hard surface \cite{STM_DNA2}.
 As the tip moves closer to the sample to try and get a current, it touches the DNA, deforming it \cite{STM_DNA}.
 Other challenges include difficulties in preparing clean samples and the fact that measurements can only be done at cryogenic temperatures \cite{STM_DNA2}.
-This is probably why there is currently no practical case for STMs in DNA sequencing.
+These, and the relatively high costs of an STM, are probably the reasons why there is currently no practical case for STMs in DNA sequencing.
 
+%%%%%%%%
 
+A different approach combines nanopores and tunnel current.
+Traditional nanopores, like from Oxford Nanopore Technologies, measure ionic current to determine the base that occupies the nanopore.
+A drawback of this method is throughput: a base has to block the pore long enough for the current to change and be measured.
+This is done by stopping, slowing down, or cleaving bases off.
+In either case, the read out of the current is in the order of tens or hundres of ms \cite{nanopore_tunnel2}.
+The new approach measures the tunneling current between two electrodes that make up a nanopore.
+Using tunneling currents can potentially be orders of magnitude faster than using ionic currents, because electrical currents can easily be detected in ranges of over MHz and possibly tens of MHz for the current amplitudes (tens of pA to nA) \cite{nanopore_tunnel2}.
+By applying a trans-membrane voltage, the movement of the DNA strands can be controlled, and using tunneling current gives a fast, accurate readout.
+In 2005, it was shown that each nucleotide has a unique electrical signature, which is independent of its nearest-neighbours \cite{nanopore_tunnel}.
+In 2013, Quantum Biosystems was founded \cite{quantum_biosystems}.
+They have two generations of devices, and use nanopores with a diameter of 0.8 nm \cite{quantum_biosystems2}.
 
+\figC{width=.6\textwidth}{nanopore_tunnel.png}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
+
+\section{DNA Assembly}
 
 \section{GPU processing}
 
