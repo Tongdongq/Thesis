@@ -1,0 +1,53 @@
+
+13-2-2018:
+
+Idea: cache compressed abseq bases in shared mem. Compressed bases need 2 bits per base, 16 per int.
+Measurements are done to find out how many ints need to be cached per thread.
+Commit 2e66cb30
+
+
+f: forward wave
+r: reverse wave
+a: aseq
+b: bseq
+x-axis show value offa-t1 or offb-t3, matrix elements show number of times the value was counted
+
+./generate.sh 4 1000 1 1200 1
+    --2		-2		-1		0		1		2		2+
+fa	0		3		294		706		60		1		0
+fb	0		23		530		484		27		0		0
+ra	7		142		1231	441		4		0		0
+rb	0		0		17		642		1035	131		0
+
+./generate.sh 4 3000 1 5000 1
+    --2		-2		-1		0		1		2		2+
+fa	0		14		2342	6150	922		7		0
+fb	4		352		4782	4151	146		0		0
+ra	0		0		0		24		0		0		0
+rb	0		0		0		19		5		0		0
+About 99% between -1 and 1.
+
+./generate.sh 4 3000 1000 5000 1
+    --2		-2		-1		0		1		2		2+
+fa	49		8817	1187366	3207224	469523	6055	0
+fb	655		200537	2621974	2011573	44294	0		0
+ra	0		619		48025	336604	122333	544		0
+rb	0		0		3886	209056	275084	20095	4
+About 99% between -1 and 1.
+
+./generate.sh 1 1100 1000 1 1 1
+    --2		-2		-1		0		1		2		2+
+fa	0		21720	96933	107756	5026	0		0
+fb	0		26747	112825	91846	17		0		0
+ra	0		0		98917	109489	98917	23744	0
+rb	0		0		11		93557	115691	27874	0
+About 90% between -1 and 1.
+
+./generate.sh 3 1100 1000 1 1 15
+    --2		-2		-1		0		1		2		2+
+fa	1323	16978	414572	895558	58966	39		0
+fb	2652	42898	682496	657006	2384	0		0
+ra	0		0		3196	48680	20555	338		0
+rb	0		0		62		35707	35496	1504	0
+About 99% between -1 and 1.
+

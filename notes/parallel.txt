@@ -633,15 +633,45 @@ Manual caching of NAB values while creating Pebbles, small slowdown, 3a49ebda
 Started with COMPRESS_PEB and COALESCE_PEB.
 Pebble compression: pb->ptr: 14b, pb->diag: 18b, pb->diag: 15b, pb->mark: 17b
 
-9-2-2018:
+12-2-2018:
+Brought back the CPU only implementation, with split LAcall_thread() and post_thread(), 9cf41b03
+Cat 4 reads typically have only 50% LA utilization (CPU compile option).
+Real Pacbio reads still have 90%.
+
+13-2-2018:
+Measured for CACHE_ABSEQ (only with COMPRESS_ABSEQ) the number of ints that should be cached, commit 2e66cb30.
+Talked to Zaid and Shanshan:
+- measure all variants on ce-cuda
+- measure for cat 1 reads, profile as well
+- try to compress more, mainly diagonalinfo, even across diags
+- benchmark real data
+
+14-2-2018:
+Bugfix: GPU threads were not shutdown properly, 7f52f651
+
+15-2-2018:
+Benched ce-cuda and real data
+./convert 2 needs more than 1400 diags with CWORK CABSEQ STREAM, 2000 works
+6.8MB needs more than 600 Pebbles per thread, 1000 seems to work
+ce-cuda, ./convert 1 needs more than 1000 pntsize, 5000 works
+
+19-2-2018:
+Benched real data on TACC and ce-cuda CPU
+Trying 6_8MB option 200 does not work with:
+2k 1k 5k (diags, Pebbles, points_size)
+2k 2k 10k
+Works: 4k 4k 10k, needs 50k < GPU_OUTPUT_BUFFER < 100k, needs 600 < MATCH_SIZE < 800
+
 
 
 
 TODO: create type 5 reads that have a AT/GC imbalance.
 	  create type 6 reads that are a subset from real reads, but with nice lengths, etc.
 
-./generate 4 1000 161 1200 1 has 128 rpairs
-./generate 4 300 1 400 1 has 1 rpair
+./generate 4 1000 161 1200 1   has 128 rpairs
+./generate 4 300 1 400 1       has 1 rpair
+./generate.sh 4 1000 44 1200 1 has 32 rpairs
+./generate 4 3000 32 5000 1    has 32 rpairs
 ./generate 4 3000 33096 5000 1 has 32768 rpairs
 
 Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs

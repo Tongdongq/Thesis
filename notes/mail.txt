@@ -1,0 +1,69 @@
+Hi Zaid,
+
+
+I'm sorry I missed you yesterday, I wasn't feeling too well.
+
+I'll give you a short summary via email, and maybe we can make an appointment for next week, just name a time and day.
+
+
+I measured CPU and GPU versions on ce-cuda and TACC:
+
+Pebbles are checkpoints, introduced to break up the long alignments Pacbio reads tend to give. This allows for quick recomputation of the overlap if necessary. They are not used in the FALCON assembler.
+
+The CUDA time includes the kernel, and the time to prepare datasets that will be copied to the CPU, and cudaMalloc/cudaMemcpy calls.
+TACC:
+C1: 2m0, Pebbles
+C2: 1m3.5, Pebbles, 1.9x vs C1
+C4: 35.86, Pebbles, 3.3x vs C1
+C8: 22.29, Pebbles, 5.4x vs C1
+C1: 1m31, no Pebbles, -25% vs Pebbles
+C2: 48.49, no Pebbles, -24% vs Pebbles
+C4: 28.09, no Pebbles, -22% vs Pebbles
+C8: 17.92, no Pebbles, -20% vs Pebbles
+GPU: 8 CPU threads, Pebbles, total: 51.97s , CUDA: 38s
+GPU: 8 CPU threads, no Pebbles, total: 26.98, CUDA: 14s
+
+ce-cuda:
+C1: 3m47, Pebbles
+C2: 1m59.7, Pebbles, 1.9x vs C1
+C4: 1m9.8, Pebbles, 3.3x vs C1
+C8: 45.14, Pebbles, 5.0x vs C1
+C1: 3m18.6,no Pebbles, -13% vs Pebbles
+C2: 1m46.8, no Pebbles, -11% vs Pebbles
+C4: 1m0.9, no Pebbles, -13% vs Pebbles
+C8: 38.44, no Pebbles, -15% vs Pebbles
+GPU: 8 CPU threads, Pebbles, total: 76.65s , CUDA: 37s
+GPU: 8 CPU threads, no Pebbles, total: 51.34s, CUDA: 15s
+
+ce-cuda is roughly 2x slower than TACC, this impact is reduced when using the GPU implementations, except when not creating Pebbles.
+The CUDA time seems to have decreased, the local alignment function used to take 90% of the time, now it's between 50-75%.
+However, this probably did not come from speeding up the local alignment function, but more from increasing the time to prepare for the GPU.
+The original algorithm got a promising readpair, found starting points, and immediately extended that starting point to find a local alignment.
+The GPU implementation first finds all startings points for all readpairs, and only then starts the local alignment on the GPU.
+This could be streamed better.
+
+I have compressed the arrays that represent the diagonals in the main datastructure: the edit graph.
+This means one diagonal has 20 bytes instead of 32 when using Pebbles, and 12 instead of 16 when not using Pebbles.
+This version has a total runtime of 45.49s, a speedup of 12% vs the previous 51.97s (on TACC).
+
+The registercount varies between 111-123, and 74-78 without Pebbles.
+
+
+I put some diagonal values in registers to reduce the number of memory transactions, but it had no impact on the total runtime, even though the number of load transactions reduced by 20%. On the other hand, compressing the arrays gave 10% more load transactions, but speedup nonetheless. Perhaps because the L2 read misses decreased by 45%.
+
+Since the diagonal accesses are quite divergent, compressing them might not reduce the number of transactions, but they probably fit better in L2 cache. This does not explain the increase in memory transactions.
+
+
+More ideas are:
+
+- compressing and coalescing Pebbles, even though they might not be needed
+
+- storing the compressed bases in shared memory, 6 bytes per thread should be enough to get 95% hits.
+
+- streaming starting points to the GPU as soon as they are found
+
+
+Kind regards,
+
+Tong Dong
+

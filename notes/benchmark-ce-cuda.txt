@@ -1,0 +1,102 @@
+
+Created: 14-2-2018:
+
+./generate.sh 4 3000 100000 5000 4
+ce-cuda, CPU 8a78ff0:	82:			90:		
+./run.sh 8 32 128 128r 	77.03 (36)	53.08 (16)				
+./run.sh 8 64  64 128r 	76.74 (37)	52.13 (16)					
+./run.sh 8 128 32 128r 	76.65 (37)	51.34 (15)
+C1: 3m47, Pebbles
+C2: 1m59.7, Pebbles, 1.9x vs C1
+C4: 1m9.8, Pebbles, 3.3x vs C1
+C8: 45.14, Pebbles, 5.0x vs C1
+C16: 30.98, Pebbles, 7.3x vs C1
+C32: 27.34, Pebbles, 8.3x vs C1
+C1: 3m18.6,no Pebbles, -13% vs Pebbles
+C2: 1m46.8, no Pebbles, -11% vs Pebbles
+C4: 1m0.9, no Pebbles, -13% vs Pebbles
+C8: 38.44, no Pebbles, -15% vs Pebbles
+C16: 26.87, no Pebbles, -13% vs Pebbles
+C32: 23.91, no Pebbles, -13% vs Pebbles
+
+200: aee92a5a, no args
+201: aee92a5a, CWORK
+202: aee92a5a, CAWORK
+203: aee92a5a, CWORK CAWORK
+204: aee92a5a, CWORK CAWORK STREAM
+205: aee92a5a, CABSEQ
+206: aee92a5a, CWORK CABSEQ
+207: aee92a5a, CWORK CABSEQ STREAM
+208: aee92a5a, CABSEQ STREAM
+209: aee92a5a, STREAM
+210: aee92a5a, CWORK STREAM
+211: aee92a5a, no args, SCORE and TABLE are not used
+212: aee92a5a, no args, SCORE and TABLE are not used, inline ptx for besta tracking
+213: 48ef9596, CABSEQ CAABSEQ
+214: 48ef9596, CABSEQ CAABSEQ CWORK
+215: 48ef9596, CABSEQ CAABSEQ STREAM
+216: 48ef9596, CABSEQ CAABSEQ CWORK STREAM
+
+./generate.sh 4 3000 100000 5000 4
+ce-cuda					200:		201:		202:		203:		204:
+./run.sh 8 64  64 128r	101.75 (62)	93.54 (53)	101.17 (61)	92.32 (52)	77.41 (38)		
+./run.sh 8 128 32 128r	99.55 (61)	92.60 (53)	101.28 (61)	92.39 (52)	76.30 (37)	
+
+ce-cuda					205:		206:		207:		208:		209:
+./run.sh 8 64  64 128r	97.24 (58)	87.48 (48)	72.80 (33)	80.02 (40)	80.51 (41)
+./run.sh 8 128 32 128r	97.35 (57)	87.95 (48)	70.31 (31)	78.13 (39)	80.64 (41)
+
+ce-cuda					210:		211:		212:		213:		214:
+./run.sh 8 64  64 128r	73.61 (34)	x			x			94.21 (54)	85.90 (46)
+./run.sh 8 128 32 128r	74.29 (34)							95.27 (54)	87.00 (46)
+
+ce-cuda					215:		216:		217:		218:		219:
+./run.sh 8 64  64 128r	96.46 (54)	86.67 (46)			
+./run.sh 8 128 32 128r	94.95 (54)	86.21 (46)			
+
+
+7f52f651, bugfix: GPU threads were not shutdown properly
+./convert.sh 1, 64 rpairs
+ce-cuda					200:		207:
+./run.sh 1  1  1 128r	10.60 (6.0)	10.73 (6.3)	
+./run.sh 1  1 32 128r	6.52 (2.7)	6.25 (2.0)		
+./run.sh 1  2 32 128r	6.21 (1.8)	6.25 (1.7)		
+./run.sh 1 32  1 128r	5.64 (1.2)	5.81 (1.2)		
+./run.sh 1 32  2 128r	6.10 (1.4)	5.74 (1.2)		
+./run.sh 1 64  1 128r	5.64 (1.2)	5.87 (1.1)		
+
+./convert.sh 2, 2294 rpairs
+ce-cuda					200:		207:
+./run.sh 1  1  1 128r	158.6 (153)	165.7 (160)
+./run.sh 1  1 32 128r	40.91 (36)	37.69 (33)
+./run.sh 1  2 32 128r	25.23 (20)	23.53 (18)
+./run.sh 1 32  1 128r	13.71 (8.7)	14.21 (9.3)
+./run.sh 1 32  2 128r	12.17 (7.2)	12.34 (7.3)
+./run.sh 1 64  1 128r	10.96 (5.9)	10.94 (6.7)
+./run.sh 1 32 32 128r	10.27 (5.3)	10.30 (5.2)
+
+./convert.sh 6_8MB, 20428 rpairs
+worksizes: 4k 4k 10k, MATCH_SIZE:800, C100k
+ce-cuda					200:
+./run.sh 1  64 64 128r	478 (471)			
+
+
+CPU 8a78ff07:
+./convert.sh 1, 64 rpairs
+C1: 0.16 s
+C8: 0.11 s
+./convert.sh 2, 2294 rpairs
+C1: 1.57 s
+C8: 0.50 s
+./convert.sh 6_8MB, 20428 rpairs
+C1: 14.91 s
+C8: 3.18 s
+
+
+
+
+
+
+
+
+

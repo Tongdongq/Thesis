@@ -70,8 +70,36 @@ l2_s0_read_misses		42484698	23905731	44942419	25068042	25048947	42359505	2347383
 l2_s0_tot_read_query	64210342	71319637	52552672	59745298	59767585	54853913	62366204					
 
 
+T1: STREAM CWORK CABSEQ NP 64
+T2: STREAM CWORK CABSEQ NP 64 WORK
+T3: STREAM CABSEQ NP 64 WORK
 
-
+./generate.sh 1 1100 50000 1 1
+./profile.sh 8 128 32 128r, 48KB L1, 683677ea
+						T1:			T2:			T3:	
+gld_transactions		6921621		2636369		2612825												
+gst_transactions		2775402		263426		296789												
+gld_efficiency			15.66%		28.84%		27.39%							
+gst_efficiency			16.64%		61.16%		63.63%							
+gst_throughput			9.37 GB/s	4.03 GB/s	4.87 GB/s														
+gld_throughput			23.45 GB/s	21.45 GB/s	21.07 GB/s														
+gst_req_throughput		1.54 GB/s	3.03 GB/s	3.85 GB/s														
+gld_req_throughput		3.54 GB/s	6.96 GB/s	6.42 GB/s														
+l2_read_transacts		6986573		3260047		3167536												
+l2_write_transacts		3035790		638311		759841												
+inst_executed			5622320		6579777		6549137												
+gld_inst_8bit			114285		114285		114285									
+gld_inst_16bit			753482		753482		753482							
+gld_inst_32bit			5292809		5292809		4550858												
+gld_inst_64bit			1561205		1561205		1561205												
+l1_gbl_ld_transacts		7183666		2669047		2644947												
+l1_gbl_st_transacts		2776023		263641		296805												
+l1_lcl_ld_hit			244			155309		179631						
+l1_lcl_ld_miss			131			21			41					
+l1_lcl_st_hit			166			152			360					
+l1_lcl_st_miss			356			746			762					
+l2_s0_read_misses		502652		49862		58208												
+l2_s0_tot_read_query	1744630		823472		800867							
 
 
 
