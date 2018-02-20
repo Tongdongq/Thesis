@@ -241,9 +241,9 @@ The fluorescent dyes are attached to the phosphate chain, which is cleaved off n
 
 \figC{scale=.4}{pacbio_dye.jpeg}{(a) A zero-mode waveguide with a DNA polymerase molecule at the bottom (b) a dyed base is incorporated into the strand, and the phosphate groups with tye dye are cleaved off, source: \cite{pacbio_dye}}{fig:pacbio_dye}
 
-\figC{scale=.5}{pacbio.jpg}{A: a ZMW with DNA polymerase and a DNA template strand, B: a C nucleotide is added to the chain, the next one is an A, source: \cite{pacbio}}{fig:pacbio}
+\figC{scale=.8}{pacbio.jpg}{A: a ZMW with DNA polymerase and a DNA template strand, B: a C nucleotide is added to the chain, the next one is an A, source: \cite{pacbio}}{fig:pacbio}
 
-\figC{scale=.5}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:pacbio_readlength}
+\figC{width=.8\textwidth}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:pacbio_readlength}
 
 A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}.
 The double-stranded DNA region and single-stranded loops are called insert and hairpins respectively.
@@ -255,7 +255,7 @@ This means that length of the sequence can become much larger than the length of
 After sequencing, the reads can be split up by removing the hairpin regions, to obtain subreads.
 Since each base can be sequenced multiple times, a consensus sequence can be constructed from all subreads, with a quality score for each base.
 
-\figC{scale=.5}{SMRTbell.jpeg}{(a) A SMRTbell template has a double-stranded region (insert) and two hairpin loops on the side. The orange part is a primer. (b) As the regions split, a circular template is formed, which is sequenced from both template and coding strand. The seperated part contains the orange primer, source: \cite{SMRTbell}}{fig:SMRTbell}
+\figC{width=.6\textwidth}{SMRTbell.jpeg}{(a) A SMRTbell template has a double-stranded region (insert) and two hairpin loops on the side. The orange part is a primer. (b) As the regions split, a circular template is formed, which is sequenced from both template and coding strand. The seperated part contains the orange primer, source: \cite{SMRTbell}}{fig:SMRTbell}
 
 \figC{scale=.5}{SMRTbell2.jpg}{Since the SMRTbell is circular, the insert can be sequenced multiple times, the resulting read is split, and a consensus sequence is created, source: \cite{SMRTbell2} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:SMRTbell2}
 
@@ -284,16 +284,54 @@ The exact change on the ionic current must be measured to determine the nucleoti
 
 Figures \ref{fig:nanopore} and \ref{fig:nanopore2} show the working of the nanopore.
 
-\figC{scale=.5}{minION.jpg}{A MinION device connected to a USB 3.0 cable, source: \cite{minION_fig}}{fig:minION}
+\figC{width=.3\textwidth}{minION.jpg}{A MinION device connected to a USB 3.0 cable, source: \cite{minION_fig}}{fig:minION}
 
-\figC{scale=.5}{nanopore.jpg}{Double-stranded DNA gets denatured by an enzyme (1), one of the strands moves through the nanopore (2), adapted from: \cite{history_sequencing}}{fig:nanopore}
-\figC{scale=.5}{nanopore2.gif}{(i) nanopore is empty, (ii) dsDNA with lead adaptor (blue), molecular motor (orange) and hairpin adaptor (red), (iii) lead adaptor, (iv) template strand (gold), (v) hairpin adaptor, (vi) complement strand (dark blue), (vii) trailing adaptor (brown), (viii) nanopore is empty again, adapted from: \cite{minION}}{fig:nanopore2}
+\figC{scale=.8}{nanopore.jpg}{Double-stranded DNA gets denatured by an enzyme (1), one of the strands moves through the nanopore (2), adapted from: \cite{history_sequencing}}{fig:nanopore}
+\figC{width=\textwidth}{nanopore2.png}{(i) nanopore is empty, (ii) dsDNA with lead adaptor (blue), molecular motor (orange) and hairpin adaptor (red), (iii) lead adaptor, (iv) template strand (gold), (v) hairpin adaptor, (vi) complement strand (dark blue), (vii) trailing adaptor (brown), (viii) nanopore is empty again, adapted from: \cite{minION}}{fig:nanopore2}
 
 Oxford Nanopore boasts very long reads, over 200 kilobases, but a disadvantage of using this system is the error rate is very high: 12-38\% \cite{minION_error1}\cite{minION_error2}.
 
 %%%%%%%%
 
-Direct imaging using a electron microscope
+The third category is direct imaging, usually with some sort of microscope.
+
+A Transmission Electron Microscope (TEM) can be used to detect atoms attached to nucleotides.
+The atoms that normally make up nucleotides are too small and light to be detected, so heavy elements elements are added, like Mercury \cite{tem}.
+To be able to read the bases, the DNA's natural state, a double helix, must be flattened and placed on a substrate.
+Some ways to prepare the DNA molecules include combing \cite{combing1}\cite{combing2}, molecular threading \cite{molecular_threading} and transfer printing \cite{transfer_printing}.
+
+\figC{width=.6\textwidth}{flatDNA1.png}{Different forms of double-stranded DNA, source: \cite{tem2}}{fig:flatDNA1}
+
+ZS Genetics uses annular dark-field (ADF) imaging \cite{ADF}.
+Dark-field imaging measures the photons/electrons that have come into contact with the object, leaving out the uninterrupted beam.
+Light-field imaging is the opposite: it measures the amount that did not get interrupted.
+Annular dark-field imaging uses an annular (ring) to capture the photons/electrons, as shown in Figure \ref{fig:ADF}.
+
+
+\figC{width=.6\textwidth}{ADF.png}{Top: electrons are scattered by heavy atoms and detected. Bottom: unlabeled DNA bases scatter fewer electrons and are harder to detect, source: \cite{tem}}{fig:ADF}
+
+\figC{width=.6\textwidth}{tem_label.png}{Single-strand DNA is primed and a complementary strand is synthesized. Thymine nucleotides have a heavy atom attached, source: \cite{tem}}{fig:tem_label}
+
+\figC{width=.6\textwidth}{flatDNA2.png}{A labeled DNA molecule, ready to be read. Image on the right shows an image from an ADF STEM, source: \cite{tem2}}{fig:flatDNA2}
+
+Another microscope capable of sequencing DNA is the Scanning Tunneling Microscope (STM) \cite{STM}.
+The machine is invented in 1982 by Binnig and Rohrer, for which they won the 1986 Nobel Prize in Physics \cite{STM_nobel}.
+The conductive tip of the machine is located very close to the sample, which is deposited on a conductive surface.
+The tip is extremely thin, to allow for very precise spatial measurements.
+Electrons can move from the sample to the tip, by tunneling \cite{STM_harvard}, a voltage difference between the sample and the tip is applied to allow for this phenomenon.
+The tunneled electrons form a current, which can be measured.
+This current is very sensitive to the distance between the tip and the sample, a change of $10^{-10}$ m can cause the current to change an order of magnitude \cite{STM_DNA}.
+The width of a DNA molecule is about $2\cdot10^{-9}$.
+The current can also depends on the applied voltage.
+This means the current can be used to measure the exact distance between the tip and the sample.
+At least, that is the theory.
+The reality is that DNA has a low conductivity when attached to a hard surface \cite{STM_DNA2}.
+As the tip moves closer to the sample to try and get a current, it touches the DNA, deforming it \cite{STM_DNA}.
+Other challenges include difficulties in preparing clean samples and the fact that measurements can only be done at cryogenic temperatures \cite{STM_DNA2}.
+This is probably why there is currently no practical case for STMs in DNA sequencing.
+
+
+
 
 \section{GPU processing}
 
