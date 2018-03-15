@@ -1,0 +1,50 @@
+
+Created: 8-3-2018:
+
+Idea: represent matches/mismatches with 1/0 in matrix, try to compute alignment from there.
+Matrices are still very large, but multiple threads could work on the same readpair.
+
+If bases are compressed, 16 fit in 1 int (see 'bittricks.txt').
+
+Maybe create multiple tracks with the same read, but different alignment:
+
+0
+A T G G T C
+x A T G G T C
+x x A T G G T C
+x x x A T G G T C
+
+To prevent extra shifting and masking when comparing.
+
+The match/mismatch vector could be stored diagonally, so that 1 thread can immediately see the snake.
+
+
+  A T G G T C
+A 0 1 1 1 1 1
+A 0 1 1 1 1 1
+T 1 0 1 1 0 1
+G 1 1 0 0 1 1
+C 1 1 1 1 1 0
+A 0 1 1 1 1 1 
+
+0
+A A T G C A
+1
+A T G G T C
+x A T G G T C
+x x A T G G T C
+x x x A T G G T C
+
+T0:
+A A T G C A
+A T G G T C
+-----------
+0 1 1 0 1 1 -> snake = 1
+
+T1:
+A A T G C A
+x A T G G T
+-----------
+x 0 0 0 1 1 -> snake = 3
+
+
