@@ -355,9 +355,27 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 \figC{width=.6\textwidth}{nanopore_tunnel.png}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
 \section{DNA Assembly}
+Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
+These length and error rate of these reads depend of the sequencing technique used, but they all have one thing in common: they have to be assembled to be useful.
+DNA assembly tries to combine the reads into large, high quality parts.
 
+The process of DNA assembly is often compared to taking a copy of a book, shredding it, and trying to piece is back together.
+However, when taking a read and splitting it into two parts, there is no information indicating that the two parts were originally together, as it would with shredded paper.
+This is why DNA is always oversampled, this means that each base is sequenced multiple times.
+If a short sequence of bases is found in multiple reads, overlaps can be found, and the reads are combined into a bigger read.
+Figure \ref{fig:dna_assembly_fig} shows the process.
+This process continues until there are no more reads to merge.
+What is left are large pieces of DNA called 'contigs'.
 
+\figC{width=.6\textwidth}{DNA_assembly.png}{A DNA strand is cloned and sequenced, the reads are assembled and the original DNA strand is recovered, source: \cite{dna_assembly_fig}}{fig:dna_assembly_fig}
 
+There are two types of assembly: de-novo and reference based.
+De-novo assembly works as described above, but reference based assembly first maps the reads to a reference.
+If multiple reads map to the same place in the reference, they are likely to be overlapping.
+De-novo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
+Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
+
+The drawback of reference based assembly is that a read must first be mapped to a reference, this results in a slightly biased assembly.
 
 
 \section{GPU processing}
