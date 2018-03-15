@@ -662,6 +662,21 @@ Trying 6_8MB option 200 does not work with:
 2k 2k 10k
 Works: 4k 4k 10k, needs 50k < GPU_OUTPUT_BUFFER < 100k, needs 600 < MATCH_SIZE < 800
 
+21-2-2018:
+Benched cat 1 reads on TACC and ce-cuda, CPU/GPU
+
+22-2-2018:
+Talked to Zaid
+- measure TIME for kernel/copy/cpu/copy
+- bench bigger cat 1 sets
+- profile CACHE_DIAGS, should speedup because of less mem operations
+- shrink B to 32b vector, could change output
+- check out striped SmithWaterman
+- radical approach: represent match/mismatch in bitmatrix, compute snakes from there
+
+8-3-2018:
+Maybe it is possible to represent matches from 1 diagonal in an int, and follow snakes there.
+
 
 
 
@@ -670,7 +685,8 @@ TODO: create type 5 reads that have a AT/GC imbalance.
 
 ./generate 4 1000 161 1200 1   has 128 rpairs
 ./generate 4 300 1 400 1       has 1 rpair
-./generate.sh 4 1000 44 1200 1 has 32 rpairs
+./generate 4 100 100 150 1     has 1 rpair
+./generate 4 1000 44 1200 1    has 32 rpairs
 ./generate 4 3000 32 5000 1    has 32 rpairs
 ./generate 4 3000 33096 5000 1 has 32768 rpairs
 
