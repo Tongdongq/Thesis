@@ -186,6 +186,11 @@ Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history
 \figC{scale=.5}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
 \figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
+Illumina also developed paired-end (PE) sequencing.
+Both ends of a DNA strand are sequenced, this creates more data per DNA strand, but also valuable information, since the length of the strand is known.
+
+\figC{scale=.5}{paired_end.jpg}{Source: \cite{paired_end_fig}}{fig:paired_end}
+
 %%%%%%%%
 
 The third major NGS method is Sequencing by Oligonucleotide Ligation and Detection (SOLiD), released by Applied Biosystems Instruments (ABI), which later became Life Technologies \cite{history_sequencing}.
@@ -352,7 +357,7 @@ In 2005, it was shown that each nucleotide has a unique electrical signature, wh
 In 2013, Quantum Biosystems was founded \cite{quantum_biosystems}.
 They have two generations of devices, and use nanopores with a diameter of 0.8 nm \cite{quantum_biosystems2}.
 
-\figC{width=.6\textwidth}{nanopore_tunnel.png}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
+\figC{width=.6\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
 \section{DNA Assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
@@ -375,8 +380,35 @@ If multiple reads map to the same place in the reference, they are likely to be 
 De-novo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
 Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
 
-The drawback of reference based assembly is that a read must first be mapped to a reference, this results in a slightly biased assembly.
+The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different streches of DNA are filtered away, this results in a biased assembly.
+Reference based assembly is good at finding small variations between the sampled DNA and the reference \cite{denovo_vs_reference}.
 
+\subsection{Reference based assembly}
+The biggest part in reference based assembly is finding the location in the reference that the read came from, this process is called 'mapping'.
+Mapping is usually done by a 'seed-and-extend' method.
+This means that first a position is found that is promising (seed), and then the algorithm looks at both ends of the seed to see if those parts also match with the reference.
+
+% mappers:
+% maq (hash)
+% bfast (suffix)
+% seqmap (hash)
+% mosaik (hash)
+% snap (hash)
+% shrimp2 (hash)
+% stampy (hash)
+% seqalto (hash)
+% bwa (bwt)
+% soap2 (bwt)
+% bowtie2 (bwt)
+% bwa-sw (bwt)
+% slider (sorting)
+% syzygy (sorting)
+
+% denovo
+% velvet (ngs)
+% abyss (ngs)
+% daligner (tgs)
+% ssake (ngs, hash, prefix)
 
 \section{GPU processing}
 
