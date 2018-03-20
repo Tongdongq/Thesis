@@ -677,7 +677,16 @@ Talked to Zaid
 8-3-2018:
 Maybe it is possible to represent matches from 1 diagonal in an int, and follow snakes there.
 
+15-3-2018:
+(B30 CABSEQ STREAM, B30 CWORK STREAM, B30 CABSEQ CWORK STREAM) output is ok
 
+16-3-2018:
+RM CWORK STREAM output ok
+Bug: when a is realloced, a_int points to freed memory, only a problem when reallocing a or b
+
+19-3-2018:
+RM CWORK CABSEQ STREAM WORK NP output is ok
+B30 NP STREAM CWORK WORK CABSEQ RM vs B30 NP STREAM output is ok
 
 
 TODO: create type 5 reads that have a AT/GC imbalance.
