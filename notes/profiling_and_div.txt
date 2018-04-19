@@ -77,31 +77,95 @@ T3: STREAM CABSEQ NP 64 WORK
 ./generate.sh 1 1100 50000 1 1
 ./profile.sh 8 128 32 128r, 48KB L1, 683677ea
 						T1:			T2:			T3:	
-gld_transactions		6921621		2636369		2612825												
-gst_transactions		2775402		263426		296789												
-gld_efficiency			15.66%		28.84%		27.39%							
-gst_efficiency			16.64%		61.16%		63.63%							
-gst_throughput			9.37 GB/s	4.03 GB/s	4.87 GB/s														
-gld_throughput			23.45 GB/s	21.45 GB/s	21.07 GB/s														
-gst_req_throughput		1.54 GB/s	3.03 GB/s	3.85 GB/s														
-gld_req_throughput		3.54 GB/s	6.96 GB/s	6.42 GB/s														
-l2_read_transacts		6986573		3260047		3167536												
-l2_write_transacts		3035790		638311		759841												
-inst_executed			5622320		6579777		6549137												
-gld_inst_8bit			114285		114285		114285									
-gld_inst_16bit			753482		753482		753482							
-gld_inst_32bit			5292809		5292809		4550858												
-gld_inst_64bit			1561205		1561205		1561205												
-l1_gbl_ld_transacts		7183666		2669047		2644947												
-l1_gbl_st_transacts		2776023		263641		296805												
-l1_lcl_ld_hit			244			155309		179631						
-l1_lcl_ld_miss			131			21			41					
-l1_lcl_st_hit			166			152			360					
-l1_lcl_st_miss			356			746			762					
-l2_s0_read_misses		502652		49862		58208												
-l2_s0_tot_read_query	1744630		823472		800867							
+gld_transactions		6921621		2636369		2612825		
+gst_transactions		2775402		263426		296789		
+gld_efficiency			15.66%		28.84%		27.39%		
+gst_efficiency			16.64%		61.16%		63.63%		
+gst_throughput			9.37 GB/s	4.03 GB/s	4.87 GB/s	
+gld_throughput			23.45 GB/s	21.45 GB/s	21.07 GB/s	
+gst_req_throughput		1.54 GB/s	3.03 GB/s	3.85 GB/s	
+gld_req_throughput		3.54 GB/s	6.96 GB/s	6.42 GB/s	
+l2_read_transacts		6986573		3260047		3167536		
+l2_write_transacts		3035790		638311		759841		
+inst_executed			5622320		6579777		6549137		
+gld_inst_8bit			114285		114285		114285		
+gld_inst_16bit			753482		753482		753482		
+gld_inst_32bit			5292809		5292809		4550858		
+gld_inst_64bit			1561205		1561205		1561205		
+l1_gbl_ld_transacts		7183666		2669047		2644947		
+l1_gbl_st_transacts		2776023		263641		296805		
+l1_lcl_ld_hit			244			155309		179631		
+l1_lcl_ld_miss			131			21			41			
+l1_lcl_st_hit			166			152			360			
+l1_lcl_st_miss			356			746			762			
+l2_s0_read_misses		502652		49862		58208		
+l2_s0_tot_read_query	1744630		823472		800867		
 
 
+-------------------------------------------------------
+-------------------------------------------------------
+22-3-2018:
+
+232: 01fd6a3a, DIAGS5 RM NP STREAM CABSEQ WORK
+234: 9a127cb0, DIAGS5 RM NP STREAM CABSEQ WORK B30
+235: 9a127cb0, RM NP STREAM CABSEQ WORK
+236: 9a127cb0, RM NP STREAM CABSEQ WORK B30
+237: 07e4658c, RM NP STREAM CABSEQ WORK ABSEQ
+238: 07e4658c, RM NP STREAM CABSEQ WORK B30 ABSEQ
+239: cdb2dbee, DIAGS5 RM NP STREAM CABSEQ WORK ABSEQ
+240: cdb2dbee, DIAGS5 RM NP STREAM CABSEQ WORK ABSEQ B30
+
+See if CACHE_DIAGS reduces gmem traffic, and if B30 reduces smem traffic
+Note that CACHE_DIAGS triggers 48KB smem, otherwise 48KB L1
+No smem replays reported
+Conclusions:
+CACHE_DIAGS ...
+- reduces gmem traffic by 25-30%
+- increases gld efficiency by 6.5%-point
+- reduces L2 reads by 7%
+- increases inst executed by 35-40%
+- 
+B30 ...
+- reduced gmem traffic by 28%
+L2 missrate: 0.36%
+ABSEQ ...
+- reduces gld transactions by 80%
+- increases gld_eff from 41% to 91% (or 34->88 with B30)
+- reduces L2 reads by 60%
+- increases inst_executed by 2%
+- reduces L1 gbl lds by 80%
+
+./generate.sh 1 10000 10000
+./profile.sh 8 64 64 128r, 9a127cb0
+						232:		234:		235:		236:		237:		238:		239:		240:
+gld_transactions		21294736	20489156	20758161	20041877	4441452		3725190		4978049		4172447
+gst_transactions		1942688		1494980		1942687		1494978		1942683		1494975		1942682		1494975
+gld_efficiency			45.09 %		38.41 %		40.81 %		33.95 %		91.08 %		88.39 %		92.40 %		90.23 %
+gst_efficiency			96.53 %		95.35 %		96.53 %		95.35 %		96.53 %		95.35 %		96.53 %		95.35 %
+gst_throughput			12.49 GB/s	9.716 GB/s	16.14 GB/s	12.63 GB/s	20.76 GB/s	16.89 GB/s	15.27 GB/s	12.00 GB/s		
+gld_throughput			52.48 GB/s	48.73 GB/s	62.91 GB/s	59.08 GB/s	36.24 GB/s	30.32 GB/s	31.29 GB/s	25.62 GB/s		
+gst_req_throughput		12.06 GB/s	9.265 GB/s	15.58 GB/s	12.05 GB/s	20.04 GB/s	16.10 GB/s	14.74 GB/s	11.44 GB/s		
+gld_req_throughput		23.66 GB/s	18.72 GB/s	25.67 GB/s	20.06 GB/s	33.02 GB/s	26.81 GB/s	28.92 GB/s	23.12 GB/s		
+l2_read_transacts		29735759	26513120	27571254	24706090	12354342	9489009		14505564	11282829	
+l2_write_transacts		7112857		5320559		7108869		5317387		7109097		5317597		7112894		5320736	
+shared_ld_throughput	31.61 GB/s	32.93 GB/s	0 B/s		0 B/s		0 B/s		0 B/s		38.64 GB/s	40.67 GB/s	
+shared_st_throughput	37.93 GB/s	39.51 GB/s	0 B/s		0 B/s		0 B/s		0 B/s		46.36 GB/s	48.80 GB/s	
+achieved_occupancy														13.0 %					13.0 %		13.0 %	
+inst_executed			105231895	100351547	77756146	71847677	79282447	73374019	106758232	101877847				
+gld_inst_8bit			192735		192735		192735		192735		192735		192735		192735		192735		
+gld_inst_16bit			11550840	11550840	11550840	11550840	11550840	11550840	11550840	11550840				
+gld_inst_32bit			71735701	97515029	60284016	83204437	60284016	83204438	71735701	97515029				
+gld_inst_64bit			25887741	108413		23028835	108413		23028835	108413		25887741	108413			
+l1_gbl_ld_transacts		21333618	20699448	20948659	20233072	4631055		3916434		5016128		4390462		
+l1_gbl_st_transacts		1942869		1495147		1942865		1495194		1943234		1495198		1943235		1495160		
+l1_lcl_ld_hit			4829749		5008380		1881908		1881907		2329667		2329667		5280790		5459531		
+l1_lcl_ld_miss			4007		4079		5			6			5			5			726			687	
+l1_lcl_st_hit			237			242			249			249			248			249			246			248	
+l1_lcl_st_miss			264			259			1			1			2			1			255			253	
+l2_s0_read_misses		28395		25921		23515		22434		23835		22719		28556		26099		
+l2_s0_tot_read_query	7591394		6785922		7049889		6333435		3245698		2529707		3783530		2977719		
+shared_load				1968732		1968732		0			0			0			0			1968732		1968732		
+shared_store			2684543		2684544		0			0			0			0			2684544		2684544		
 
 
 

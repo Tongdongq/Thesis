@@ -187,8 +187,21 @@ best s1 reads: for: 0.0  39.9  39.9  20.2  rev: 0.0  48.8  48.8   2.4
 	-130MB: 247436 enough, 244784 not enough, min 136048
 	-270MB: max 284598, min 98014
 
-busy:
+---------------------------------------
+27-3-2018:
+width of d-wave for different datasets (reported hgh-low, width=hgh-low+1)
+./generate 1 10000 10000:
+	100% 4
+./generate 4 3000 100000 5000 4:
+	max: 97
+count value percentage:
+244014 	2-9		24.4
+644801 	10-19	64.5
+106769 	20-29	10.7	99.6% is under 30
+4145 	30-39	0.1
+92 		40-49	
+21 		50-59	
+9 		60-69	
+7 		70-79	
+total: 999858
 
-
-done:
-h3, c_elegans, FALCON, failed after 10h

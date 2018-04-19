@@ -688,10 +688,92 @@ Bug: when a is realloced, a_int points to freed memory, only a problem when real
 RM CWORK CABSEQ STREAM WORK NP output is ok
 B30 NP STREAM CWORK WORK CABSEQ RM vs B30 NP STREAM output is ok
 
+21-3-2018:
+Implemented CACHE_DIAGS, RM forced, NP forced, only caches 64b B/T and 32b V
+DIAGS5 RM NP vs RM NP output ok, ad4d27b2
+DIAGS5 RM NP STREAM CABSEQ WORK vs RM NP output ok, ad4d27b2
+
+22-3-2018:
+Implemented B30 with CACHE_DIAGS
+DIAGS5 RM NP B30 vs B30_gold_NP output ok, 9a127cb0
+Checked clkspeeds TACC and ce-cuda with 'nvidia-smi -q -d CLOCK', same for both
+
+23-3-2018:
+Implemented ABSEQ with CABSEQ
+CABSEQ ABSEQ vs 4_gold_P output ok, 07e4658c
+CABSEQ ABSEQ NP vs 4_gold_NP output ok, 07e4658c
+
+26-3-2018:
+Another bugfix: sizeof out buffer was not calculated correctly in coalesce_compressed_reads, cdb2dbee
+
+27-3-2018:
+Talk with Zaid:
+- try bigger datasets
+- focus more on GPU based implementation, find matches/mismatches in GPU, calc snakes on CPU
+- translate improvements in profiling to improvements in runtime
+
+3-4-2018:
+Finished implementing CABSEQ on original/CPU
+
+5-4-2018:
+Bugfix: the end of compressed reads would still have bases from previous reads, or the value '4' (0b100) which contaminated the previous (last) base, daca007
+Trying bitmasks for quick ctz/clz calculation:
+- 6_8MB: 77.4% clz is calculated in 2 bits
+		 93.5% clz is calculated in 4 bits
+		 97.8% clz is calculated in 6 bits
+		 77.8% ctz is calculated in 2 bits
+		 93.7% ctz is calculated in 4 bits
+
+Removed some redundant ctz/clz calls
+Using more bits for fast ctz/clz calculation is slower than the builtin on TACC.
+Same runtime for TACC/ce-cuda, with NP or not
+
+9-4-2018:
+Possible gpu-daligner implementations:
+- calculate bitmatrix on gpu, find snakes on cpu with clz/ctz
+-- multiple encoding schemes are possible, preferably diagonally based
+- calculate snakes on gpu, put lenghts in 2d-matrix, cpu will read snake instead of calculating
+-- either encode all snakes (1 byte per snake), or use position->length mapping function (probably not feasible)
+
+10-4-2018:
+Mind signedness when shifting right!
+
+12-4-2018:
+Darwin has a new paper: 120x speedup over Daligner, expected 700x speedup for whole human assembly.
+Their local alignment algorithm is Tiled Smith Waterman:
+- for reverse wave:
+- from a seed, create a tile of size TxT, where the right-bottom corner is the seed
+- perform Smith Waterman on the whole tile, they have a systolic array, a GPU would need big tiles to allow the whole warp to be active
+- find the best boundary cell (boundary left or up), this becomes the right-bottom corner for the next tile
+
+13-4-2018:
+Options:
+- calc match/mismatch matrix on GPU on uncompressed bases, use simple snakefinding on CPU
+- implement Tiled Smith-Waterman (Darwin GACT)
+
+16-4-2018:
+Naive GPU_SINGLE (one match/mismatch per byte, idx = apos+bpos*alen) has 12% cache misrate, 5% L1 data misrate
+Problems witn GPU_SNAKE: the CPU can start in the middle of a snake, these points are not written by the GPU. If they would, they would not be coalesced at all. Maybe the CPU can detect if an apos/bpos combination is the start of a snake by checking apos-1 and bpos-1.
+Started with TSW and CTSW ((CPU) Tiled Smith Waterman)
+
+17-4-2018:
+Linear gap penalty SW uses H(i,j) = max(A,B,C,D)
+Affine gap penalty SW uses I(i,j) = max(A,B); D(i,j) = max(C,D); H(i,j) = max(0,I,D,E);
+
+18-4-2018:
+The reported apos/bpos is at the end of the first kmer (assuming an LAcall has 3 kmers)
+For SW: either report the SW score, or calculate the number of diffs during traceback
+
+19-4-2018:
+SW stop condition: score = 0, or end of read reached. Different gap penalties and substitution matrix (S) values need to allow the score to come to 0 in time. Or calc number of diffs during traceback.
+
+
+
 
 TODO: create type 5 reads that have a AT/GC imbalance.
 	  create type 6 reads that are a subset from real reads, but with nice lengths, etc.
 
+./generate 4 200 20 440 1      has 1 rpair ab: 66
 ./generate 4 1000 161 1200 1   has 128 rpairs
 ./generate 4 300 1 400 1       has 1 rpair
 ./generate 4 100 100 150 1     has 1 rpair
@@ -701,9 +783,6 @@ TODO: create type 5 reads that have a AT/GC imbalance.
 
 Add asm("exit;") when ERROR CANNOT REALLOC TRACE CELLS occurs
 
-TODO: 	redo profiling CACHE_VARS
-		make variables volatile and measure register pressure
-		implement CACHE_DIAGS
 
 TODO: find out relation between number of seed hits, etc. and overlaps. This can be used to preprocess the readpairs and possibly decrease divergence. First check if the threads really have a lot of divergence.
 

@@ -1,4 +1,16 @@
 
+17 apr
+Possibly similar to Tiled Smith Waterman
+https://onlinelibrary.wiley.com/doi/full/10.1111/j.1574-6968.1999.tb13575.x
+
+17 apr
+Similar to Tiled Smith Waterman
+https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-6-31
+
+13 apr
+Smith Waterman on GPU
+https://onlinelibrary.wiley.com/doi/full/10.1002/cpe.1913
+
 24 jan
 cuda-gdb manual
 http://lutgw1.lunet.edu/cuda/pdf/cuda-gdb.pdf
