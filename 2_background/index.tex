@@ -187,7 +187,8 @@ Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history
 \figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
 Illumina also developed paired-end (PE) sequencing.
-Both ends of a DNA strand are sequenced, this creates more data per DNA strand, but also valuable information, since the length of the strand is known.
+Both ends of a DNA strand are sequenced, with an unsequenced gap in the middle, this creates more data per DNA strand, but also valuable information, since the length of the strand is known.
+These paired-end reads can be used during assembly, namely during the scaffolding phase.
 
 \figC{scale=.5}{paired_end.jpg}{Source: \cite{paired_end_fig}}{fig:paired_end}
 
@@ -373,10 +374,10 @@ DNA assembly tries to combine the reads into large, high quality parts.
 The process of DNA assembly is often compared to taking a copy of a book, shredding it, and trying to piece is back together.
 However, when taking a read and splitting it into two parts, there is no information indicating that the two parts were originally together, as it would with shredded paper.
 This is why DNA is always oversampled, this means that each base is sequenced multiple times.
-If a short sequence of bases is found in multiple reads, overlaps can be found, and the reads are combined into a bigger read.
-Figure \ref{fig:dna_assembly} shows the process.
-This process continues until there are no more reads to merge.
-What is left are large pieces of DNA called 'contigs'.
+%If a short sequence of bases is found in multiple reads, overlaps can be found, and the reads are combined into a bigger read.
+Figure \ref{fig:dna_assembly} shows a simplified assembly process.
+%This process continues until there are no more reads to merge.
+%What is left are large pieces of DNA called 'contigs'.
 
 \figC{width=.6\textwidth}{DNA_assembly.png}{A DNA strand is cloned and sequenced, the reads are assembled and the original DNA strand is recovered, source: \cite{dna_assembly_fig}}{fig:dna_assembly}
 
@@ -396,13 +397,16 @@ Reference based assembly is good at finding small variations between the sampled
 % abyss (ngs, k:27-36, dBG)
 % daligner (tgs)
 % allpaths
-% euler-sr
+% euler-sr (dBG)
 % vcake
 % sharcgs (ngs, prefix, greedy)
 % edena (ngs, olc)
 % ssake (ngs, hash, prefix, greedy)
 % spades (dbg)
 % qsra (ngs, hash, prefix, greedy)
+% Newbler (ngs, olc, seed: k:16)
+% sga (ngs, olc, fm, BWT)
+% SOAPdenovo2 (dBG)
 
 % HGAP (tgs)
 % Falcon (tgs)
@@ -416,22 +420,52 @@ The greedy approach works like this: from the set of reads, pick the two strings
 The 'best' overlap can differ: a perfect overlap between two strings s and t is a string y, such that s = xy and t = yz for some non-empty strings x and z \cite{denovo2}, but different scoring schemes allowing a few mismatches here and there are possible.
 A suitable overlap will have a minimum length: since there are only four different bases, a set will likely have two reads with an overlap of one base, one can imagine merging these is not likely to be correct.
 The greedy approach requires all reads to be compared with all reads, which is not suited for the high througput of ngs systems.
-Another problem are repeat regions, %TODO: citation, finish sentence ('which are common in mammalian genomes')
+Another problem are repeat regions, which are very common in eukaryotic genomes, the human genome can contain more than 50\% repeats or repetitive areas \cite{repeats1}\cite{repeats2}.
+
 Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble reads containing a repeat region.
 
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
-For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn graph (dBG).
+For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG).
 %TODO: give examples of OLC and dBG assemblers
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.
 During the layout phase, the graph is analyzed to find paths, corresponding to segments of the original genome.
 The perfect graph contains one path that visists each node exactly once.
-This problem can be described as finding a Hamiltonina path \cite{Hamiltonian}, which is also an NP-hard problem \cite{ngs_difficulties}.
-
+This problem can be described as finding a Hamiltonian Path \cite{Euler_Hamil_paths}, which is also an NP-hard problem \cite{ngs_difficulties}.
+A Hamiltonian Path includes all vertices of a graph exactly once.
+Assemblers that use the OLC approach are Newbler \cite{newbler}, SGA \cite{sga} and Edena \cite{edena}.
 
 \figC{width=.6\textwidth}{olc.jpeg}{Overlaps are found and put in a graph, each arrow represents an overlap, a Hamiltonian path is found to create the contig, source: \cite{old_fig}}{fig:olc}
 
+To build a de Bruijn Graph, each read is divided into kmers.
+Each kmer represents a directed edge between two vertices, where the source vertex represents the first k-1 bases of the kmer, and the destination vertex the last k-1 bases of the kmer.
+When a particular k-1 vectex does not exist, it is created, otherwise the existing one is reused.
+This means there are at most $4^{k-1}$ vertices in the graph.
+The weights of the edges indicate how many times a particular kmer is encountered.
+The next step is to find an Eulerian Path \cite{Euler_Hamil_paths}, which is a path that includes all edges of a graph exactly once.
+A small value of k means the number of vertices is limited, but it also creates more edges, and loses more information.
+Examples of dBG assemblers are Velvet \cite{velvet}, ABySS \cite{abyss} and SOAPdenovo2 \cite{soapdenovo2}.
+
+Constructing a dBG is easier than constructing an OLC graph, since no overlaps are computed.
+It is also easier to find an Eulerian Path than to find a Hamiltonian Path.
+However, there can be an exponential number of Eulerian Paths in a graph, where only one is needed.
+De Bruijn Graphs are quite susceptible to sequencing errors, one substituted base causes k incorrect kmers.
+Pair this with a often-used value of k between 19 and 27 and a PacBio error rate of about 15\%, and it is clear that the graph will contain a lot of incorrect edges.
+Another drawback of using this strategy is that information is lost when dividing the reads into kmers.
+This information could overcome short repeats in the genome.
+That is the reason why a variant of the Eulerian Path problem was formulated: the Eulerian Superpath problem \cite{Eulerian_Superpath}.
+It tries to find an Eulerian path, that contains a set of subpaths, given a graph and the set of subpaths.
+
+The previously described methods cannot reconstruct the whole genome on their own, their output consists of contigs: sequences of bases which are known.
+The next step is building scaffolds \cite{scaffold1}\cite{scaffold2}.
+A scaffold consists of contigs and gaps.
+The gaps contain unknown bases, denoted by 'N', but their lengths is roughly known.
+To create scaffolds, paired-end reads can be used.
+When two ends of the paired-end read are found in different contigs, these contigs are likely to belong next to eachother, with a gap between them.
+
+%TODO consider talking about Optical Mapping to aid scaffolding
+%TODO talk about error correction before/after assembly?
 
 \subsection{Reference based assembly}
 The biggest part in reference based assembly is finding the location in the reference that the read came from, this process is called 'mapping'.
@@ -457,6 +491,10 @@ Most use Smith-Waterman for this stage.
 Snap uses an $O(ND)$ algorithm from Ukkonen \cite{O_ND2}.
 Stampy uses a probabilistic aligner to extend their seeds.
 SeqAlto and Aryana use a banded Needleman-Wunsch.
+
+When all the reads are mapped to the reference, they have to be combined.
+This can be done by local denovo assembly, or a consensus algorithm \cite{consensus}.
+
 
 % mappers:
 % maq (hash)
@@ -489,7 +527,7 @@ An algorithm like matrix addition is easily parallelized by assigning a matrix c
 Each thread can perform the addition in parallel, let this take one cycle.
 A sequential implementation would have taken $N\times M$ cycles, where $N$ and $M$ are the dimensions of the matrices.
 
-CPUs usually have large caches and a complex instruction set and execution that includes out-of-order execution and branch prediction \cite.
+CPUs usually have large caches and a complex instruction set and execution that includes out-of-order execution and branch prediction \cite{CPUvsGPU1}\cite{CPUvsGPU2}.
 
 GPUs cannot operate on their own, they must be guided by a CPU.
 A general workflow using a GPU is shown in Figure \ref{gpu:workflow}.
