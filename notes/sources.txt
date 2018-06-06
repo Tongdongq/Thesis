@@ -1,4 +1,30 @@
 
+17 mei
+Acceleration Of Nucleotide Semi-Global Alignment With Adaptive Banded Dynamic Programming
+https://www.biorxiv.org/content/early/2017/04/25/130633
+
+
+14 mei
+GASAL genomic alignment library
+https://github.com/nahmedraja/GASAL
+
+26 apr
+FPGA acceleration of SW
+https://dl.acm.org/citation.cfm?id=1146880
+
+26 apr
+FPGA acceleration and ASIC design of SW
+'A Reconfigurable Accelerator for Smith–Waterman Algorithm'
+https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4395198
+
+25 apr
+Efficient reduction on GPU
+http://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/reduction/doc/reduction.pdf
+
+23 apr
+SW on GPU, with traceback
+http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0122524&type=printable
+
 17 apr
 Possibly similar to Tiled Smith Waterman
 https://onlinelibrary.wiley.com/doi/full/10.1111/j.1574-6968.1999.tb13575.x

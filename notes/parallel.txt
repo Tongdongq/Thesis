@@ -767,6 +767,128 @@ For SW: either report the SW score, or calculate the number of diffs during trac
 19-4-2018:
 SW stop condition: score = 0, or end of read reached. Different gap penalties and substitution matrix (S) values need to allow the score to come to 0 in time. Or calc number of diffs during traceback.
 
+20-4-2018:
+DOPA only returns the max score, not the traceback, this saves memory and time.
+We might be able to use the score to keep track of the match/mismatch ratio, this means only the current and previous antidiagonals need to be kept in memory, the ones before that are not needed.
+Talked to Zaid:
+- find Darwin (TSW) CPU implementation
+- accelerate their TSW on GPU (possibly with DOPA copy-paste)
+- compare CPU/GPU TSW with CPU/GPU Daligner
+- talk to Nauman for accuracy measurements
+
+23-4-2018:
+Talked to Nauman:
+- measure accuracy of heuristics by comparing SW score of exact SW
+- use simple scoring scheme for exact and heuristics (match ? 1 : -1)
+
+25-4-2-2018:
+Received GACT CPU code from Yatish.
+Be careful with ILP when rewriting GACT CPU parts.
+Added options GACT and FULL_GACT, GACT extends on two sides, FULL_GACT performs GACT on the whole matrix.
+
+26-4-2018:
+Daligner base representation: ACGT = [0-3], same for GACT
+Talked to Zaid and Nauman:
+- Only report start/endpoints and score, not traceback
+- Possibly keep checkpoints with each tile
+- Copy/paste from GASAL library
+- View GACT as general SW algorithm, not specific to Darwin
+- Accelerate GACT on GPU!
+- Using linear gap might reduce memory requirement
+
+14-5-2018:
+Downloaded GASAL library, created branch gpu-daligner/GASAL
+Implemented GASAL based alignment partially: passed LAcalls and Readpair info
+
+15-5-2018:
+Consideration when sending reads to GPU:
+- produce mapping/unmapping of IDs, send all of them that have an LAcall, is very space expensive, unless it is done in parts
+- rewrite buffer for reads each time, causes redundant writes, because a read usually has multiple LAcalls
+- rewrite buffer for reads only when space can be saved, 
+- keep track of filled and empty spots in buffer, to minimize redundant writing, needs some sort of monitor and causes external fragmentation of the buffer
+GASAL uses 4 bits per packed base, 130MB has 133 million bases -> 67 million bytes, therefore we pick the first sending option.
+GASAL packing also interleaves the bases, so prepacking all reads is not a good option.
+Since different rpairs can have tiles in different directions and LAcalls start at different positions, uncoalesced accesses might occur. This could be countered by rewriting bases and relaunching kernels for each tile, but this will increase the CPU-GPU overhead.
+Since uncoalesced access is annoying, and we have multiple CPU pthreads, we choose to relaunch for each tile.
+Speaking about multiple CPU pthreads, GASAL functions are not asynchronous, so this will have to change too.
+
+16-5-2018:
+Expanded Rpair_status to contain abpos and LAcall_idx to allow tiling
+Odd value: a_out[j] can be larger than tile_a_len at the end of a read. Efforts to fix using different padding characters and defining N_PENALTY were fruitless.
+
+17-5-2018:
+Started with changing the local GASAL kernel to fit GACT
+Talked to Nauman:
+- found bug in GASAL global first row score init
+- put Overlap by Overlap matrix of scores in gmem, because you want to know the score of the aligned part without overlap. Normal overlap size is 120, but smem is too small for that
+
+20-5-2018:
+Overlap is not wrt elem with max score, but to next Tile.
+
+22-5-2018:
+Imagine three zones in the Tile:
+- 1: terminate: when elem with max score has x < T/2 and y < T/2 (empiric)
+- 2: easy: when elem with max score has x < T-O and y < T-O and not in terminate, new tile will start at that elem
+- 3: hard: when elem with max score has x >= T-O or y >= T-O, easy new tile computation will not have enough overlap between tiles. But you cannot just to minus O or whatever, because you want to know where the trace hit the x = T-O or y = T-O line. To this end, perform this pseudocode:
+if(x == T-O || y == T-O){
+	start = 1;
+}elif(x > T-O || y > T-O){
+	propagate = 1;
+}
+i = x*T+y;
+D = max(A,B,C);
+if(A == D){
+	if(start == 1){
+		p[i] = ((x-1) << 8) | (y - 1);
+	}elif(propagate == 1){
+		p[i] = p[(x-1)*T + y - 1];
+	}
+}elif(B == D){
+	if(start == 1){
+		p[i] = ((x-1) << 8) | y;
+	}elif(propagate == 1){
+		p[i] = p[(x-1)*T + y];
+	}
+}elif(C == D){
+	if(start == 1){
+		p[i] = (x << 8) | (y - 1);
+	}elif(propagate == 1){
+		p[i] = p[x*T + y - 1];
+	}
+}
+--------- rewritten
+if(x == T-O || y == T-O){
+	start = 1;
+}elif(x > T-O || y > T-O){
+	propagate = 1;
+}
+i = x*T+y;
+D = max(A,B,C);
+if(A == D){
+	x--;
+	y--;
+}elif(B == D){
+	x--;
+}elif(C == D){
+	y--;
+}
+if(start == 1){
+	p[i] = (x << 8) | y;
+}elif(propagate == 1){
+	p[i] = p[x*T+y];
+}
+
+24-5-2018:
+If part of the Tile is outside the DP matrix, there are different actions/calculations to terminate or find the start of a new Tile.
+
+25-5-2018:
+Talked to Zaid:
+- focus on putting algorithm on GPU, not on changing algorithm
+- put GASAL in CPU version of GACT
+
+5-6-2018:
+Finished moving GACT to GPU, same output as CPU version
+
 
 
 
