@@ -1,0 +1,65 @@
+
+Created: 5-6-2018:
+Repo: gact, commit: e306aefd
+380 lines, T50 (tile size), O10 (tile overlap):
+CPU: 38s
+BATCH: 38.4s
+GPU:
+-  T3: 28s
+- T32: 13.0s
+- T64: 8.7s
+-T128: 6.8s
+
+1200 lines, T50, O10:
+CPU: 1m58
+BATCH32: 2m7
+GPU: 
+- T32: 29.3s
+-T128: 11.7s
+-T256: 9.1s
+
+1200 lines, T100, O20: output different than T50 O10
+CPU: 4m17
+BATCH32: 4m12
+GPU: 
+- T32: 3m22
+-T128: 54.8s
+-T256: 33.7s
+
+1200 lines, T200, O40: output same as T100 O20
+CPU: 2m26
+BATCH32: 2m25
+GPU:
+-T128: 1m46
+-T256: 1m5
+
+1200 lines, T300, O50: output same as T200 O40
+CPU: 1m51
+BATCH32: 1m52
+GPU:
+- T32: 9m22
+-T128: 2m36
+-T256: 1m34
+
+1200 lines, T400, O50: output same as T300 O50
+CPU: 1m28
+BATCH: 
+GPU:
+-T128: 
+-T256: 
+
+1200 lines, T400, O100:
+CPU: 
+BATCH: 
+GPU:
+-T128: 
+-T256: 
+
+1200 lines, T2048 (exact):
+CPU: 
+BATCH: 
+GPU:
+-T128: 
+-T256: 
+
+
