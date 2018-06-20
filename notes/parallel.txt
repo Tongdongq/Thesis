@@ -889,7 +889,33 @@ Talked to Zaid:
 5-6-2018:
 Finished moving GACT to GPU, same output as CPU version
 
+7-6-2018:
+Different max calculation of h_matrix_wr[j] is 13% faster.
 
+8-6-2018:
+Different max calculation of m_matrix_wr[j] is 0-9% faster.
+
+11-6-2018:
+Different max_score tracking if 4% faster, 0ac9c7b.
+Coalesced all device-side matrices, output ok, 3x speedup, 8de15c5
+Minor improvement with 'tmp += (ins_open >= ins_extend) ? (2 << INSERT_OP) : 0;', output ok, 7% faster, commit 2991155
+
+12-6-2018:
+Not checking to write pos_score each element, output ok, 0% speedup, 9581e87
+Coalescing bases from ref_seq and query_seq, output ok, 0-13% speedup, f7ebc6f
+
+15-6-2018:
+Measured difference between matrixfill and traceback on GPU, matrixfill is about >99% of time, commit 798edc3
+Changed generate.c to create datasets for gact/, because it needs no PacBio headers, and single lines
+
+18-6-2018:
+Talked to Zaid:
+- profile matrixfill vs traceback on cpu
+- thesis writing takes 1-2 months
+- measure speedup on other datasets
+
+19-6-2018:
+Comparing the chars instead of using NtChar2Int(), 0-15% speedup (linear with tile_size), commit 7f5a691
 
 
 TODO: create type 5 reads that have a AT/GC imbalance.

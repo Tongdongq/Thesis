@@ -5,61 +5,274 @@ Repo: gact, commit: e306aefd
 CPU: 38s
 BATCH: 38.4s
 GPU:
--  T3: 28s
-- T32: 13.0s
-- T64: 8.7s
--T128: 6.8s
+- T64: 
+-T128: 
 
 1200 lines, T50, O10:
 CPU: 1m58
 BATCH32: 2m7
 GPU: 
-- T32: 29.3s
--T128: 11.7s
--T256: 9.1s
+-T128: 9.7s
+-T256: 8.4s
 
 1200 lines, T100, O20: output different than T50 O10
 CPU: 4m17
 BATCH32: 4m12
 GPU: 
-- T32: 3m22
--T128: 54.8s
--T256: 33.7s
+-T128: 46.9s
+-T256: 29.1s
 
 1200 lines, T200, O40: output same as T100 O20
 CPU: 2m26
 BATCH32: 2m25
 GPU:
--T128: 1m46
--T256: 1m5
+-T128: 1m31
+-T256: 55.8s
 
 1200 lines, T300, O50: output same as T200 O40
 CPU: 1m51
 BATCH32: 1m52
 GPU:
-- T32: 9m22
--T128: 2m36
--T256: 1m34
+-T128: 2m14
+-T256: 1m21
 
 1200 lines, T400, O50: output same as T300 O50
 CPU: 1m28
-BATCH: 
+BATCH32: 1m28
 GPU:
--T128: 
--T256: 
+-T128: 2m47
+-T256: 1m43
 
-1200 lines, T400, O100:
+1200 lines, T400, O100: output same as T400 O50
+CPU: 1m40
+BATCH32: 1m36
+GPU:
+-T128: 3m8
+-T256: 1m56
+
+1200 lines, T2048 (exact): output same as T100 O20 to T400 T50
 CPU: 
 BATCH: 
 GPU:
 -T128: 
 -T256: 
 
-1200 lines, T2048 (exact):
-CPU: 
-BATCH: 
+-------------------
+e306aefd vs aacfb61   (different max calculation m_matrix_wr[j])
+1200 lines, T50, O10:
+CPU: 1m44
+BATCH32: 1m52
+GPU: 
+- T32: 24.4s, 23.2s, 5%
+- T64: 15.0s, 14.6s, 3%
+-T128: 9.8s, 9.7s, 1%
+-T256: 7.6s, 7.6s, 0%
+
+1200 lines, T400, O100: output different than T50 O10
+CPU: 1m40
+BATCH32: 1m36
 GPU:
--T128: 
--T256: 
+- T64: 6m2, 5m31, 8.5%
+-T128: 3m8, 2m55, 6.9%
+-T256: 1m56, 1m49, 6.0%
+------------------
+aacfb61 vs 0ac9c7b (different max_score tracking)
+1200 lines, T50, O10:
+CPU: 1m44
+BATCH32: 1m52
+GPU: 
+- T32: 23.2s, 22.4s, 3%
+- T64: 14.6s, 13.8s, 5%
+-T128: 9.7s,  9.3s, 4%
+-T256: 7.6s,  7.4s, 3%
 
+1200 lines, T400, O100: output different than T50 O10
+CPU: 1m40
+BATCH32: 1m36
+GPU:
+- T64: 331s, 315s, 5%
+-T128: 175s, 168s, 4%
+-T256: 109s, 105s, 4%
+---------------------
+0ac9c7b vs 8de15c5 (coalescing of all device-side matrices)
+1200 lines, T50, O10:
+CPU: 1m53
+BATCH32: 2m2
+GPU:
+- T32: 22.3s, 7.2s, 4.8x
+- T64: 13.5s, 5.2s, 2.6x
+-T128: 9.0s, 4.1s, 2.2x
+-T256: 7.3s, 3.8s, 1.9x
 
+1200 lines, T400, O50:
+CPU: 90s
+BATCH32: 90s
+GPU:
+- T64: 278s, 76.5s, 3.6x
+-T128: 148s, 47.6s, 3.1x
+-T256: 92s, 29.8s, 3.1x
+---------------------
+8de15c5 vs 2991155 (minor improvement with 'tmp += (ins_open >= ins_extend) ? (2 << INSERT_OP) : 0;')
+1200 lines, T50, O10:
+CPU: 113s
+BATCH32: 119s
+GPU:
+- T32: 7.2s, 6.6s, 8%
+- T64: 5.2s, 4.8s, 8%
+-T128: 4.1s, 3.9s, 5%
+-T256: 3.6s, 3.6s, 0%
+
+1200 lines, T400, O50:
+CPU: 
+BATCH32: 
+GPU:
+- T64: 76.5s, 67.8s, 11%
+-T128: 47.6s, 42.7s, 10%
+-T256: 29.8s, 27.3s, 8%
+
+-----------------------
+2991155 vs 9581e87 (not checking to write pos_score each element)
+1200 lines, T50, O10:
+CPU: 113s
+BATCH32: 119s
+GPU:
+- T32: 6.7s, 6.7s
+- T64: 4.8s, 4.8s
+-T128: 4.2s, 4.2s
+-T256: 3.6s, 3.6s
+
+1200 lines, T400, O50:
+CPU: 
+BATCH32: 
+GPU:
+- T64: 67.7s, 67.5s
+-T128: 42.6s, 42.6s
+-T256: 27.6s, 27.5s
+-----------------------
+9581e87 vs (coalescing bases from ref_seq and query_seq)
+1200 lines, T50, O10:
+CPU: 113s
+BATCH32: 112s
+GPU:
+- T32: 6.7s, 6.4s, 4%
+- T64: 4.8s, 4.8s, 0%
+-T128: 4.2s, 4.1s, 2%
+-T256: 3.7s, 3.7s, 0%
+
+1200 lines, T400, O50:
+CPU: 92s
+BATCH32: 114s
+GPU:
+- T64: 67.8s, 59.0s, 13%
+-T128: 42.4s, 38.6s, 9%
+-T256: 27.5s, 24.2s, 12%
+----------------------
+798edc3: temporary splitting of kernel to profile matrixfill and traceback
+all measurements on the 1200 lines dataset, unless specified otherwise
+notation: matrixfill time, traceback time (both in ms)
+T50, O10:
+- T32: 3360, 55
+-T128: 1050, 16
+T50, O20: output different from T50, O10
+- T32: 3830, 55
+-T128: 1240, 16
+T300, O100: output different from T50, O10 and T50, O20
+- T32: 96650, 230
+-T128: 25400, 62
+T400, O50: output same as T300, O100
+-T128: 35400, 68
+-T256: 21200, 34
+T400, O100:
+-T128: 39460, 66
+-T256: 23150, 33
+T400, O120:
+-T128: 44750, 62
+-T256: 26150, 36
+-------
+still 798edc3, dataset: ./generate.sh 3 2000 1000 1 1 15
+T50, O10:
+- T32: 10700, 120
+-T128: 2700, 34
+T50, O20:
+- T32: 14200, 140
+-T128: 3570, 35
+T300, O100:
+- T32: 81100, 135
+-T128: 21100, 36
+T400, O50:
+-T128: 29180, 35
+-T256: 17600, 20
+T400, O100:
+-T128: 32000, 33
+-T256: 18530, 22
+T400, O120:
+-T128: 36500, 40
+-T256: 21300, 19
+------
+still 798edc3, dataset: ./generate.sh 3 10000 1000 1 1 15
+T50, O10:
+- T32: 52100, 670
+-T128: 13200, 170
+T400, O100:
+-T128: 140900, 220
+-T256: 79300, 90
+------
+still 798edc3, dataset: ./generate.sh 3 500 10000 1 1 15, startpos: 100, 100
+T50, O10:
+- T32: 28700, 340
+-T128: 7250, 100
+T400, O100:
+-T128: 141200, 160
+-T256: 82000, 63
+------
+still 798edc3, dataset: ./generate.sh 3 2000 1000 1 1 30, startpos: 100, 100
+T50, O10:
+- T32: 10800, 160
+-T128: 2740, 43
+T400, O100:
+-T128: 36300, 55
+-T256: 20750, 22
+----------------------------------------
+----------------------------------------
+compare chars instead of uncoding them to ints via NtChar2Int(), 7f5a691
+(forgot to undo matrixfill vs traceback timing)
+CPU only benchmarks
+./generate.sh 3 1000 500 1 1 15
+./run  50  10 1 1     47.58 vs 47.04, 1%
+./run 400 100 1 1     11.52 vs 9.98, 13%
+./generate.sh 3 2000 1000 1 1 30
+./run  50  10 1 1     192.2 vs 192.1, 0%
+./run 400 100 1 1     43.02 vs 36.5, 15%
+----------------------------------------
+benchmarks, startpos: 600, 600, commit 2210640
+GPU: ./z_compile.sh BATCH GPU CMAT CBASES 64
+./generate.sh 3 2000 10000 1 1 5
+CPU  50  10 1         61m1
+GPU  50  10 1 128 64  
+CPU 320 128 1         17m5
+GPU 320 128 1 128 64  12.0s
+./generate.sh 3 2000 10000 1 1 10
+CPU  50  10 1         
+GPU  50  10 1 128 64  
+CPU 320 128 1         
+GPU 320 128 1 128 64  
+./generate.sh 3 2000 10000 1 1 15
+CPU  50  10 1         
+GPU  50  10 1 128 64  
+CPU 320 128 1         
+GPU 320 128 1 128 64  
+./generate.sh 3 2000 10000 1 1 20
+CPU  50  10 1         
+GPU  50  10 1 128 64  
+CPU 320 128 1         
+GPU 320 128 1 128 64  
+./generate.sh 3 2000 10000 1 1 25
+CPU  50  10 1         
+GPU  50  10 1 128 64  
+CPU 320 128 1         
+GPU 320 128 1 128 64  
+./generate.sh 3 2000 10000 1 1 30
+CPU  50  10 1         
+GPU  50  10 1 128 64  
+CPU 320 128 1         
+GPU 320 128 1 128 64  
