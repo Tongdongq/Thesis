@@ -361,10 +361,63 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 \figC{width=.6\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
 \section{DNA Alignment}
-DNA alignment involves determining the similarity between two DNA reads, often with the intend to find an overlapping region.
+DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
+This information can be used to reconstruct the whole genome, during the assembly phase.
+%TODO: possibly refer to the next section 'DNA Assembly'?
+An example of an alignment is shown in Figure \ref{fig:alignment}.
+
+\figC{width=.6\textwidth}{alignment.png}{An example alignment, vertical stripes indicate matching nucleotides, horizontal stripes indicate gaps in one of the reads, source: \cite{alignment_fig}}{fig:alignment}
+
+If the two reads originate from the same part of the genome, the mismatches can be explained by sequencing errors.
+But copying the genome during cell division can also cause errors \cite{dna_replication_errors}.
+Since DNA sequencing is usually performed on more than one cell, the variations in these cells are all sequenced.
+%TODO: citation needed
+
+The mismatches between reads can be distinguished between substitutions, insertions and deletions.
+A substitution is shown between the fifth bases in the figure.
+An insertion is where a read has a base that does not occur in the other read, a deletion means the opposite.
+Note that usually, it cannot be determined if read A has an insertion, or that read B has a deletion, unless they can be compared to other reads.
+Due to the similarity between insertions and deletions, they are often referred to as 'indels'.
+
+Dynamic algorithms can be used to determine the best alignment between two reads.
+A match increases the score, a mismatch (substitution) or indel decreases the score.
+The alignment with the highest score is the most likely alignment.
+
+A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
+%TODO: citation needed
+This is why an affine gap penalty in the form of $y = a*N+b$ is often used, where $b$ is the gap open penalty, $a$ the gap extend penalty, and $N$ the number of bases in the gap - 1.
+Other variations in gap penalty include constant ($y = a$), double affine (), convex ($y = a+b\cdot ln(N)$).
+%TODO: add double affine description
 
 %TODO: SW and NW, global vs local
+Global alignment aligns the full length of both sequences.
+Every base will either have a match/mismatch with a base from the other read, or a gap.
+Local alignment will look for the two subsequences from the reads that have the highest score.
+This means that low scoring regions could be ignored.
+Local alignment is especially useful when the reads are very different in length.
+If one read represents a whole genome of 10000 bases, and the other represents a small sequenced part of 100 bases, global alignment will contain at least 9900 gaps, and at most 100 matches.
+Local alignment will ignore most of those gaps, and only match the small read to a small part of the larger read.
+Figure \ref{fig:global_vs_local_alignment_fig} shows another example of a case where local alignment is better.
 
+\figC{width=.6\textwidth}{global_vs_local.png}{Local alignment can find small, overlapping regions very well, source: \cite{global_vs_local_alignment_fig}}{fig:global_vs_local_alignment_fig}
+
+
+
+\subsection{Global alignment}
+
+
+
+
+
+The affine gap penalty is implemented via 3 matrices, one for a match/mismatch, one for a gap in read A, one for a read in B.
+%X[] = max(gap_open + M[], gap_extend + X[])
+
+
+\subsection{Local alignment}
+
+%TODO: mention multiple sequence alignment
+
+Alignment algorithms are also useful in applications like textcomparison.
 
 \section{DNA Assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
@@ -512,6 +565,7 @@ This can be done by local denovo assembly, or a consensus algorithm \cite{consen
 % bfast (suffix, k:18-22)
 % slider (sorting)
 % syzygy (sorting)
+
 
 \section{GPU processing}
 
