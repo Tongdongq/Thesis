@@ -568,12 +568,13 @@ Each block is assigned to at most one SMX.
 This block's threads are then executed as warps, with 32 threads per warp.
 Each SMX has multiple warp schedulers, so multiple warps can run in parallel on an SMX.
 All threads in a warp must execute the same instruction, if a thread is the only to take a branch, the other threads must wait until the branch is completed, this is called divergence.
+
 Memory operations are also executed in parallel, this means that all threads try to read/write to the memory in parallel.
 If the addresses are next to eachother, only one memory transaction is needed, since a transaction processes a whole memory line.
 This is known as coalescing.
+Uncoalesced memory accesses cause multiple memory transactions.
 
-%TODO include figure of coalescing
-
+\figC{scale=.5}{gpu_coalesced.png}{Uncoalesced accesses are inefficient, source: \cite{gpu_coalesced_fig}}{fig:gpu_coalesced}
 
 %TODO include figure of hardware
 %https://www.techpowerup.com/img/12-05-17/155a.jpg
@@ -586,7 +587,7 @@ GPUs have several different memory types and levels.
 Not all of these are accessible from the host or from other components of the memory hierarchy \cite{cuda}. Figure \ref{fig:memory_hierarchy} shows three types of memory.
 \begin{itemize}
 \item Global memory: The largest and slowest memory, located outside the chip. Can be read and written from the host. Best used for coalesced operations.
-\item Local memory: Each thread has private memory for when registers are not enough. It is stored in global memory, so accesses are very slow.
+\item Local memory: Each thread has private memory for when registers are not enough. It is cached in L1 cache, or stored in global memory when too large.
 \item Registers: The fastest memory available, located on-chip. A thread has a maximum number of registers available depending on Compute Capability.
 \item Shared memory: Each SMX has shared memory, it can be accesses by every thread in every block on the SMX. This can be used by threads in a block to communicate. It is located on-chip, so very fast.
 \item Constant memory: The host can initialize this memory, the kernel can only read it. Reading is as fast as reading a register, but only when all addresses of a half-warp are the same, otherwise reading is serialized. It resides off-chip, but is cached on-chip.
@@ -615,6 +616,17 @@ These operations can be overlapped or pipelined by using streams. Figure \ref{fi
 \section{Heterogeneous computing}
 %\cite{hetero_survey}
 
+
+\subsection{Bioinformatics on GPU}
+
+% BarraCUDA (align/mapping, ngs)
+% CUDASW++ (mapping)
+% CUSHAW (long read, align)
+% GPU-BLAST (local alignment)
+% GPU-HMMER (hidden Markov models, local alignment)
+% mCUDA-MEME
+% SeqNFind
+% UGENE (SW, SA)
 
 
 
