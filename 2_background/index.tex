@@ -379,7 +379,7 @@ An insertion is where a read has a base that does not occur in the other read, a
 Note that usually, it cannot be determined if read A has an insertion, or that read B has a deletion, unless they can be compared to other reads.
 Due to the similarity between insertions and deletions, they are often referred to as 'indels'.
 
-Dynamic algorithms can be used to determine the best alignment between two reads.
+\textit{Dynamic} algorithms can be used to determine the best alignment between two reads.
 A match increases the score, a mismatch (substitution) or indel decreases the score.
 The alignment with the highest score is the most likely alignment.
 
@@ -401,11 +401,64 @@ Figure \ref{fig:global_vs_local_alignment_fig} shows another example of a case w
 
 \figC{width=.6\textwidth}{global_vs_local.png}{Local alignment can find small, overlapping regions very well, source: \cite{global_vs_local_alignment_fig}}{fig:global_vs_local_alignment_fig}
 
+%TODO: should this be a seperate subsection? Could be an appendix as well
+\subsection{Dynamic programming}
+Dynamic programming is a programming technique that solves problems by dividing them recursively into smaller, simpler problems \cite{Dynamic_programming1}.
+An important aspect is that the subproblems overlap, saving the results of one subproblem to use in another subproblem.
+This makes it different than a divide-and-conquer approach, where the problem is divided into non-overlapping subproblems \cite{Dynamic_programming2}.
+Ther are two ways to solve these problems: top-down, and bottom-up.
+Top-down is a direct result of the recursive formulation.
+It starts by asking the end result, if this is not available, follow the recursion, and check for the answer(s) of the subproblem(s).
+If these are available, use them, if not, calculate them and store them.
+This technique is called memoization.
+Bottom-up firsts solves the subproblems, and uses these results to build the solution for the original problem.
 
 
 \subsection{Global alignment}
+For global alignment, the Needleman-Wunsch algorithm \cite{NeedlemanWunsch} is widely used.
+It was published in 1970, and designed to compare sequences of amino acids, but as both are represented by letters, comparing nucleotides works in the same way.
+%TODO: mention and cite that NW is proven optimal
+
+In Needleman-Wunsch, the smallest subproblems are trivial alignments, such as aligning two bases, or aligning zero bases in one read with N bases in the other.
+The first can result in two cases: a match or a mismatch, the latter results in N gaps.
+The alignments are built incrementally, a non-trivial alignment is always a combination of a smaller (known) alignment, plus a match, mismatch or indel.
+The scores in this thesis used are $match = 1$, $mismatch = gap = -1$ unless stated otherwise.
+Of these cases, the maximum resulting score is considered as the score for that alignment.
+This recursion is shown in Equation \ref{eq:NW_recursion}, where $S(i,j)$ is the maximum score when aligning subreads $a[0:i]$ and $b[0:j]$, $s(a_i,b_j)$ is the (mis)match score of those two bases, and $gap$ is the gap penalty.
+
+\begin{equation}
+S(i,j) = max
+\begin{cases}
+S(i-1,j) - gap \\
+S(i,j-1) - gap \\
+S(i-1,j-1) + s(a_i,b_j) \\
+\end{cases}
+\label{eq:NW_recursion}
+\end{equation}
+
+The score of every calculated alignment is stored in a matrix, where the score in the bottom-right corner indicates the score of the total alignment.
+To find out the actual alignment, like in Figure \ref{fig:alignment}, traceback must be performed.
+Traceback starts at the bottom-right corner, and for each matrix element, the source of the maximum score is found, either because it was stored in a different matrix, or because it is recalculated.
+The traceback of one element is shown in Figure \ref{fig:NW_traceback}.
+
+\figC{width=.4\textwidth}{NW_traceback.png}{Calculating a single element, the source of its score is either element on the left, top, or top-left, this determines the direction of the traceback pointer.}{fig:NW_traceback}
+
+The algorithm consists of three steps: initialization, filling the matrix, and performing traceback.
+The initialization writes scores to the first row and column, as these alignments are trivial.
+Figure \ref{fig:NW1} shows an initialized matrix.
+
+\figC{width=.6\textwidth}{NW1.png}{The DP matrix, initialised, source: \cite{NW_online}}{fig:NW1}
+
+The matrix is filled according to the recurrence relation, where the elements have to be calculating in a particular order, because certain previous values need to be known.
+A filled matrix is shown in Figure \ref{fig:NW2}.
+
+\figC{width=.6\textwidth}{NW2.png}{The DP matrix, filled, source: \cite{NW_online}}{fig:NW2}
+
+The traceback starts at the bottom-right element.
+This $S(N,M)$ element indicates the score of aligning the total reads in an optimal way.
 
 
+\figC{width=.6\textwidth}{NW3.png}{The DP matrix, with the traceback path highlighted, source: \cite{NW_online}}{fig:NW3}
 
 
 
@@ -418,6 +471,23 @@ The affine gap penalty is implemented via 3 matrices, one for a match/mismatch, 
 %TODO: mention multiple sequence alignment
 
 Alignment algorithms are also useful in applications like textcomparison.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \section{DNA Assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
