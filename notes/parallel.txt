@@ -917,9 +917,14 @@ Talked to Zaid:
 19-6-2018:
 Comparing the chars instead of using NtChar2Int(), 0-15% speedup (linear with tile_size), commit 7f5a691
 
+22-6-2018:
+Create type 5 reads, same as type 4, but they start at the same point of the genome to allow for simple gact benchmarking, as gact without filter has a constant start_pos.
 
-TODO: create type 5 reads that have a AT/GC imbalance.
-	  create type 6 reads that are a subset from real reads, but with nice lengths, etc.
+
+
+
+TODO: create type 6 reads that have a AT/GC imbalance.
+	  create type 7 reads that are a subset from real reads, but with nice lengths, etc.
 
 ./generate 4 200 20 440 1      has 1 rpair ab: 66
 ./generate 4 1000 161 1200 1   has 128 rpairs

@@ -246,33 +246,57 @@ CPU only benchmarks
 ----------------------------------------
 benchmarks, startpos: 600, 600, commit 2210640
 GPU: ./z_compile.sh BATCH GPU CMAT CBASES 64
-./generate.sh 3 2000 10000 1 1 5
+./generate.sh 3 2000 10000 1 1 5, output CPUvsGPU ok, output tilesizes differ
 CPU  50  10 1         61m1
-GPU  50  10 1 128 64  
-CPU 320 128 1         17m5
+GPU  50  10 1 128 64  4.2s
+CPU 320 128 1         17m0
 GPU 320 128 1 128 64  12.0s
-./generate.sh 3 2000 10000 1 1 10
-CPU  50  10 1         
-GPU  50  10 1 128 64  
-CPU 320 128 1         
-GPU 320 128 1 128 64  
-./generate.sh 3 2000 10000 1 1 15
-CPU  50  10 1         
-GPU  50  10 1 128 64  
-CPU 320 128 1         
-GPU 320 128 1 128 64  
-./generate.sh 3 2000 10000 1 1 20
-CPU  50  10 1         
-GPU  50  10 1 128 64  
-CPU 320 128 1         
-GPU 320 128 1 128 64  
-./generate.sh 3 2000 10000 1 1 25
-CPU  50  10 1         
-GPU  50  10 1 128 64  
-CPU 320 128 1         
-GPU 320 128 1 128 64  
-./generate.sh 3 2000 10000 1 1 30
-CPU  50  10 1         
-GPU  50  10 1 128 64  
-CPU 320 128 1         
-GPU 320 128 1 128 64  
+./generate.sh 3 2000 10000 1 1 10, output CPUvsGPU ok, 
+CPU  50  10 1         61m3
+GPU  50  10 1 128 64  7.0s
+CPU 320 128 1         17m0
+GPU 320 128 1 128 64  14.9s
+./generate.sh 3 2000 10000 1 1 15,                   , T50 T320 same
+CPU  50  10 1         62m26
+GPU  50  10 1 128 64  6.6s
+CPU 320 128 1         17m9
+GPU 320 128 1 128 64  14.7s
+./generate.sh 3 2000 10000 1 1 20, output CPUvsGPU ok, T50 T320 same
+CPU  50  10 1         62m1
+GPU  50  10 1 128 64  6.6s
+CPU 320 128 1         17m38
+GPU 320 128 1 128 64  15.1s
+./generate.sh 3 2000 10000 1 1 25, output CPUvsGPU ok, T50 T320 .06% different
+CPU  50  10 1         61m2
+GPU  50  10 1 128 64  6.6s
+CPU 320 128 1         17m25
+GPU 320 128 1 128 64  15.5s
+./generate.sh 3 2000 10000 1 1 30, output CPUvsGPU ok, T50 T320 .2% different
+CPU  50  10 1         61m58
+GPU  50  10 1 128 64  7.3s
+CPU 320 128 1         17m31
+GPU 320 128 1 128 64  18.3s
+./generate.sh 3 2000 10000 1 1 35, output CPUvsGPU ok, T50 T320 2.3% different
+CPU  50  10 1         66m1
+GPU  50  10 1 128 64  6.9s
+CPU 320 128 1         17m29
+GPU 320 128 1 128 64  17.0s
+./generate.sh 3 2000 10000 1 1 40, output CPUvsGPU ok, T50 T320 13% different
+CPU  50  10 1         59m51
+GPU  50  10 1 128 64  7.1s
+CPU 320 128 1         17m43
+GPU 320 128 1 128 64  17.5s
+----------------------------------------
+startpos 600, 600, commit 6d4ac15(2210640)
+./generate.sh 5 2000 10000 4000 1, output CPUvsGPU ok
+CPU 320 128 1         17m53
+GPU 320 128 1 128 64  16.9s, 63x
+./generate.sh 5 10000 5000 20000 1, output CPUvsGPU ok
+CPU 320 128 1         39m19
+GPU 320 128 1 64 64   52.3s, 45x
+matfill vs traceback: 45200, 85 ms
+./generate.sh 5 10000 10000 20000 1
+
+
+
+
