@@ -1,0 +1,96 @@
+
+Created 2-7-2018:
+
+Speedup yeast: 10x
+
+-----------
+d822c11
+./generte.sh 4 2000 20000 4000 16
+CPU 1       : 132m
+GPU 1  32 32:  31m, but 4 outputs are different
+GPU 1  64 32:   9m27, but 4 outputs are different
+./generate.sh 4 2000 10000 4000 4
+CPU 1       : 17m11
+GPU 1  64 32:  1m27, 2 outputs are different, of 33272
+GPU 1 128 32:    59.8s, 2 outputs are different, of 33272
+./generate.sh 4 2000 20000 4000 1
+CPU 1       : 11m36, 21751 outputs
+GPU 1  64 32:  1m16, 3 outputs are different, fixed now
+./generate.sh 4 2000 5000 4000 1
+CPU 1       : 4m15
+GPU 1  64 32:   23.8s, output ok
+./generate.sh 4 2000 10000 4000 1
+CPU 1       : 4m56  , 9364 outputs
+GPU 1  64 32:   40s7, output ok
+---------------
+8a31321
+./generate.sh 4 2000 5000 4000 2
+CPU 1       : 7m26  , 8367 outputs
+GPU 1  64 32:   32s6, output ok
+./generate.sh 4 2000 10000 4000 4
+CPU 1       : 17m11, 33272 outputs
+GPU 1  64 32:  1m29, 2 outputs are different
+---------------
+e7bb0f8
+./generate.sh 4 2000 20000 4000 16
+CPU 1            : 131m  , 258253 outputs
+CPU 8            :  58m  , output ok
+GPU 1  64 32  64r:   9m30, output ok
+GPU 1 128 32  64r:   5m50, output ok
+GPU 1 256 32  64r:   6m12, output ok
+GPU 1 128 64  64r:   4m35, output ok
+GPU 1 64 128  64r:   4m32, output ok, 29x speedup vs CPU1
+GPU 1 64 128  32r:   4m48, output ok
+GPU 1 128 32 128r:   5m42, output ok
+
+
+profile
+./generate.sh 4 2000 5000 4000 1, 4088 183 hits
+./profile.sh 1 64 64 64r
+./z_compile.sh GPU CMAT CBASES 64
+                      inst_executed         874444002
+                      gld_inst_8bit         196908942
+                     gld_inst_32bit        1357716015
+      __l1_global_load_transactions          92959386
+     __l1_global_store_transactions          48170839
+        l2_subp0_read_sector_misses          74242649
+ l2_subp0_total_read_sector_queries          70013059
+                   gld_transactions          92958700
+                   gst_transactions          47742500
+                     gld_efficiency            54.3 %
+                     gst_efficiency            51.7 %
+                     gst_throughput        16.04 GB/s
+                     gld_throughput        25.11 GB/s
+           gst_requested_throughput        10.85 GB/s
+           gld_requested_throughput        15.77 GB/s
+               l2_read_transactions         280043547
+              l2_write_transactions         327500288
+                      sm_efficiency            51.42%
+                 achieved_occupancy          0.076286
+
+-------------
+356bfcf
+./generate.sh 4 2000 5000 4000 1
+CPU 1       : 5m51  , 4271 outputs
+CPU 8       : 1m27  , output ok
+GPU 1  64 64:   16s4, output ok
+GPU 2  32 64:   21s8, output ok
+GPU 2  32 64:   15s9, output ok, STREAM
+./generate.sh 4 2000 20000 4000 16
+GPU 1  64 128: 4m28, 258253 outputs
+GPU 2  64 128: 4m2 , output ok
+GPU 4  32 128: 5m36, output ok
+GPU 8  16 128: 9m43, output ok
+GPU 2  64 128: 4m46, output ok STREAM
+GPU 4  32 128: 4m38, output ok STREAM
+GPU 8  16 128: 4m40, output ok STREAM
+GPU 8  24 128: 3m58, output ok STREAM
+GPU 4  48 128: 3m59, output ok STREAM
+
+seed_length = 14:
+./generate.sh 4 2000 20000 4000 16
+GPU 1  64 128: 3m54, 217470 outputs
+GPU 4  48 128: 3m29, output ok STREAM
+sm_efficiency        93.82%
+achieved_occupancy   0.251539
+

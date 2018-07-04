@@ -919,7 +919,39 @@ Comparing the chars instead of using NtChar2Int(), 0-15% speedup (linear with ti
 
 22-6-2018:
 Create type 5 reads, same as type 4, but they start at the same point of the genome to allow for simple gact benchmarking, as gact without filter has a constant start_pos.
+TIME compile option shows: 100% in Align_Batch() for BATCH, 90% in Align_Batch_GPU() for BATCH GPU CMAT CBASES
 
+25-6-2018:
+Received D-SOFT code, is to be merged with GACT code.
+The resulting GACT_calls from D-SOFT are sorted on query_id, then on query_pos. This means they would have to be sorted to create Readpairs with consecutive GACT_calls. We'll perform all GACT_calls then, instead of trying to skip some.
+Default params:
+match = 1
+mismatch = gap_open = gap_extend = -1
+seed_length = 13
+tile_size = 320
+tile_overlap = 120
+
+29-5-2018:
+Bug when using multiple CPU threads: GPU_storage struct was shared among all CPU threads
+Got 10x speedup on the provided yeast data.
+Talked to Nauman
+
+2-7-2018:
+Weird errors when using generated cat 4 data and BATCH vs CPU.
+Caused by starting a GACT_call with pos==0, they stayed in reverse mode too long, fixed by adding another turnaround in the 'next_call==1' code.
+Another bug for GACT_calls with pos==0: when initially assigned to a BATCH thread, they got wrong pos values during the turnaround, fixed by setting 'bpos=pos' during creation of the GACT_call.
+
+3-7-2018:
+Implemented CUDA streams for CPU multithreading.
+gact.h:GPU_storage has a pointer to a CUDA_Stream_Holder, which is implemented in cuda_header.h, uses Forward Declaration to compile
+Also created GPU_close() to destroy the streams.
+Verified output when using streams.
+
+4-7-2018:
+Not enough VRAM (12GB) when using CBT 4 64 128, 3 64 128 works.
+
+
+TODO: implement async cuda functions, to allow for CPU multithreading
 
 
 
