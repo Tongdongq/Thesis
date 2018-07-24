@@ -87,10 +87,111 @@ GPU 8  16 128: 4m40, output ok STREAM
 GPU 8  24 128: 3m58, output ok STREAM
 GPU 4  48 128: 3m59, output ok STREAM
 
-seed_length = 14:
+-----------------------------------------------------------
+seed_length = 14, from this point:
+-----------------------------------------------------------
 ./generate.sh 4 2000 20000 4000 16
 GPU 1  64 128: 3m54, 217470 outputs
 GPU 4  48 128: 3m29, output ok STREAM
 sm_efficiency        93.82%
 achieved_occupancy   0.251539
+
+with 32 registers, occupancy increases to 46%, but runtime stays the same
+
+dataset 2 (30k lines):
+CPU 1        : 2m54 , 1245 outputs, 648 597 seeds
+CPU 2        : 1m50 ,
+CPU 4        : 1m6
+CPU 8        :   48s
+GPU 1  24  32:   55s, output ok
+GPU 2  12  32:   55s, output ok
+
+dataset 6.8MB (100k lines): 
+CPU 1        : 22m53, 11401 outputs, 5881 5520 seeds
+CPU 4        : 10m35, output ok
+CPU 8        :  6m30, output ok
+GPU 1  64  64:  1m20, output ok
+GPU 1  96  64:  1m17, output ok, 18x speedup vs CPU1
+GPU 2  48  64:  1m16, output ok
+GPU 4  24  64:  1m17, output ok
+
+dataset 50MB (720k lines):
+CPU 8        : 95m51, 222299 outputs, 108771 113528 seeds
+GPU 8  48  64:  8m4 , output ok, 12x speedup vs CPU8
+GPU 1 256  64: 10m56, output ok
+
+dataset 90MB (132k lines):
+CPU 8        : 177m, 407516 outputs, 201217 206299 seeds
+GPU 8  48  64:  13m33, output ok, 13x speedup vs CPU8
+GPU 1 256  64:  17m17, output ok
+
+8c39e13
+dataset 6.8MB (100k lines), mismatch = -3:
+CPU 8        : 12m39, 11401 outputs, 5881 5520 seeds
+GPU 1  96  64:  2m18, output ok
+
+16b42b2
+dataset 50MB (720k lines), mismatch = -3:
+CPU 8        : 95m51, 222299 outputs, 108771 113528 seeds
+GPU 8  48  64:  8m4 , output ok, 12x speedup vs CPU8
+
+---------------------
+6dfd022
+compress dir matrix
+dataset 6.8MB:
+old GPU 1 96 64: 1m17
+new GPU 1 96 64: 1m21, output ok
+
+dataset 50MB:
+old GPU 8 48 64: 7m59
+new GPU 8 48 64: 8m13, output ok
+new GPU 8 64 64: 9m10, output ok
+
+---------------------
+eee7add
+reverse the bases on CPU, instead of GPU, to coalesce all bases reads
+dataset 6.8MB:
+old GPU 1 96 64: 1m17
+new GPU 1 96 64: 1m17, output ok
+
+dataset 50MB:
+old GPU 8 48 64: 7m59
+new GPU 8 48 64: 7m51
+new GPU 8 32 64: 8m14
+new GPU 8 64 64: 8m41
+---------------------
+c0aa55a
+load ref_nt once per column, instead of for each element
+dataset 6.8MB:
+old GPU 1 96 64: 1m17
+new GPU 1 96 64: 1m15, output ok
+
+dataset 50MB:
+old GPU 8 48 64: 7m59
+new GPU 8 48 64: 7m47
+new GPU 8 64 64: 8m45
+----------------------
+GPU STREAM GASAL CMAT 64, a6e24fd59
+some outputs are wrong for GASAL when using too many CBT
+1 16 128 ok    2048 GPU threads
+1 32 128 wrong
+
+1  8 256 ok    2048 GPU threads
+1 16 256 wrong
+
+1 32  64 ok    2048 GPU threads
+1 64  64 wrong
+
+2  4  32 ok    2x128=256 GPU threads
+2  8  32 ok    2x256=512 GPU threads
+2 16  32 wrong 2x512=1024 GPU threads
+
+2  4  64 ok    2x256=512 threads
+2  6  64 wrong 2x384=768 threads
+2  8  64 wrong 2x512=1024 threads
+
+4  4  32 ok    4x128=512 threads
+4  6  32 ok    4x192=768 threads
+4  8  32 ok    4*256=1024 threads
+4 12  32 wrong 4*384=1536 threads
 
