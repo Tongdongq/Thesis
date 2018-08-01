@@ -171,27 +171,59 @@ old GPU 8 48 64: 7m59
 new GPU 8 48 64: 7m47
 new GPU 8 64 64: 8m45
 ----------------------
-GPU STREAM GASAL CMAT 64, a6e24fd59
-some outputs are wrong for GASAL when using too many CBT
-1 16 128 ok    2048 GPU threads
-1 32 128 wrong
+fixed out-of-bounds dir_matrix access, ccbe9504b
+also writing output to files now
 
-1  8 256 ok    2048 GPU threads
-1 16 256 wrong
+dataset 6.8MB:
+CPU  8       : 5m45
+CPU 16       : 5m24     output ok
+GPU 1  32 128:   15.5 s output ok
+GPU 1  64  64:   15.0 s output ok
+GPU 2   8  32:   24.3 s output ok
+GPU 2  16  32:   18.1 s output ok
+GPU 8  16  32:   15.6 s output ok
 
-1 32  64 ok    2048 GPU threads
-1 64  64 wrong
+dataset 50MB:
+CPU 1        : 218m
+CPU 8        :  93m44
+GPU 1  32 128:   1m55  output ok
+GPU 1  64  64:   2m19  output ok
+GPU 1  32  32:   3m14  output ok
+GPU 2  64  64:   1m22  output ok
+GPU 2  16 128:   1m35  output ok
+GPU 2  32 128:   1m22  output ok
+GPU 2  32  64:   1m37  output ok
+GPU 8  16  64:   1m16  output ok
+GPU 8  32  64:   1m15  output ok, 75x speedup vs CPU8
+GPU 8  64  64:   1m22  output ok
+---------------------
+d48ad30, fixed OLD traceback for GASAL, suitable for affine gap penalty now
 
-2  4  32 ok    2x128=256 GPU threads
-2  8  32 ok    2x256=512 GPU threads
-2 16  32 wrong 2x512=1024 GPU threads
+dataset 6_8MB (match=1,mismatch=-1,open=-1,extend=-1):
+CPU 8        : 6m37
+GPU 8   8  64:   16s8
 
-2  4  64 ok    2x256=512 threads
-2  6  64 wrong 2x384=768 threads
-2  8  64 wrong 2x512=1024 threads
+dataset 6_8MB (match=1,mismatch=-1,open=-2,extend=-1):
+CPU 8        : 4m4
+GPU 8   8  64:   14s6
 
-4  4  32 ok    4x128=512 threads
-4  6  32 ok    4x192=768 threads
-4  8  32 ok    4*256=1024 threads
-4 12  32 wrong 4*384=1536 threads
+dataset 6_8MB (match=1,mismatch=-1,open=-2,extend=-2):
+CPU 8        : 3m53
+GPU 8   8  64:   14s7
+
+dataset 6_8MB (match=1,mismatch=-3,open=-1,extend=-1):
+CPU 8        : 4m19
+GPU 8   8  64:   14s9
+
+dataset 50MB (match=1,mismatch=-1,open=-1,extend=-1):
+
+
+dataset 50MB (match=1,mismatch=-1,open=-2,extend=-1):
+
+
+dataset 50MB (match=1,mismatch=-1,open=-2,extend=-2):
+
+
+dataset 50MB (match=1,mismatch=-3,open=-1,extend=-1):
+
 

@@ -949,9 +949,49 @@ Verified output when using streams.
 
 4-7-2018:
 Not enough VRAM (12GB) when using CBT 4 64 128, 3 64 128 works.
+With 32 registers, occupancy increases to 46%, but runtime stays the same
 
+5-7-2018:
+75% of stalls are caused by memory depencies, more threads could solve this, but each thread needs tons of memory for the matrices.
 
-TODO: implement async cuda functions, to allow for CPU multithreading
+6-7-2018:
+Moved all scores to reference_guided.cpp, it will pass them to other functions, 8c39e13
+Changed dir_matrix type from int to char to save space, output ok, 16b42b2
+
+9-7-2018:
+COMPRESS_DIR implemented, dir_matrix elements take 4 bits, but runtime is longer, due to more complex storing/reading, 6dfd022
+Reverse reads on CPU, instead of GPU, eee7add
+Load ref_nt once per column, instead of each matrix element, c0aa55a
+Adding #pragma unroll 8 seems to have little effect
+Talked to Zaid:
+- balance workload between CPU and GPU
+- check scalability of CPU for accelerated version
+- implement GASAL to push GPU performance
+
+10-7-2018:
+Talked to Nauman:
+- reported speedups
+- reported possible GASAL local error
+
+11-7-2018:
+A problem with GASAL is the order in which the matrix elements are done, when two elements with the same highscore are calculated, only the first one is recorded. This could differ among the implementations. Chosen is to take the one with the highest ref_pos, then query_pos.
+
+13-7-2018:
+GPU and GPU GASAL have the same output now, but it is different from the CPU output. Some things with 0-based and 1-based indexing caused some +1 and -1 to change the outputs. cdd8a84
+Initial tests show a 5x speedup for GPU GASAL vs GPU.
+Printing bases only works when they are not coded to 0,1,2,3.
+
+23-7-2018:
+CPU and GPU GASAL have same output, errors for larger blocknumbers. Caused by i=-1 underflow (out of bounds) access for dir_matrix.
+
+24-7-2018:
+Fixed i=-1 underflow by adding extra elements for i=-1 and j=-1, ccbe9504b. Alternate fix is to check for negative values while tracebacking, but this check needs to be done for every iteration.
+
+25-7-2018:
+GASAL has 75x speedup vs CPU8 for 50MB dataset.
+
+28-7-2018:
+The basic traceback does not work when using an affine gap penalty. The old implementation must be used.
 
 
 
