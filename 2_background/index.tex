@@ -382,6 +382,7 @@ Due to the similarity between insertions and deletions, they are often referred 
 \textit{Dynamic} algorithms can be used to determine the best alignment between two reads.
 A match increases the score, a mismatch (substitution) or indel decreases the score.
 The alignment with the highest score is the most likely alignment.
+Alignment algorithms are also useful in applications like textcomparison \cite{SW_plagiarism}.
 
 A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
 %TODO: citation needed
@@ -425,12 +426,13 @@ The alignments are built incrementally, a non-trivial alignment is always a comb
 The scores in this thesis used are $match = 1$, $mismatch = gap = -1$ unless stated otherwise.
 Of these cases, the maximum resulting score is considered as the score for that alignment.
 This recursion is shown in Equation \ref{eq:NW_recursion}, where $S(i,j)$ is the maximum score when aligning subreads $a[0:i]$ and $b[0:j]$, $s(a_i,b_j)$ is the (mis)match score of those two bases, and $gap$ is the gap penalty.
+$a[i]$ indicates a single base, and is shortened to $a_i$.
 
 \begin{equation}
 S(i,j) = max
 \begin{cases}
-S(i-1,j) - gap \\
-S(i,j-1) - gap \\
+S(i-1,j) + gap \\
+S(i,j-1) + gap \\
 S(i-1,j-1) + s(a_i,b_j) \\
 \end{cases}
 \label{eq:NW_recursion}
@@ -456,7 +458,8 @@ A filled matrix is shown in Figure \ref{fig:NW2}.
 
 The traceback starts at the bottom-right element.
 This $S(N,M)$ element indicates the score of aligning the total reads in an optimal way.
-
+The traceback path either follows the traceback pointers, denoted by arrows in Figure \ref{fig:NW3}, or recalculates the possible scores, and chooses the direction based on the maximum.
+The traceback path always ends at element $S(0,0)$.
 
 \figC{width=.6\textwidth}{NW3.png}{The DP matrix, with the traceback path highlighted, source: \cite{NW_online}}{fig:NW3}
 
@@ -464,26 +467,42 @@ This $S(N,M)$ element indicates the score of aligning the total reads in an opti
 
 The affine gap penalty is implemented via 3 matrices, one for a match/mismatch, one for a gap in read A, one for a read in B.
 %X[] = max(gap_open + M[], gap_extend + X[])
+Multiple recurrences are used to fill these matrices:
+\begin{align}
+M(i,j) = max
+\begin{cases}
+A(i-1,j-1) + s(a_i,b_j) \\
+B(i-1,j-1) + s(a_i,b_j) \\
+M(i-1,j-1) + s(a_i,b_j) \\
+\end{cases}
+\\
+A(i,j) = max
+\begin{cases}
+M(i-1,j) + gap\_open \\
+A(i-1,j) + gap\_extend \\
+\end{cases}
+\\
+B(i,j) = max
+\begin{cases}
+M(i,j-1) + gap\_open \\
+B(i,j-1) + gap\_extend \\
+\end{cases}
+\label{eq:NW_recursion_affine}
+\end{align}
+
+$A(i,j)$ indicates the score between subreads $a[0:i]$ and $b[0:j]$, where $a_i$ is aligned with a gap.
+This could be a newly opened gap, in which case the score is based on $M(i-1,j)$, the optimal score for aligning $a[0:i-1]$ and $b[0:j]$, and the $gap\_open$ penalty.
+Or it could be an extension of an existing gap, in which case the score if based on $A(i-1,j)$, where base $a_{i-1}$ is also aligned with a gap, and the $gap\_extend$ penalty.
 
 
 \subsection{Local alignment}
 
+
+
+
+
+
 %TODO: mention multiple sequence alignment
-
-Alignment algorithms are also useful in applications like textcomparison.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
