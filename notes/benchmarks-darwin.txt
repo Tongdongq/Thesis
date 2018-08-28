@@ -216,14 +216,47 @@ CPU 8        : 4m19
 GPU 8   8  64:   14s9
 
 dataset 50MB (match=1,mismatch=-1,open=-1,extend=-1):
-
+CPU 8        : 94m15
+GPU 1  32 128:  2m10
+GPU 1  32  64:  2m41
+GPU 8  16  64:  1m22
+GPU 8  32  64:  1m21, 70x speedup vs CPU8
+GPU 8  64  64:  1m29
 
 dataset 50MB (match=1,mismatch=-1,open=-2,extend=-1):
-
+CPU 8        : 66m35
+GPU 1  32 128:  1m34
+GPU 1  32  64:  1m54
+GPU 8  16  64:  1m8
+GPU 8  32  64:  1m7, 60x speedup vs CPU8
+GPU 8  64  64:  1m15
 
 dataset 50MB (match=1,mismatch=-1,open=-2,extend=-2):
-
+CPU 8        : 63m45
+GPU 1  32 128:  1m31
+GPU 1  32  64:  1m49
+GPU 8  16  64:  1m5, 59x speedup vs CPU8
+GPU 8  32  64:  1m14
+GPU 8  64  64:  1m11
 
 dataset 50MB (match=1,mismatch=-3,open=-1,extend=-1):
+CPU 8        : 81m10
+GPU 1  32 128:  1m32
+GPU 1  32  64:  1m53
+GPU 8  16  64:  1m10
+GPU 8  32  64:  1m8, 72x speedup vs CPU8
+GPU 8  64  64:  1m18
+
+-------------------
+50MB, GASAL
+./profile.sh 1 256 64 64r
+  gld_transactions     14991684
+  gst_transactions     41223262
+    gld_efficiency       13.95%
+    gst_efficiency       48.75%
+    gst_throughput   12.218GB/s
+    gld_throughput   4.4988GB/s
+     sm_efficiency       80.40%
+achieved_occupancy     0.320907
 
 

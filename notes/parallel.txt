@@ -993,6 +993,29 @@ GASAL has 75x speedup vs CPU8 for 50MB dataset.
 28-7-2018:
 The basic traceback does not work when using an affine gap penalty. The old implementation must be used.
 
+3-8-2018:
+The basic traceback does not work for affine, because you need more info. Old implementation put back now.
+Tried to divide converting bases to 2b values among CPU threads, failed because std::vector is not threadsafe. Fix: create converted strings instead of writing each base to the vector.
+New problem: some threads start aligning before other threads are done with their base converting. Possible fix: use semaphores, not implemented in c++
+
+4-7-2018:
+Balanced base conversion using a condition_variable for synchronization, 581920c, saves about 1.7s for 50MB.
+
+5-8-2018:
+Coalescing h,f,p,d and global matrices seems to have a 5x slowdown, 712ab14, a possible reason is that the arrays are optimized to be in registers.
+Using 128 registers seems to have a 7% speedup.
+
+8-8-2018:
+Only coalescing the 'global' matrix instead of also the h,f,p,d is slightly slower (5%).
+
+27-8-2018:
+Minimizers can be used, but they hurt sensitivity.
+
+28-8-2018:
+Minimizers can sometimes give seeds with ref_pos > ref_length.
+
+
+
 
 
 TODO: create type 6 reads that have a AT/GC imbalance.
