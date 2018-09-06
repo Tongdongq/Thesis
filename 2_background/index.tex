@@ -365,6 +365,7 @@ DNA alignment involves determining the similarity between two DNA reads, a high 
 This information can be used to reconstruct the whole genome, during the assembly phase.
 %TODO: possibly refer to the next section 'DNA Assembly'?
 An example of an alignment is shown in Figure \ref{fig:alignment}.
+Alignment algorithms are also useful in applications like textcomparison \cite{SW_plagiarism}.
 
 \figC{width=.6\textwidth}{alignment.png}{An example alignment, vertical stripes indicate matching nucleotides, horizontal stripes indicate gaps in one of the reads, source: \cite{alignment_fig}}{fig:alignment}
 
@@ -379,10 +380,10 @@ An insertion is where a read has a base that does not occur in the other read, a
 Note that usually, it cannot be determined if read A has an insertion, or that read B has a deletion, unless they can be compared to other reads.
 Due to the similarity between insertions and deletions, they are often referred to as 'indels'.
 
-\textit{Dynamic} algorithms can be used to determine the best alignment between two reads.
 A match increases the score, a mismatch (substitution) or indel decreases the score.
 The alignment with the highest score is the most likely alignment.
-Alignment algorithms are also useful in applications like textcomparison \cite{SW_plagiarism}.
+Exact or heuristic algorithms can be used to determine the best alignment between two reads.
+Exact algorithms are guaranteed to find the best alignment, heuristic algorithms reduce the search space, which (dramatically) improves runtime, but the results might be worse than exact algorithms.
 
 A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
 %TODO: citation needed
@@ -416,8 +417,9 @@ Bottom-up firsts solves the subproblems, and uses these results to build the sol
 
 
 \subsection{Global alignment}
-For global alignment, the Needleman-Wunsch algorithm \cite{NeedlemanWunsch} is widely used.
+For global alignment, the Needleman-Wunsch (NW) algorithm \cite{NeedlemanWunsch} is widely used.
 It was published in 1970, and designed to compare sequences of amino acids, but as both are represented by letters, comparing nucleotides works in the same way.
+Needleman-Wunsch is an exact algorithm, producing the optimal global alignment.
 %TODO: mention and cite that NW is proven optimal
 
 In Needleman-Wunsch, the smallest subproblems are trivial alignments, such as aligning two bases, or aligning zero bases in one read with N bases in the other.
@@ -449,20 +451,19 @@ The algorithm consists of three steps: initialization, filling the matrix, and p
 The initialization writes scores to the first row and column, as these alignments are trivial.
 Figure \ref{fig:NW1} shows an initialized matrix.
 
-\figC{width=.6\textwidth}{NW1.png}{The DP matrix, initialised, source: \cite{NW_online}}{fig:NW1}
+\figC{width=.6\textwidth}{NW1.png}{The NW matrix, initialised, source: \cite{NW_online}}{fig:NW1}
 
 The matrix is filled according to the recurrence relation, where the elements have to be calculating in a particular order, because certain previous values need to be known.
 A filled matrix is shown in Figure \ref{fig:NW2}.
 
-\figC{width=.6\textwidth}{NW2.png}{The DP matrix, filled, source: \cite{NW_online}}{fig:NW2}
+\figC{width=.6\textwidth}{NW2.png}{The NW matrix, filled, source: \cite{NW_online}}{fig:NW2}
 
 The traceback starts at the bottom-right element.
 This $S(N,M)$ element indicates the score of aligning the total reads in an optimal way.
 The traceback path either follows the traceback pointers, denoted by arrows in Figure \ref{fig:NW3}, or recalculates the possible scores, and chooses the direction based on the maximum.
 The traceback path always ends at element $S(0,0)$.
 
-\figC{width=.6\textwidth}{NW3.png}{The DP matrix, with the traceback path highlighted, source: \cite{NW_online}}{fig:NW3}
-
+\figC{width=.6\textwidth}{NW3.png}{The NW matrix, with the traceback path highlighted, source: \cite{NW_online}}{fig:NW3}
 
 
 The affine gap penalty is implemented via 3 matrices, one for a match/mismatch, one for a gap in read A, one for a read in B.
@@ -496,16 +497,74 @@ Or it could be an extension of an existing gap, in which case the score if based
 
 
 \subsection{Local alignment}
+Smith-Waterman (SW)\cite{SW} is a variation on Needleman-Wunsch, it finds local alignments instead of global alignments.
+It is also based on dynamic programming, but has small changes which allow the algorithm to start and stop an alignment at any point in the matrix.
+Cells with a negative score are set to zero.
+Traceback starts at the highest scoring cell, instead of in the bottom-right corner.
+NW traceback always ends in the top-left corner, but SW traceback can also end in a cell with score zero.
+Smith-Waterman is also exact, producing the optimal local alignment.
+
+During initialization, the first row and column are set to zero.
+The recurrence relation is slightly changed:
+
+\begin{equation}
+S(i,j) = max
+\begin{cases}
+S(i-1,j) + gap \\
+S(i,j-1) + gap \\
+S(i-1,j-1) + s(a_i,b_j) \\
+0 \\
+\end{cases}
+\label{eq:NW_recursion}
+\end{equation}
+
+These changes allow stretches with a negative alignment score to be ignored.
+Note that the scores are still based on previous scores, one cannot take a filled NW matrix and set the negative scores to zero to perform the SW algorithm.
+
+Figure \ref{fig:SW1} shows the filled SW matrix, some positive values are different from the NW matrix.
+Figure \ref{fig:SW2} shows the traceback path, note that it does not span the whole sequences.
+
+\figC{width=.6\textwidth}{SW1.png}{The SW matrix, filled, source: \cite{SW_online}}{fig:SW1}
+\figC{width=.6\textwidth}{SW2.png}{The SW matrix, with the traceback path highlighted, source: \cite{SW_online}}{fig:SW2}
+
+\subsection{Hybrid methods}
+Global alignment aligns every base in both sequences, local alignment allows for gaps at the start and end of both sequences.
+By applying a subset of the difference between NW and SW, hybrid or semi-global methods can be created \cite{semi_global1}\cite{semi_global2}.
+It might be useful to penalize gaps at the start, while allowing gaps at the end.
+Or to only allow gaps for one sequence.
 
 
+\subsection{Heuristic algorithms}
+% Daligner
+% BLAST
+% PSI BLAST
+% FASTA
+% Banded-SW
+% X-drop
+% SAGA genetic algorithm
+% Ant colony optimzation, particle swarm optimization
+% BWA
 
+A heuristic algorithm does not guarantee to find an optimal solution, but gives an approximate solution to a particular problem \cite{heuristic}.
+Heuristics are often used to reduce the runtime, and a well designed heuristic will prevent large drops in the quality of the solution.
 
+In DNA alignment, a heuristic will often reduce the number of elements in a NW or SW matrix that are calculated.
+
+Many heuristic aligners implement a seed-and-extend technique \cite{seed_extend}.
+A seed is a small piece that contains k consecutive nucleotides, also known as kmer, where k is usually 3-25.
+Exact kmer matches are found, and the overlap is extended from there.
+
+A small k will result in lots of hits, many of which will not result in a convincing overlap.
+A large k will limit the number of hits, but also reduces the sensitivity, since actual overlaps could have zero large consecutive matching nucleotides.
+To increase the sensitivity when using a large k, one could allow one or more mismatches in the seed, to create so-called spaced seeds \cite{spaced_seeds}.
+To reduce the number of hits, multiple nearby kmer matches can be required to start extension, since an actual overlap is likely to have lots of matching nucleotides.
+
+For the extension phase, a variant of dynamic programming can be used, which forces the traceback to start at the end of the seed.
+The dynamic programming can include an area that is smaller than the matrix that would be calculated by regular Smith-Waterman.
+Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
 
 %TODO: mention multiple sequence alignment
-
-
-
 
 
 \section{DNA Assembly}
@@ -527,7 +586,7 @@ There are two types of assembly: de-novo and reference based.
 De-novo assembly works as described above, but reference based assembly first maps the reads to a reference.
 If multiple reads map to the same place in the reference, they are likely to be overlapping.
 De-novo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
-De-novo assembly is an NP-hard problem \cite{https://www.ncbi.nlm.nih.gov/pubmed/19580519}.
+De-novo assembly is an NP-hard problem \cite{denovo_NP}.
 Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
 
 The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different streches of DNA are filtered away, this results in a biased assembly.
