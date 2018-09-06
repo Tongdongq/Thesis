@@ -259,4 +259,28 @@ GPU 8  64  64:  1m18
      sm_efficiency       80.40%
 achieved_occupancy     0.320907
 
+-------------------
+29-8-2018
+First number indicates minimizers window size, 0 means no minimizer used
+NPBSS generated sets based on Ecoli reference
+W C   B   T
+100000 reads:
+0 1  32  32: 22m44, 233061 outputs
+
+-------------------
+4-9-2018
+COALESCE_PACKED_BASES, 
+A: GPU GASAL 64 STREAM CMAT
+B: GPU GASAL 64 STREAM CMAT CPBASES
+50MB      A:    B:
+8  64 64:  86.3  84.0
+8  32 64:  76.7  74.4
+4  64 64:  77.5  77.7
+1 256 64: 137   137
+1 128 64: 113   114
+6.8MB:    A:    B:
+1  64 64: 17.68 17.83
+
+
+
 

@@ -1014,6 +1014,34 @@ Minimizers can be used, but they hurt sensitivity.
 28-8-2018:
 Minimizers can sometimes give seeds with ref_pos > ref_length.
 
+29-8-2018:
+GPU GASAL STREAM 64 CMAT: matfill 96% of time, traceback 4%.
+Nauman: just use number of time SW (GACT) was started as sensitivity.
+Downloaded NPBSS PacBio read generator.
+
+30-8-2018:
+Profiling shows that accessing packed_query_batch and packed_target_batch are very uncoalesced, as well as the out[] matrix.
+
+3-9-2018:
+Implemented COALESCE_PACKED_BASES, which interleaves bases on the CPU. The GPU packing kernel reads and writes coalesced, and the align kernel reads coalesced.
+Initial run shows no speedup.
+
+4-9-2018:
+6.8MB, 1 64 64:
+normal:  total_GPU_prep: 171 ms, total_pack:  8.4 ms, total_align: 6342 ms
+CPBASES: total_GPU_prep: 388 ms, total_pack: 23.3 ms, total_align: 6536 ms
+50MB, 1 256 64:
+normal:  total_GPU_prep: 4172 ms, total_pack: 53.6 ms, total_align: 41.1 s
+CPBASES: total_GPU_prep: 6002 ms, total_pack: 95.7 ms, total_align: 38.9 s
+
+Talked to Zaid:
+- benchmark everything
+
+NPBSS creates the same simulated reads everytime, because the matlab rng is initialized in the same way at startup.
+
+5-9-2018:
+Changed NPBSS/simulatePacBio4.p to simulatePacBio4.m, same output
+Added the origin of the read in the ref (position) to the output readname.
 
 
 
