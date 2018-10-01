@@ -1043,6 +1043,50 @@ NPBSS creates the same simulated reads everytime, because the matlab rng is init
 Changed NPBSS/simulatePacBio4.p to simulatePacBio4.m, same output
 Added the origin of the read in the ref (position) to the output readname.
 
+10-9-2018:
+How to measure sensitivity:
+- generate two sets of reads from genome, store original position
+- align them with aligner, check if overlaps coincide with original positions
+For 50MB, 2% of reported overlaps are duplicates, for small NPBSS: 15-20%
+
+13-9-2018:
+Online EMBOSS water tool uses match:5, mismatch:-4 as default for DNA alignment.
+ksw uses gapo+gape as gapo, so compensate.
+ksw has problems printing the name of the subread (with coordinates in the name) when the score is low, (lower than 4)
+
+17-9-2018:
+Downloaded human reference from https://www.gencodegenes.org/releases/21.html, FASTA region ALL, might actually not be needed at all. The E.coli reference in NPBSS should be enough to measure sensitivity.
+
+18-9-2018:
+Changed NPBSS default error rate to 9% ins, 4.5% del, 1.5% sub, Darwin metrics still bad.
+Downloaded PBSIM
+
+20-9-2018:
+Talked to Yatish:
+- don't actually do exact SW, only compare to theoretical ovls
+
+24-9-2018:
+Great sensitivity for Darwin ref: 99.9%, spec: 98.5%
+Great sensitivity for Daligner ref: 98.3%, spec: 97.4%
+Terrible sensitivity for Darwin denovo: 45%, spec: 66%
+Mediocre sensitivity for Daligner denovo: 85.6%, spec: 86.5%
+
+25-9-2018:
+Talked to Zaid:
+- create 0% error reads, heuristic should have 100% sensitivity
+- ask Yatish, results should be easily reproducible
+
+27-9-2018:
+older defaults:
+h = 26
+num_seeds = 1000
+
+28-9-2018:
+Talked to Zaid:
+- measure runtime vs sensitivity
+
+1-10-2018:
+Set default PBSIM seed to 1538399012
 
 
 

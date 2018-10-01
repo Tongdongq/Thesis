@@ -1,4 +1,8 @@
 
+28 sep
+Darwin blog
+https://blog.acolyer.org/2018/04/19/darwin-a-genomics-co-processor-provides-up-to-15000x-acceleration-on-long-read-assembly/
+
 17 mei
 Acceleration Of Nucleotide Semi-Global Alignment With Adaptive Banded Dynamic Programming
 https://www.biorxiv.org/content/early/2017/04/25/130633

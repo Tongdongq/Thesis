@@ -281,6 +281,29 @@ B: GPU GASAL 64 STREAM CMAT CPBASES
 6.8MB:    A:    B:
 1  64 64: 17.68 17.83
 
+5-9-2018:
+Inline PTX to resolve elements with tied max score, 58d28fc
+50MB
+A: GPU GASAL 64 STREAM CMAT (base)
+B: GPU GASAL 64 STREAM CMAT (inline PTX)
+50MB      A:    B:
+8  32 64: 71.8  69.2
+--------
+Inline PTX to find max of 4 values in SW kernel, 6855f39
+50MB
+A: GPU GASAL 64 STREAM CMAT (base)
+B: GPU GASAL 64 STREAM CMAT (inline PTX)
+50MB      A:    B:
+8  32 64: 72.8  75.6
+--------------------
+10-9-2018:
+A: GPU GASAL 64 STREAM CMAT (base)
+B: GPU GASAL 64 STREAM CMAT CPBASES (inline PTX to resolve tied max)
+C: GPU GASAL 64 STREAM CMAT CPBASES (base)
+D: GPU GASAL 64 STREAM CMAT (inline PTX to resolve tied max)
+50MB      A:    B:    C:    D:
+8  32 64: 72.3  70.2  70.3  69.8
+
 
 
 
