@@ -1,0 +1,22 @@
+
+19-9-2018:
+Possible questions during defence:
+
+What is the theorical max speedup of Darwin?
+- occupancy of functional units is 45%
+What is the bottleneck for Darwin on GPU?
+- registers, memory latency
+- fine-grained parallelism might be better
+How easy is it to adapt Darwin to work on protein?
+- packing from GASAL uses 4 bit per symbol, max 16 different values
+- there are ~22 different aminoacids, Blosum can be put in constant memory
+What portion of total assembly time is spent on alignment?
+Can this be used for reference based alignment?
+- yes
+
+To be answered in thesis:
+How are the sensitivity and specificity measured?
+How are the sensitivity and specificity influenced by the parameters?
+How does the error rate of the reads impact those metrics?
+How suitable are Oxford Nanopore reads for Darwin/Daligner?
+

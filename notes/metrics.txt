@@ -1,0 +1,82 @@
+
+-- created 14-9-2018:
+
+metrics are: sensitivity and specificity (and runtime)
+
+DALIGNER:
+with complement
+
+50MB: 
+CPU8, 3m0 runtime, 288282 ovls
+
+90MB:
+CPU8,            7m45 runtime, 718020 ovls
+CPU8, -h45,      6m54 runtime, 657411 ovls
+CPU8, -h55,      6m8  runtime, 588433 ovls
+CPU8, -k15 -h55, 4m53 runtime, 486901 ovls
+CPU8, -k15 -h65, 4m19 runtime, 429113 ovls
+
+-----------
+Darwin:
+GPU GASAL 64 STREAM CMAT
+match = 1, mismatch = gap_open = gap_extend = -1
+
+50MB:
+8 32 64, 1m16 runtime, 222299 ovls, 216993 unique
+8 32 64, 1m11 runtime, 185681 ovls, 181173 unique, where ae-ab > 1000 and be-bb > 1000
+
+90MB:
+8 32 64,      2m44 runtime, 407516 ovls
+8 64 64,      4m9  runtime, 407516 ovls
+8 32 32,      2m9  runtime, 407517 ovls
+8 32 64 32r,  7m43 runtime, 407513 ovls
+8 64 32 128r, 2m42 runtime, 407513 ovls
+8 32 32 128r, 2m7  runtime, 407516 ovls
+
+8 32 64,      2m19 runtime, 343926 ovls, 335527 unique, where ae-ab > 1000 and be-bb > 1000
+
+---------------------
+24-9-2018
+
+daligner
+./convert PBSIM
+./convert PBSIMref
+time ./daligner -T1 -v human/h1.db human/h2.db | tee >(grep "ids" > tmp) | grep -v "ids"
+
+darwin
+./convert PBSIM
+./reference_guided ../PBSIM/src/data/ecoliGenomeWrap70.fa reads.fasta 1 32 32
+./run.sh 1 32 32
+sort darwin.0.out | uniq > out.darwin
+
+------------------
+28-9-2018:
+
+PBSIM, 15% error, 10x, min-length 1k, E.coli, ref
+darwin: 1 64 64, 33s, score_thres = 900, sens 96.0%, spec 86.5
+daligner: 1, 19s, 
+          8, 6s
+
+darwin
+TP: 19136
+FN: 791
+FP: 2979
+sensitivity: 0.960305
+specificity: 0.865295
+
+daligner
+TP: 14056
+FN: 426
+FP: 2781
+sensitivity: 0.970584
+specificity: 0.834828
+
+
+
+
+PBSIM, 15% error, 20x, min-length 1k, E.coli, ref
+darwin: 1 64 64, 
+daligner: 1, 44s
+		  8, 8s
+daligner with no alignment: 9.7e9 seed hits, with Local Alignment: 42e3 seed hits.
+daligner: 25% of runtime for report_thread
