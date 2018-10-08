@@ -1088,6 +1088,9 @@ Talked to Zaid:
 1-10-2018:
 Set default PBSIM seed to 1538399012
 
+3-10-2018:
+Using the same seed for PBSIM to generate two datasets resulted in two identical datasets.
+The default PBSIM seed for the second dataset is 1156173320
 
 
 TODO: create type 6 reads that have a AT/GC imbalance.

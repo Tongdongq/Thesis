@@ -45,38 +45,222 @@ time ./daligner -T1 -v human/h1.db human/h2.db | tee >(grep "ids" > tmp) | grep 
 
 darwin
 ./convert PBSIM
-./reference_guided ../PBSIM/src/data/ecoliGenomeWrap70.fa reads.fasta 1 32 32
-./run.sh 1 32 32
+time ./reference_guided ../PBSIM/src/data/ecoliGenomeWrap70.fa reads.fasta 1 64 64
+./run.sh 1 64 64
 sort darwin.0.out | uniq > out.darwin
 
 ------------------
 28-9-2018:
 
-PBSIM, 15% error, 10x, min-length 1k, E.coli, ref
-darwin: 1 64 64, 33s, score_thres = 900, sens 96.0%, spec 86.5
-daligner: 1, 19s, 
-          8, 6s
-
-darwin
-TP: 19136
-FN: 791
-FP: 2979
-sensitivity: 0.960305
-specificity: 0.865295
-
-daligner
-TP: 14056
-FN: 426
-FP: 2781
-sensitivity: 0.970584
-specificity: 0.834828
-
-
-
+sens and spec in percentages, score 1 -1 -1 -1 unless otherwise mentioned
 
 PBSIM, 15% error, 20x, min-length 1k, E.coli, ref
-darwin: 1 64 64, 
-daligner: 1, 44s
-		  8, 8s
-daligner with no alignment: 9.7e9 seed hits, with Local Alignment: 42e3 seed hits.
-daligner: 25% of runtime for report_thread
+                                                          sens  spec
+darwin: 1 64 64, s, h21, n1400 | score >= 800,          
+                                   score >= 850,        
+        1 64 64, s, h21, n1100 | score >= 800,          
+        1 64 64, s, h21, n 300 | score >= 800,          
+        8 32 32, s, h21, n 300
+        1 64 64, 30s, h21, n 200 | score >= 800,          96.8, 98.2
+        1 64 64, 28s, h21, n 150 | score >= 800,          92.9, 98.1
+                                   score >= 400,          94.3, 97.7
+                                   score >=   0,          94.3, 97.3
+        1 64 64, s, h18, n 200 | score >= 800,          
+daligner: 1, 39-44s,               score >= 800,          99.3, 98.0
+          8, 7.6-8.5s              score >= 850,          
+          1, 40s, k15              score >= 800,          99.3, 98.0
+          1, 39s, k16              score >= 800,          99.3, 98.0
+          1, 43s, k20              score >= 800,          99.3, 98.1
+          1, 37s, l950             score >= 800,           100, 98.0
+daligner with no alignment: 2x9.7e9 seed hits, with Local Alignment: 2x42e3 seed hits.
+daligner: 68% building sorted Kmer list, 32% Match_Filter
+darwin: 2x39k GACT_calls, query: 25%, aligning: 60% runtime, took 15.7s to find 2x39k seeds.
+
+
+PBSIM, 15% error, 20x, E.coli, ref
+                                                          sens  spec   mem (GB)
+darwin: 1 64 64, 62s, h21, n1400 | score >= 800,          88.7, 98.2   7.8
+                                   score >= 600,          94.7, 97.8
+                                   score >= 400,          98.6, 97.3
+                                   score >=   0,           100, 95.9
+        1 32 32, 82s                                                   7.0
+        8 64 64, 47s
+        8 32 64, 42s                                                  13.2
+        8 32 32, 41s                                                   9.6
+        1 64 64, 47s, h21, n 800 | score >= 800,          88.6, 98.1   7.0
+                                   score >= 600,          94.7, 97.8
+                                   score >= 400,          98.6, 97.4
+                                   score >= 200,          99.9, 96.6
+        1 64 64, 37s, h21, n 400 | score >= 600,          94.6, 98.0   6.0
+                                   score >= 400,          98.6, 97.6
+                                   score >= 200,         99.90, 97.2
+                                   score >=   0,         99.98, 96.9
+        8 32 64, 33s, h21, n 400                                      11.4
+        8 32 32, 31s, h21, n 400                                       7.6
+        1 32 32, 47s, h21, n 400 | score >= 200,                       4.7
+        1 64 64, 32s, h21, n 200 | score >= 600,          93.1, 98.1   5.3
+                                   score >= 400,          97.0, 97.8
+                                   score >= 200,          98.3, 97.5
+                                   score >=   0,          98.4, 97.3
+        1 64 64, 30s, h21, n 150 | score >= 600,          89.2, 98.0   5.1
+                                   score >= 400,          92.9, 97.8
+                                   score >= 200,          94.2, 97.5
+                                   score >=   0,          94.3, 97.4
+        1 64 64, 32s, h18, n 150 | score >= 600,          90.5, 96.7
+                                   score >= 400,          94.4, 96.2
+                                   score >= 200,          95.8, 95.3
+                                   score >=   0,          96.0, 94.1
+
+daligner: 1, 39s,                  score >= 800,          89.1, 98.0   3.1
+                                   score >=   0,          89.1, 97.9
+          8, 7.4s
+          1, 39s, l500,            score >= 800,          90.5, 98.0   
+                                   score >= 600,          95.7, 97.7
+                                   score >=   0,          98.8, 96.9
+          8, 7.4s, l500
+          1, 37s, h65, l500,       score >=   0,          98.8, 97.4
+          1, 37s, h65, l400,       score >=   0,          99.5, 97.3
+          1, 35s, h120, l400,      score >=   0,          99.4, 97.5
+          1, 35s, h200, l400,      score >=   0,          98.5, 97.8
+          1, 45s, h30, l500,       score >= 800,          90.5, 98.0   
+                                   score >= 600,          95.7, 97.6
+                                   score >=   0,          98.8, 96.7
+          1, 50s, h25, l500,       score >= 800,          90.5, 98.0   
+                                   score >= 600,          95.7, 97.6
+                                   score >=   0,          98.8, 96.6
+          1, 38s, l400,            score >= 800,          90.5, 98.0   3.1
+                                   score >= 600,          95.7, 97.7
+                                   score >=   0,          99.5, 96.7
+          1, 43s, k13,             score >=   0,          89.1, 97.8
+          1, 43s, k15,             score >= 800,          89.1, 98.1   3.1
+                                   score >=   0,          89.1, 98.0
+          1, 41s, k16,             score >=   0,          89.1, 98.0   3.1
+
+
+PBSIM, 15% error, 40x, E.coli, ref
+darwin    1 64 64 DNF in 10m
+          8 64 64 DNF
+daligner: 1, 1m12-18               score >= 800,          88.8, 98.0   6.1
+                                   score >=   0,          88.9, 97.9
+          1, 1m12, l500,           score >= 800,          90.0, 98.0
+                                   score >= 600,          95.7, 97.7
+                                   score >=   0,          98.7, 97.0
+          1, 1m19, k15 l500,       score >= 800,          90.2, 98.0   6.1
+                                   score >= 600,          95.7, 97.8
+                                   score >=   0,          98.7, 97.2
+          1, 1m17, k16 l500,       score >= 800,          90.2, 98.0   6.1
+                                   score >= 600,          95.7, 97.8
+                                   score >=   0,          98.7, 97.3
+          1, 1m8, l500, h45        score >= 800,          90.2, 98.0
+                                   score >= 600,          95.7, 97.7
+                                   score >=   0,          98.7, 97.1
+          1, 58s, l500, h50        score >= 800,          90.2, 98.0
+                                   score >= 600,          95.7, 97.8
+                                   score >=   0,          98.7, 97.3
+          1, 1m20, k13             score >= 800,          88.8, 97.8   6.1
+                                   score >=   0,          88.8, 97.8
+          1, 1m20, k13 l500        score >= 800,          90.2, 98.0   
+                                   score >= 600,          95.7, 97.6
+                                   score >=   0,          98.7, 96.8
+
+PBSIM, 30% error ONT2D, 10x, E.coli, ref
+darwin    1 64 64, 28s              s >= 0, l >= 0,       93.9, 96.1   4.4
+          1 64 64, 33s n2000        s >= 0, l >= 0,       96.0, 95.7   4.5
+          1 64 64, 38s n2500        s >= 0, l >= 0,       96.3, 95.4   5.0
+          1 64 64, 30s k13          s >= 0, l >= 0,       98.0, 90.7   3.8
+                                    s >= 300              97.0, 94.3
+          1 64 64, 35s k13 n2000    s >= 0, l >= 0,       98.3, 87.6   4.2
+                                    s >= 300              97.3, 94.3
+daligner  1, 16s                    score >=   0,         87.6, 98.1   1.6
+          1, 16s, l400              score >=   0,         93.6, 97.7
+          1, 16s, l200              score >=   0,         93.7, 97.5
+          1, 17s, k13               score >=   0,         89.3, 98.0   1.6
+          1, 17s, k13 l400          score >=   0,         96.7, 97.6
+          1, 18s, k13 l400 h30      score >=   0,         97.6, 97.6
+          1, 17s, k15               score >=   0,         84.3, 98.2   1.6
+          1, 17s, k15 l400          score >=   0,         88.9, 97.8
+
+PBSIM, 15% error, 10x, E.coli, denovo
+darwin    1 256 64, 1m23, h21 n1000 s >= 0, l >= 900,     64.0, 76.8   14.1
+          1 256 64, 1m34, h21 n1400 s >= 0, l >= 900,     70.7, 74.8   15.8
+          1 256 64, 1m50, h21 n2000 s >= 0, l >= 900,     70.7, 74.8   16.8
+          8  64 64, 57s                                                18.9
+          8  32 64, 53s                                                14.3
+daligner: 1, 56s,                   score >= 300,         80.2, 92.9    2.3
+                                    score >= 250,         95.3, 89.9
+                                    score >= 240,         97.7, 89.1
+                                    score >= 225,         99.4, 87.6
+                                    score >= 200,         99.8, 86.8
+                                    score >=   0,         99.8, 86.8
+          1, k15                                                        2.3
+          1, k13                                                        2.8
+          8, 9s
+
+PBSIM, 15% error, 20x, E.coli, denovo
+darwin    1 256 64, 7m23, h21 n1400 s >= 0, l >= 900      70.7, 74.9   
+daligner: 1, 2m46,                  score >= 250,         95.3, 89.2
+                                    score >= 240,         97.6, 88.4
+                                    score >=   0,         99.8, 86.1
+          1, 2m53, h30              score >= 250,         95.4, 89.1
+                                    score >= 240,         97.7, 88.3
+                                    score >=   0,         99.9, 86.0
+          1, 2m45, h40              score >=   0,         99.7, 86.1
+          1, 3m58, k13              score >=   0,        99.98, 85.9
+          1, 2m32, k15              score >=   0,         98.9, 86.4
+          1, 2m32, k15 l950         score >= 240,         96.7, 88.4
+                                    score >=   0,         98.9, 83.3
+          1, 2m20, k16              score >=   0,         96.9, 86.9
+          1, 2m20, k16 l950         score >= 240,         94.8, 88.9
+                                    score >=   0,         96.9, 84.0
+
+
+PBSIM, 15% error, 20x, E.coli
+random darwin ref profile (compiled with TIME), 1 64 64:
+- seedpos table construction:      2.7s
+- time finding seeds:              7.2s
+- time converting bases:           2.7s
+- time looping for:                3.3s
+- time GPU for:                    7.2s
+- time looping rev:                3.3s
+- time GPU rev:                    7.6s
+- seed table querying + aligning:  31s
+- total time:                      37s
+48k ovls
+
+PBSIM, 15% error, 20x, E.coli
+random darwin denovo profile (compiled with TIME), 1 256 64:
+- seedpos table construction:      33s
+- time finding seeds:               9.6s
+- time converting bases:            2.7s
+- time looping for:                33s
+- time GPU for:                    43s
+- time looping rev:                30s
+- time GPU rev:                    35s
+- seed table querying + aligning: 156s
+- total time:                     204s
+576k ovls
+
+PBSIM, 15% error, 20x, E.coli
+random daligner ref profile, T1:   T8:
+- Sort_Kmers ablock         0.6s   0.4s
+- Sort_Kmers bblock        13.8s   2.4s
+- report_threads            3.5s   0.7s
+- Match_Filter              6.0s   1.2s
+- Sort_Kmers bblock        12.6s   1.9s
+- report_threads            3.8s   0.6s
+- Match_Filter              6.2s   1.1s
+- total_time:              39.4s   7.4s
+34k ovls
+
+PBSIM, 15% error, 20x, E.coli
+random daligner denovo profile, T1:   T8:
+- Sort_Kmers ablock            11s    2.0s
+- Sort_Kmers bblock            12s    1.9s
+- report_threads               56s    8.7s
+- Match_Filter                102s   13.8s
+- Sort_Kmers bblock            14s    1.9s
+- report_threads               53s    8.9s
+- Match_Filter                 77s   11.4s
+- total_time:                 219s    33s
+840k ovls
+
