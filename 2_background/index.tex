@@ -360,6 +360,7 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 
 \figC{width=.6\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
+%TODO: mention protein alignment?
 \section{DNA Alignment}
 DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
 This information can be used to reconstruct the whole genome, during the assembly phase.
@@ -527,9 +528,9 @@ Figure \ref{fig:SW2} shows the traceback path, note that it does not span the wh
 \figC{width=.6\textwidth}{SW1.png}{The SW matrix, filled, source: \cite{SW_online}}{fig:SW1}
 \figC{width=.6\textwidth}{SW2.png}{The SW matrix, with the traceback path highlighted, source: \cite{SW_online}}{fig:SW2}
 
-\subsection{Hybrid methods}
+\subsection{Semi-global methods}
 Global alignment aligns every base in both sequences, local alignment allows for gaps at the start and end of both sequences.
-By applying a subset of the difference between NW and SW, hybrid or semi-global methods can be created \cite{semi_global1}\cite{semi_global2}.
+By applying a subset of the differences between NW and SW, hybrid or semi-global methods can be created \cite{semi_global1}\cite{semi_global2}.
 It might be useful to penalize gaps at the start, while allowing gaps at the end.
 Or to only allow gaps for one sequence.
 
@@ -565,6 +566,9 @@ Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
 
 %TODO: mention multiple sequence alignment
+\subsection{Multiple Sequence Alignment}
+Multiple Sequence Alignment algorithms \cite{MSA_survey} try to align three or more sequences, usually of similar length.
+The results can be used to create phylogenetic trees or to study evolutionary relationships \cite{MSA}
 
 
 \section{DNA Assembly}
@@ -821,14 +825,37 @@ These operations can be overlapped or pipelined by using streams. Figure \ref{fi
 
 \subsection{Bioinformatics on GPU}
 
-% BarraCUDA (align/mapping, ngs)
-% CUDASW++ (mapping)
-% CUSHAW (long read, align)
-% GPU-BLAST (local alignment)
-% GPU-HMMER (hidden Markov models, local alignment)
-% mCUDA-MEME
-% SeqNFind
-% UGENE (SW, SA)
+% MUMmerGPU (2007, suffix tree, ref based)
+% BarraCUDA (align/mapping, ngs, dna)
+% CUDASW++ (mapping, protein)
+% CUSHAW (2012, short read, align, ref based, bwt)
+% GPU-BLAST (2010, local alignment, protein)
+% GPU-HMMER (hidden Markov models, local alignment, protein)
+% mCUDA-MEME (2010, find patterns called memes)
+% SeqNFind (hardware/software, propietary
+% UGENE (SW, SA, short reads, 6x vs cpu)
+% CUDAlign
+% G-PAS (2011, SW)
+% SW-CUDA (2008, SW)
+% Swift (dna, SW, seed-extend)
+
+Multiple efforts to accelerate DNA alignment algorithm on GPU have been made.
+MUMmerGPU \cite{MUMmerGPU}\cite{MUMmerGPU2} is one of the first GPU accelerated algorithms, it stores a suffix tree of the reference sequence on the GPU, and aligns it with queries.
+Its newest GPU implementation shows a 13x speedup over the CPU implementation.
+CUDAlign \cite{CUDAlign} accelerates the exact Smith-Waterman algorithm, and allows an affine gap.
+The input sequence length is only restricted by the available global memory.
+CUDAlign 2.0 \cite{CUDAlign2} uses linear space and boasts a 702x and 19.5x speedup compared to 1 core and 64 cores respectively.
+
+SeqNFind \cite{SeqNFind} is a hardware/software solution based on NVIDIA Tesla GPUs.
+It can be used to speed up numerous algorithms.
+
+\figC{scale=.2}{SeqNFind.jpg}{An image of the SeqNFind hardware, source \cite{SeqNFind}}{fig:SeqNFind}
+
+CUSHAW is an accelerated short read aligner that uses BWT.
+%TODO: citation CUSHAW
+
+%TODO: mention other GPU algorithms
+
 
 
 
