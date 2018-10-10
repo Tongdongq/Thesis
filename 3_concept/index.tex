@@ -103,7 +103,7 @@ The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive s
 Because seeds are not always at the beginning, so waves are computed in both forward and reverse direction.
 The latter is easily done by reversing the direction of edges in the edit graph.
 
-\section{Seeding: concept}
+\subsection{Seeding: concept}
 To find suitable starting points for the edit graphs, seeding is done.
 A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
 Finding a seed includes finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
@@ -151,7 +151,7 @@ For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
 %TODO include time analysis?
 
 
-\section{Seeding: implementation}
+\subsection{Seeding: implementation}
 Daligner is designed to use multiple threads and use the cache efficiently.
 Building and merge the lists in steps 1 and 3 is easy, since only one pass is needed for both actions.
 The elements of the lists are compressed into 64-bit integers.
@@ -188,7 +188,7 @@ The optimal number of threads is more complex, because they usually do not have 
 %TODO insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware
 
 
-\section{Local Alignment}
+\subsection{Local Alignment}
 Assuming the filter finds a seed-hit $\rho = (i,j)$, the basic idea is compute furthest reaching waves in forward and reverse direction to find the alignment.
 The problem is that as the wave propagates further from $\rho$, it spans wider and wider since it occupies $2d+1$ diagonals.
 The final alignment will have only one point from each wave so most of the points are wasted, but we only which ones until the whole alignment is done.
@@ -263,6 +263,74 @@ true &\text{ if } x = 0
 %TODO include summary of Daligner algorithm?
 %TODO include summary of Daligner results wrt sensitivity and running time?
 
+
+
+
+\section{Darwin}
+Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{Darwin1}\cite{Darwin2}.
+It consists of a filter called D-SOFT (Diagonal-band Seed Overlapping based Filtration Technique), which finds seeds, and GACT (Genome Alignment using Constant memory Traceback), which performs alignment between reads of arbitrary length, using constant traceback.
+The fact that GACT uses constant traceback makes it very suitable for hardware acceleration.
+Darwin boasts a 39.000x more energy-efficient approach then software, and a 15.000x speedup for reference-guided alignment for third generation reads using an ASIC.
+On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for denovo over state-of-the-art software.
+
+
+\subsection{D-SOFT}
+Like Daligner, D-SOFT filters by counting bases in Kmer matches.
+For each band of diagonals (bin), a particular threshold must be exceeded to constitute a seed hit, thus invoking the GACT algorithm.
+When using D-SOFT to do de-novo alignment, each read is padded with unknown nucleotides (N), so that each read starts at the start of a bin.
+Figure \ref{fig:D_SOFT} illustrates the working of D-SOFT for k = 4, N = 10, h = 8, N$_{B}$ = 6.
+N is the number of Kmer matches that are considered, h is the minimum number of unique bases that the Kmer matches in a particular bin must have, N$_{B}$ is the number of bins.
+The start positions of the matches are marked by red dots, the rest of the seed is a red line.
+Bin 1 contains six consecutive matching bases, which form three Kmer matches.
+Bin 3 also contains three Kmer matches, but they contain nine matching bases, for h = 8, only bin 3 produces a seed.
+As oppose to Daligner, D-SOFT only considers the Kmer matches from one bin, not taking its direct neighbours into account.
+
+\figC{width=.7\textwidth}{D_SOFT.png}{Illustration of D-SOFT algorithm, source: \cite{Darwin2}}{fig:D_SOFT}
+
+First, a lookup table for the Kmer all Kmers and their positions is made.
+This can be done with any implementation, like seed position tables, suffix arrays or BWT or FM based indices.
+%TODO add citations for those implementations?
+
+D-SOFT uses two arrays, \textit{bp\_count} and \textit{last\_hit\_pos}.
+Both have N$_{B}$ values, and store the number of bases in Kmer matches, and the last seed hit position for that bin, respectively.
+%TODO explain D-SOFT algorithm? Maybe include code?
+
+\subsection{GACT}
+Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratric for the length of the reads.
+Numerous efforts to accelerate Smith-Waterman have been made, both by using hardware and by using heuristics.
+%TODO name accelerated variants here, or in Chapter 2 Background?
+%TODO banded alignment is mentioned later this subsection
+Even when using heuristics, the memory requirements are still linear.
+GACT finds the alignment between reads of arbitrary length using constant traceback memory.
+It performs normal Smith-Waterman on a submatrix called a tile of size T, and then moves to the next tile, which overlaps with the previous tile with O bases.
+For reasonable values for T and O, GACT produces an optimal result.
+
+The algorithm for left extension is shown in Listing \ref{code:GACT}.
+Positions $i\_curr$ and $j\_curr$ are produced by D-SOFT.
+The start and end position of the current tile are stored in $i,j\_start$ and $i,j\_curr$ respectively.
+The traceback path of the whole left extension is kept in $tb_left$.
+The function $Align()$ uses modified Smith-Waterman to compute the optimal alignment between subsequences $R\_tile$ and $Q\_tile$, with traceback starting from the bottom-right cell, except for the first tile, where traceback starts from the highest-scoring cell.
+$Align()$ returns the tile's alignment score, the number of bases in R and Q aligned by this tile ($i,j\_off$), the traceback pointers $tb$ and the position of the highest-scoring cell (ignored except for the first cell).
+$Align()$ also limits $i,j\_off$ to at most T - O bases, to ensure the next tile overlaps by at least O bases.
+The left extension finishes when it hits the end of $R$ or $Q$, or when traceback cannot add any bases to the existing alignment.
+The memory needed for the traceback is $O(T^2)$, which is constant since T is chosen up front.
+The traceback for the whole alignment $tb\_left$ is linear with read length, but not performance critical.
+The right extension operates on the reverse of $R$ and $Q$.
+
+\lstinputlisting[caption=GACT, label=code:GACT]{\codePath GACT.c}
+
+Figure \ref{fig:GACT} shows a left extension from GACT, using T = 4 and O = 1.
+For the first tile (T1), traceback starts at the highest-scoring cell (green), the other tiles start at the bottom-right cell (yellow), where the traceback from the previous tile ends.
+The traceback is ended earlier for higher overlaps, so that the tiles will overlap.
+
+
+\figC{width=.7\textwidth}{GACT.png}{Illustration of GACT algorithm, source: \cite{Darwin2}}{fig:GACT}
+
+
+The performance of GACT is linear ($O(max(m,n)\cdot T)$) with respect to the length of the reads.
+It is more suited to long reads than banded alignment, because banded alignment uses a static band around the main diagonal.
+GACT allows for flexible bands, since the position of the new tile depends on the traceback path, this is useful for long reads that have high indel rates.
+%TODO flexible bands are better when indels are present, should I prove/cite that it does not matter when only having substitutions?
 
 
 
