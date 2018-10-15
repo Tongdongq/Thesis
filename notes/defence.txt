@@ -19,4 +19,6 @@ How are the sensitivity and specificity measured?
 How are the sensitivity and specificity influenced by the parameters?
 How does the error rate of the reads impact those metrics?
 How suitable are Oxford Nanopore reads for Darwin/Daligner?
+How do the aligners create the large list of LA/GACT_calls?
+- daligner creates an LAcall for every Kmer would be part of a seed
 

@@ -931,7 +931,7 @@ seed_length = 13
 tile_size = 320
 tile_overlap = 120
 
-29-5-2018:
+29-6-2018:
 Bug when using multiple CPU threads: GPU_storage struct was shared among all CPU threads
 Got 10x speedup on the provided yeast data.
 Talked to Nauman
