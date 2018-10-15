@@ -22,7 +22,7 @@ The filter implementation is not very complex, and is combined with the alignmen
 Each seed is aligned in forward and reverse direction.
 
 
-%TODO insert pictures of profiling, or maybe switch to gprof, because mcprof pictures were off
+\todo{insert pictures of profiling, or maybe switch to gprof, because mcprof pictures were off}
 % \label{prof1}, \label{prof2}
 
 
@@ -34,7 +34,7 @@ This is why Daligner uses multiple threads, each one running the filter-align fu
 \section{Statistics}
 Numerous ... have been measured to characterize the process performed by Daligner.
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio has been used.
-%TODO add citation for 54x dataset
+\todo{add citation for 54x dataset}
 Tables \ref{tbl:41} to \ref{tbl:4x} show the results.
 The 999th permille indicates that the value is lower than or equal to the listed value for 99.9\% of the observed values.
 
@@ -128,7 +128,7 @@ The host side will assign an LAcall to each GPU thread (unless there are not eno
 The GPU performs the local alignment, and returns the results.
 If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new readpair.
 
-%TODO figure on skipping seed hits 'apos > lasta[diag]'
+\todo{figure on skipping seed hits 'apos > lasta[diag]'}
 
 
 % multiple implementations:
@@ -146,16 +146,17 @@ If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new 
 
 
 \subsection{Darwin}
-%TODO maybe refer to pseudocode in lstlisting
+\todo{maybe refer to pseudocode in lstlisting}
 It is possible to run the whole GACT kernel on the GPU, for both left and right extension.
 However, since it is not known how long the resulting alignment will be, and all GPU threads have to wait until all threads are done, this will cause lots of idle time.
 Instead, it is chosen to only have a single tile aligned per GPU-thread per GPU-invocation.
+The scheduling and preperation of the tiles will be done by the CPU.
 The CPU will receive a large list with seed hit positions, for each hit, the GACT algorithm is performed.
 It is not necessary to implement skipping seeds/Kmer matches for Darwin, since it generates less redundant seeds than Daligner.
 
 
 
-It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism %TODO \cite
+It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism \todo{cite}
 The tilesize of 320 should be enough to allow for enough utilization.
 This method uses less memory, since the Smith-Waterman matrices and the sequences are shared.
 However, this complicates the implementation, since the number of elements on an anti-diagonal is often not equal to 32.
@@ -188,7 +189,9 @@ This way, a whole column of 8-by-8 tiles can be calculated.
 Because the elements of the next column need the scores of the last, an array of scores is kept for the vertical column.
 It does not provide traceback information, when the start position of an alignment is requested, it performs the alignment again, but in reverse.
 
-
+GASAL needs to be adapted to perform actual traceback, to guarantee that the tiles of GACT have a minimum overlap.
+It is chosen to perform the actual traceback on the GPU, instead of copying all the pointers to the CPU, and doing the traceback there.
+\todo{this choice might seem odd, since traceback on GPU is usually very divergent, might need more explanation}
 
 
 

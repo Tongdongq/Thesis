@@ -36,12 +36,12 @@ Since Daligner was build, new methods of using \ac{DBG} with long reads have bee
 The first step in an \ac{OLC} assembler is usually finding overlaps between reads \cite{OLC}.
 BLASR \cite{BLASR} was the only long read aligner at the time, and inpsired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
-%TODO is seed-extend already introduced?
+\todo{is seed-extend already introduced?}
 The most time-consuming step is extending the seed hit to find an alignment.
 To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a datastructure that describes a sparse path from the seed hit to the furthest reaching point.
 
-%TODO daligner paper includes a small section on results
-%TODO next part is copied straight from daligner paper
+\todo{daligner paper includes a small section on results}
+\todo{next part is copied straight from daligner paper}
 Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
 It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
 Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
@@ -64,15 +64,15 @@ a_i \\ b_j
 \end{bmatrix}$} if $i,j > 0$.
 \end{itemize}
 
-%TODO insert picture of edit graph
+\todo{insert picture of edit graph}
 
 An alignment between $A[i+1,g]$ and $B[j+1,h]$ is described as a sequence of labels from vertex $(i,j)$ to $(g,h)$.
 A diagonal edge can be either be a match edge, when $a_i = b_j$, or a substitution edge.
 If a match edge has weight 0, and the other edges have weight 1, the weight of the total path is the number of differences in the alignment it represents.
 To find suitable alignments, we have to find a read subset pairs P such that $len(P)\ge \tau$ and the weight of the lowest scoring path between $(i,j)$ and $(g,h)$ in the edit graph of $A_a$ and $B_b$ is not more than $2\epsilon\cdot len(P)$.
 
-%TODO include something about SW and if Daligner is actually SW with certain penalty values?
-%A naive but exact way to calculate the lowest scoring path is described in the paper from Smith and Waterman \cite{SW}.
+\todo{include something about SW and if Daligner is actually SW with certain penalty values?
+A naive but exact way to calculate the lowest scoring path is described in the paper from Smith and Waterman \cite{SW}.}
 
 The O(ND) algorithm tries to find progressive waves of furthest reaching (f.r.) points until the endpoint is reached.
 The goal is to find longest possible paths starting at a starting point $\rho = (i,j)$ with 0 differences, then 1 difference, then 2 and so on.
@@ -142,13 +142,13 @@ When there are k+1 matching consecutive bases, two $k$-mers are generated.
 These are less 'valuable' than two non-overlapping $k$-mers.
 If $Count(d) \ge h$ for any diagonal band $d$, there is a seed hit for each position $(i,j$) in the band $d$ unless position $i$ was already in the range of a previously calculated local alignment.
 
-%TODO insert image of diagonal bands
+\todo{insert image of diagonal bands}
 
 The best values for $h$ and $s$ depend on things like $\epsilon$ and the read lengths.
 
 For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
 
-%TODO include time analysis?
+\todo{include time analysis?}
 
 
 \subsection{Seeding: implementation}
@@ -185,7 +185,7 @@ This means a smaller $B$ is better for caching behaviour, but this increases the
 On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{Daligner}.
 The optimal number of threads is more complex, because they usually do not have their own caches.
 
-%TODO insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware
+\todo{insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware}
 
 
 \subsection{Local Alignment}
@@ -230,7 +230,7 @@ When $\epsilon$ goes to 0, there is a very long slide from the starting point $\
 Each f.r. point not on the path should lag a lot behind the best f.r. point.
 As $\alpha$ increases as $\epsilon$ goes to 0, this explains further why the wave becomes very pointy and narrow.
 
-%TODO which last step of the argument is wrong exactly? Probably the formula of \beta
+\todo{which last step of the argument is wrong exactly? Probably the formula of \beta}
 
 The alignment finding algorithm ends because either the boundary of the edit graph is reached, or because all f.r. points have failed the regional alignment criterion, this means that the reads are probably not correlated anymore.
 In the second case, the best point in the last wave should not be reported as endpoint of the alignment, because the last columns could all be mismatches.
@@ -260,8 +260,8 @@ true &\text{ if } x = 0
 \end{cases}
 \end{align}
 
-%TODO include summary of Daligner algorithm?
-%TODO include summary of Daligner results wrt sensitivity and running time?
+\todo{include summary of Daligner algorithm?}
+\todo{include summary of Daligner results wrt sensitivity and running time?}
 
 
 
@@ -289,17 +289,17 @@ As oppose to Daligner, D-SOFT only considers the Kmer matches from one bin, not 
 
 First, a lookup table for the Kmer all Kmers and their positions is made.
 This can be done with any implementation, like seed position tables, suffix arrays or BWT or FM based indices.
-%TODO add citations for those implementations?
+\todo{add citations for those implementations?}
 
 D-SOFT uses two arrays, \textit{bp\_count} and \textit{last\_hit\_pos}.
 Both have N$_{B}$ values, and store the number of bases in Kmer matches, and the last seed hit position for that bin, respectively.
-%TODO explain D-SOFT algorithm? Maybe include code?
+\todo{explain D-SOFT algorithm? Maybe include code?}
 
 \subsection{GACT}
 Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratric for the length of the reads.
 Numerous efforts to accelerate Smith-Waterman have been made, both by using hardware and by using heuristics.
-%TODO name accelerated variants here, or in Chapter 2 Background?
-%TODO banded alignment is mentioned later this subsection
+\todo{name accelerated variants here, or in Chapter 2 Background?}
+\todo{banded alignment is mentioned later this subsection}
 Even when using heuristics, the memory requirements are still linear.
 GACT finds the alignment between reads of arbitrary length using constant traceback memory.
 It performs normal Smith-Waterman on a submatrix called a tile of size T, and then moves to the next tile, which overlaps with the previous tile with O bases.
@@ -330,7 +330,7 @@ The traceback is ended earlier for higher overlaps, so that the tiles will overl
 The performance of GACT is linear ($O(max(m,n)\cdot T)$) with respect to the length of the reads.
 It is more suited to long reads than banded alignment, because banded alignment uses a static band around the main diagonal.
 GACT allows for flexible bands, since the position of the new tile depends on the traceback path, this is useful for long reads that have high indel rates.
-%TODO flexible bands are better when indels are present, should I prove/cite that it does not matter when only having substitutions?
+\todo{flexible bands are better when indels are present, should I prove/cite that it does not matter when only having substitutions?}
 
 
 

@@ -15,6 +15,7 @@
 \usepackage{mciteplus}     % TD needed for bibliography
 \usepackage{eso-pic}       % TD custom cover
 \usepackage{epstopdf}      % TD custom cover
+\usepackage{todonotes}     % TD todo notes
 \definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
 
 % usage: \fig{options}{fileName}{caption}{fig:label}
@@ -29,15 +30,13 @@
 \newcommand{\figC}[4]{%
 \begin{figure}[h]
 \centering
+%\fbox{
 \includegraphics[#1]{\figPath #2}
+%}
 \caption{#3}
 \label{#4}
 \end{figure}}
 
-% structure
-% denovo vs reference based
-% 3 generations of sequencing
-% compare daligner to other denovo aligners
 
 
 

@@ -48,7 +48,7 @@ This leads to a \textit{backbone} of alternating sugar and phosphate groups.
 The two strands are \textit{antiparallel}, this means one strands 5'-end is matched to the others 3'-end.
 The orientation of the strand is significant: replication and translation can only be done in 5'$\rightarrow$3' direction.
 
-%TODO add DNA replication
+\todo{add DNA replication image, picture already in comments}
 % use picture from http://academic.pgcc.edu/~kroberts/Lecture/Chapter%207/replication.html
 % as source
 
@@ -360,11 +360,11 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 
 \figC{width=.6\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunneling nanopore measuring the tunneling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
-%TODO: mention protein alignment?
+\todo{mention protein alignment?}
 \section{DNA Alignment}
 DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
 This information can be used to reconstruct the whole genome, during the assembly phase.
-%TODO: possibly refer to the next section 'DNA Assembly'?
+\todo{possibly refer to the next section 'DNA Assembly'}
 An example of an alignment is shown in Figure \ref{fig:alignment}.
 Alignment algorithms are also useful in applications like textcomparison \cite{SW_plagiarism}.
 
@@ -373,7 +373,7 @@ Alignment algorithms are also useful in applications like textcomparison \cite{S
 If the two reads originate from the same part of the genome, the mismatches can be explained by sequencing errors.
 But copying the genome during cell division can also cause errors \cite{dna_replication_errors}.
 Since DNA sequencing is usually performed on more than one cell, the variations in these cells are all sequenced.
-%TODO: citation needed
+\todo{citation needed}
 
 The mismatches between reads can be distinguished between substitutions, insertions and deletions.
 A substitution is shown between the fifth bases in the figure.
@@ -387,12 +387,12 @@ Exact or heuristic algorithms can be used to determine the best alignment betwee
 Exact algorithms are guaranteed to find the best alignment, heuristic algorithms reduce the search space, which (dramatically) improves runtime, but the results might be worse than exact algorithms.
 
 A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
-%TODO: citation needed
+\todo{citation needed}
 This is why an affine gap penalty in the form of $y = a*N+b$ is often used, where $b$ is the gap open penalty, $a$ the gap extend penalty, and $N$ the number of bases in the gap - 1.
 Other variations in gap penalty include constant ($y = a$), double affine (), convex ($y = a+b\cdot ln(N)$).
-%TODO: add double affine description
+\todo{add double affine description}
 
-%TODO: SW and NW, global vs local
+\todo{SW and NW, global vs local}
 Global alignment aligns the full length of both sequences.
 Every base will either have a match/mismatch with a base from the other read, or a gap.
 Local alignment will look for the two subsequences from the reads that have the highest score.
@@ -404,7 +404,7 @@ Figure \ref{fig:global_vs_local_alignment_fig} shows another example of a case w
 
 \figC{width=.6\textwidth}{global_vs_local.png}{Local alignment can find small, overlapping regions very well, source: \cite{global_vs_local_alignment_fig}}{fig:global_vs_local_alignment_fig}
 
-%TODO: should this be a seperate subsection? Could be an appendix as well
+\todo{should this be a seperate subsection? Could be an appendix as well}
 \subsection{Dynamic programming}
 Dynamic programming is a programming technique that solves problems by dividing them recursively into smaller, simpler problems \cite{Dynamic_programming1}.
 An important aspect is that the subproblems overlap, saving the results of one subproblem to use in another subproblem.
@@ -421,7 +421,7 @@ Bottom-up firsts solves the subproblems, and uses these results to build the sol
 For global alignment, the Needleman-Wunsch (NW) algorithm \cite{NeedlemanWunsch} is widely used.
 It was published in 1970, and designed to compare sequences of amino acids, but as both are represented by letters, comparing nucleotides works in the same way.
 Needleman-Wunsch is an exact algorithm, producing the optimal global alignment.
-%TODO: mention and cite that NW is proven optimal
+\todo{mention and cite that NW is proven optimal}
 
 In Needleman-Wunsch, the smallest subproblems are trivial alignments, such as aligning two bases, or aligning zero bases in one read with N bases in the other.
 The first can result in two cases: a match or a mismatch, the latter results in N gaps.
@@ -565,10 +565,10 @@ The dynamic programming can include an area that is smaller than the matrix that
 Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
 
-%TODO: mention multiple sequence alignment
 \subsection{Multiple Sequence Alignment}
 Multiple Sequence Alignment algorithms \cite{MSA_survey} try to align three or more sequences, usually of similar length.
 The results can be used to create phylogenetic trees or to study evolutionary relationships \cite{MSA}
+\todo{expand this section?}
 
 
 \section{DNA Assembly}
@@ -632,7 +632,7 @@ Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble read
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
 For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG).
-%TODO: give examples of OLC and dBG assemblers
+\todo{give examples of OLC and dBG assemblers}
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.
 During the layout phase, the graph is analyzed to find paths, corresponding to segments of the original genome.
@@ -669,8 +669,8 @@ The gaps contain unknown bases, denoted by 'N', but their lengths is roughly kno
 To create scaffolds, paired-end reads can be used.
 When two ends of the paired-end read are found in different contigs, these contigs are likely to belong next to eachother, with a gap between them.
 
-%TODO consider talking about Optical Mapping to aid scaffolding
-%TODO talk about error correction before/after assembly?
+\todo{consider talking about Optical Mapping to aid scaffolding}
+\todo{talk about error correction before/after assembly?}
 
 \subsection{Reference based assembly}
 The biggest part in reference based assembly is finding the location in the reference that the read came from, this process is called 'mapping'.
@@ -721,9 +721,9 @@ This can be done by local denovo assembly, or a consensus algorithm \cite{consen
 
 \section{GPU processing}
 
-%TODO also talk about OpenCL?
-%TODO why GPU in the first place? What do they look like, what are they good at?
-%TODO CUDA was released in 2006, source: programming guide
+\todo{also talk about OpenCL?}
+% why GPU in the first place? What do they look like, what are they good at?
+% CUDA was released in 2006, source: programming guide
 
 A GPU is a Graphics Processing Unit, it is a processor that is mainly used to perform video processing.
 This type of processing often includes rotation and translation of objects in a space, calculating shadows and rendering images to display on a monitor.
@@ -738,7 +738,7 @@ CPUs usually have large caches and a complex instruction set and execution that 
 GPUs cannot operate on their own, they must be guided by a CPU.
 A general workflow using a GPU is shown in Figure \ref{gpu:workflow}.
 
-%TODO include gpu:workflow
+\todo{include figure gpu:workflow}
 
 \begin{itemize}
 \item Copy data from CPU to GPU
@@ -750,7 +750,7 @@ The functions that run on a GPU are called \textit{kernels}, and are usually lau
 Kernels can also be called from other kernels.
 
 
-%TODO maybe divide into subsections
+\todo{maybe divide into subsections}
 \section{CUDA}
 CUDA is a parallel computing platform that allows people to use Nvidia GPUs for their own applications.
 Developers can write functions that will execute on the GPU called \textit{kernels}, these are launched from a CPU function.
@@ -762,7 +762,7 @@ A grid is one-/two- or three-dimensional, and has an array of blocks in each dir
 Each block itself is also one-/two- or three-dimensional, and has an array of threads in each direction.
 Figure \ref{cuda:hierarchy} shows a full grid.
 
-%TODO picture of hierarchy \label{cuda:hierarchy}
+\todo{add picture of hierarchy, possible source in comments}
 % possible source: http://international.download.nvidia.com/pdf/kepler/NVIDIA-Kepler-GK110-GK210-Architecture-Whitepaper.pdf
 
 Each thread executes the kernel code, although they usually operate on different data.
@@ -782,7 +782,7 @@ Uncoalesced memory accesses cause multiple memory transactions.
 
 \figC{scale=.5}{gpu_coalesced.png}{Uncoalesced accesses are inefficient, source: \cite{gpu_coalesced_fig}}{fig:gpu_coalesced}
 
-%TODO include figure of hardware
+\todo{include figure of hardware, possible source in comments}
 %https://www.techpowerup.com/img/12-05-17/155a.jpg
 
 %Tesla-Fermi-Kepler-Maxwell-Pascal-Volta
@@ -818,7 +818,7 @@ These operations can be overlapped or pipelined by using streams. Figure \ref{fi
 
 
 
-%TODO include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation
+\todo{include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation}
 \section{Heterogeneous computing}
 %\cite{hetero_survey}
 
@@ -852,9 +852,9 @@ It can be used to speed up numerous algorithms.
 \figC{scale=.2}{SeqNFind.jpg}{An image of the SeqNFind hardware, source \cite{SeqNFind}}{fig:SeqNFind}
 
 CUSHAW is an accelerated short read aligner that uses BWT.
-%TODO: citation CUSHAW
+\todo{citation CUSHAW}
 
-%TODO: mention other GPU algorithms
+\todo{mention other/more GPU algorithms}
 
 
 
