@@ -36,18 +36,18 @@ Numerous ... have been measured to characterize the process performed by Daligne
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio has been used.
 \todo{add citation for 54x dataset}
 Tables \ref{tbl:41} to \ref{tbl:4x} show the results.
-The 999th permille indicates that the value is lower than or equal to the listed value for 99.9\% of the observed values.
+A column with 75\% indicates that 75\% of the observed values is less than or equal to the listed value.
 
 \begin{table}[h]
-\caption{Width of the d-wave}
+\caption{Width of the d-wave, the last two rows indicate the width if it was not trimmed}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c}
 & max & median \\ \hline
-forward & 190 & 25 \\
-reverse & 189 & 29 \\ \hline
-forward* & 13522 & 429 \\
-reverse* & 13530 & 215 \\
+forward & 190 & 24 \\
+reverse & 189 & 28 \\ \hline
+forward* & 13522 & 428 \\
+reverse* & 13530 & 214 \\
 \end{tabular}
 \end{table}
 
@@ -55,10 +55,10 @@ reverse* & 13530 & 215 \\
 \caption{Length of snake}
 \centering
 \vspace{-5pt}
-\begin{tabular}{c|c c c c}
-& max & median & 75th percentile & 999th permille \\ \hline
-forward & 87 & 2 & 0 & 10 \\
-reverse & 78 & 2 & 0 & 10 \\
+\begin{tabular}{c|c c c c c c}
+& max & median & 75\% & 90\% & 99\% & 99.9\% \\ \hline
+forward & 87 & 0 & 0 & 1 & 5 & 9 \\
+reverse & 78 & 0 & 0 & 1 & 5 & 9 \\
 \end{tabular}
 \end{table}
 
@@ -66,9 +66,9 @@ reverse & 78 & 2 & 0 & 10 \\
 \caption{Number of Kmer matches per readpair}
 \centering
 \vspace{-5pt}
-\begin{tabular}{c|c c c}
-max & median & 99th percentile \\ \hline
-32733 & 5 & 40 \\
+\begin{tabular}{c|c c c c}
+max & median & 75\% & 99\% \\ \hline
+32733 & 4 & 6 & 34 \\
 \end{tabular}
 \end{table}
 
@@ -89,7 +89,7 @@ reverse & 1323 & 37 \\
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c}
-max & median & 90th percentile & 99th percentile \\ \hline
+max & median & 90\% & 99\% \\ \hline
 18384 & 2 & 15 & 70 \\
 \end{tabular}
 \end{table}
@@ -98,14 +98,14 @@ max & median & 90th percentile & 99th percentile \\ \hline
 \caption{Length of overlap}
 \centering
 \vspace{-5pt}
-\begin{tabular}{c|c c c c}
-max & median & 75th percentile & 90th percentile & 99th percentile \\ \hline
-a & 18384 & 2 & 15 & 70 \\
-b & & & &  \\
+\begin{tabular}{c|c c c c c c}
+& max & median & 75\% & 90\% & 99\% & 99.9\% \\ \hline
+a & 27240 & 627 & 1341 & 2493 & 6380 & 10726 \\
+b & 26465 & 629 & 1345 & 2502 & 6394 & 10755 \\
 \end{tabular}
 \end{table}
 
-
+Benchmarks show that not trimming the width of the wave slows down the runtime by about 8x.
 
 
 
@@ -133,7 +133,7 @@ If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new 
 
 % multiple implementations:
 % - (V)MTHAB
-% - coalesce_diags
+% - coalesce_diags (V,M,H arrays)
 % - no_pebble
 % - cache_diags
 % - xor to find snake
@@ -143,6 +143,83 @@ If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new 
 % - compress_abseq
 % - coalesce_abseq
 
+\paragraph{Coalesce main data arrays}
+The main data of a wave is stored in a few arrays.
+These arrays are not interleaved when used by the CPU, since each thread has its own cache.
+On the GPU, they need to be interleaved to allow for coalesced reads.
+
+\paragraph{No pebbles}
+Pebbles are checkpoints in the alignment to allow for easier recalculation of the full alignment when needed.
+Shorter alignments do not need these, but long reads create long alignments.
+However, since Falcon does not use them \cite{Falcon}, they could be removed.
+This means some arrays and loops can be removed.
+
+\paragraph{Cache variables}
+The alignment kernel of Daligner is quite complex and contains many variables.
+This results in a large register usage per thread.
+To try and combat this, a few often used variables can be placed in the unused shared memory.
+
+% V: furthest reaching anti-diagonal in current wave, higher is better
+% M: number of matches in current 60 bit history
+% H: index of previous Pebble in Pebble-array
+% N: indicates next position in aread (i*s) where the next Pebble should be created
+\paragraph{Encoding main data arrays}
+Each variable in a main data array is a 32-bit integer.
+Not all of these values need to use all of those bits.
+Table \ref{tbl:value_range} shows the possible values that the arrays can hold.
+Figure \ref{fig:CWORK} shows the encoding.
+Care must be taken considering the signs of the values.
+H only contains non-negative value and -1.
+When placed in the least-significant (LS) part and read by masking out the most-significant part (MS), the -1 would give a positive value.
+Since checking each time for -1 is inefficient, it could be put in the MS part.
+However, N contains negative values as well, it starts at -s (s is 100 by default).
+Storing N in the LS part would mean reading and writing a negative value that is unknown at compile time.
+It it easier to give H an offset of 1, so that the stored value is always non-negative.
+Since N can still be negative, it is put in the MS part, where shifting right is possible for both positive and negative values.
+M is always non-negative, but V can contain -1, therefore V is put in the MS part, and M in the LS part.
+T contains a bitvector that represents the history of the last C (default = 60) bases, based on this, the number of matches is updated.
+T cannot be easily reduced in size without reducing C, although M can be removed by calculating the popcount of T when it is needed.
+
+\begin{table}
+\centering
+\begin{tabular}{c|c c}
+& min & max \\ \hline
+V & -1 & 63225 \\
+M & 0 & 61 \\
+H & -1 & 4677 \\
+N & -100 & 34500 \\
+\end{tabular}
+\end{table}
+
+\figC{width=.7\textwidth , clip, trim=60 490 210 120}{CWORK.pdf}{Encoding of data.}{fig:CWORK}
+
+\paragraph{Remove M}
+The M array is stored in global memory, so reading and writing is relatively expensive.
+Its only purpose is to require a certain number of matches in the last C (60) match/mismatches, but it is only checked if the V value is larger than the highest V value for the current wave.
+Since it is used infrequently, an option is to calculate the M when it is needed, based on the T vector.
+This can be done using the popcount instruction, which is available as an intrinsic instruction in CUDA (\_\_popc()) \cite{CUDA_math}. 
+
+
+\paragraph{XOR to find snakelength}
+The CPU version uses one byte per base, and each base is retrieved on its own.
+Since each base only needs two bits, four bases can be encoded into one byte, or sixteen bases into one integer.
+The actual comparison is done via the XOR operation, matching bases result in zeros.
+By counting the leading zeros via the intrinsic \_\_clz() \cite{CUDA_math} and dividing by two, the snakelength can be determined.
+If the result contains 32 zeros, the next integers must also be checked.
+The position that needs to be checked might not be divisible by eight, in this case, the integers that hold the encoded bases must be shifted and masked to prevent comparison between sequences of unequal length.
+Another option is to have 16 copies of the encoded bases, so that there is always an integer available that starts at the correct position, eliminating the need for shifting and masking, but it costs 16x more memory, and shifts and masks are relatively cheap on a GPU.
+The T vector is filled with the appropiate amount of ones afterwards.
+
+
+
+\subsubsection{Splitting the alignment between GPU and CPU}
+There are other ways of using the GPU, the implementations GPU\_SINGLE, GPU\_SNAKE and COMPRESS\_ABSEQ try to do that.
+GPU\_SINGLE lets the GPU compute a large bitmatrix, where 0 means a mismatch, and 1 means a match.
+These bits will be read by the CPU, instead of having the CPU do the comparisons itself.
+GPU\_SNAKE computes the whole snake on the GPU, and stores it at some index that is based on the positions in reads a and b.
+When the CPU wants to know the length of a snake during alignment, it only has to look up the length in the array.
+COMPRESS\_ABSEQ calculates the XORred bitvector between integers with compressed bases like described above, but the results returned to the CPU.
+During alignment on the CPU, it only has to read the correct bitvector, and count the leading zeros.
 
 
 \subsection{Darwin}
@@ -151,6 +228,7 @@ It is possible to run the whole GACT kernel on the GPU, for both left and right 
 However, since it is not known how long the resulting alignment will be, and all GPU threads have to wait until all threads are done, this will cause lots of idle time.
 Instead, it is chosen to only have a single tile aligned per GPU-thread per GPU-invocation.
 The scheduling and preperation of the tiles will be done by the CPU.
+Tracking the full alignment in two strings is also done on the CPU, they are used to calculate the total alignment score.
 The CPU will receive a large list with seed hit positions, for each hit, the GACT algorithm is performed.
 It is not necessary to implement skipping seeds/Kmer matches for Darwin, since it generates less redundant seeds than Daligner.
 
@@ -192,6 +270,30 @@ It does not provide traceback information, when the start position of an alignme
 GASAL needs to be adapted to perform actual traceback, to guarantee that the tiles of GACT have a minimum overlap.
 It is chosen to perform the actual traceback on the GPU, instead of copying all the pointers to the CPU, and doing the traceback there.
 \todo{this choice might seem odd, since traceback on GPU is usually very divergent, might need more explanation}
+
+Since the order of accesses is slightly different between the CPU version and GASAL, the reported coordinates of the element with the maximum score could differ.
+
+% CUDA streams
+% CMAT
+% CBASES (for non GASAL)
+% CPBASES (for GASAL)
+
+
+\paragraph{No score}
+If the score of the alignment is not needed, the used traceback pointers do not have to returned to the CPU.
+It also saves the time spend on building the aligned strings.
+
+\paragraph{Coalesce matrices}
+The score matrices in GASAL are reduced to fit in the registers, and cannot be coalesced.
+There are two main matrices left: the global array that stores the scores of one column, and the tracebackpointer matrix.
+The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be seperated.
+
+\paragraph{Coalesce packed bases}
+The bases are uninterleaved when they are send to the GPU, and after packing.
+This means that during alignment, they cause uncoalesced reads.
+To prevent this, the writing of the packed bases can interleave them, but this means the packing kernel has write in an uncoalesced manner.
+When preparing the bases on the CPU, they are interleaved, so that the packing kernel can read and write coalesced, and the alignment kernel can read coalesced too.
+
 
 
 

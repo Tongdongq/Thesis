@@ -315,6 +315,7 @@ $Align()$ also limits $i,j\_off$ to at most T - O bases, to ensure the next tile
 The left extension finishes when it hits the end of $R$ or $Q$, or when traceback cannot add any bases to the existing alignment.
 The memory needed for the traceback is $O(T^2)$, which is constant since T is chosen up front.
 The traceback for the whole alignment $tb\_left$ is linear with read length, but not performance critical.
+GACT calculates the full alignment strings and uses these to calculate the score of the whole alignment.
 The right extension operates on the reverse of $R$ and $Q$.
 
 \lstinputlisting[caption=GACT, label=code:GACT]{\codePath GACT.c}
