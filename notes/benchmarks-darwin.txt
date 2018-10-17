@@ -5,7 +5,7 @@ Speedup yeast: 10x
 
 -----------
 d822c11
-./generte.sh 4 2000 20000 4000 16
+./generate.sh 4 2000 20000 4000 16
 CPU 1       : 132m
 GPU 1  32 32:  31m, but 4 outputs are different
 GPU 1  64 32:   9m27, but 4 outputs are different
@@ -304,6 +304,52 @@ D: GPU GASAL 64 STREAM CMAT (inline PTX to resolve tied max)
 50MB      A:    B:    C:    D:
 8  32 64: 72.3  70.2  70.3  69.8
 
+--------------------
+15-10-2018:
+d4f25db
+A: GPU GASAL 64 STREAM SCORE
+B: GPU GASAL 64 STREAM CMAT SCORE (coalescing of dir_matrix)
+50MB      A:    B:
+1  64 64: 15m52  2m50
+8  32 64: 14m37  1m45
+10x denovo
+1  64 64:  5m54  1m32
+--------------------
+15-10-2018:
+637b165
+A: GPU GASAL 64 STREAM CMAT
+B: GPU GASAL 64 STREAM CMAT GLOBAL (coalescing of global)
+C: GPU GASAL 64 STREAM CMAT GLOBAL CPBASES
+D: GPU GASAL 64 STREAM CMAT CPBASES
+10x denovo A:   B:   C:   D:
+1  64 64:  1m3  1m6  1m6  1m3
+--------------------------
+profile.sh nf 1 64 64
+Tesla K40c
+    gasal_pack_kernel                             avg       total
+               l2_subp0_read_sector_misses       16522     8310793
+        l2_subp0_total_read_sector_queries       33085    16642237
+    gasal_local_kernel
+               l2_subp0_read_sector_misses     6410519  3218080629
+        l2_subp0_total_read_sector_queries     3648417  1831505721
 
+    gasal_pack_kernel               avg
+          gld_transactions          33051
+          gst_transactions           8263
+            gld_efficiency         49.89%
+            gst_efficiency         99.74%
+            gst_throughput     17.87 GB/s
+            gld_throughput     71.49 GB/s
+             sm_efficiency         84.74%
+        achieved_occupancy       0.128729
+    gasal_local_kernel
+          gld_transactions        9926993
+          gst_transactions       17251645
+            gld_efficiency         49.21%
+            gst_efficiency         71.31%
+            gst_throughput     19.56 GB/s
+            gld_throughput     13.01 GB/s
+             sm_efficiency         91.29%
+        achieved_occupancy       0.125633
 
 

@@ -96,10 +96,11 @@
 			other are 0, weird because 6.8MB does show Really 4
 
 - distribution of overlap lengths
-	-6.8MB: aepos-abpos: max 12377, median 152, 75% < 279, 90% < 539, 99% < 2801 < 99.9% < 7649, 142677 ovls checked
-			bepos-bbpos: max 12917, median 154, 75% < 284, 90% < 556, 99% < 2869 < 99.9% < 7734, 142677 ovls checked
-	-130MB: aepos-abpos: max 27240, median 628, total alignments 12891001
-			bepos-bbpos: max 26465, median 630, total alignments 12891001
+	-6.8MB: aepos-abpos: max 12377, median 150, 75% < 279, 90% < 553, 99% < 2630 < 99.9% < 5470, 149874 ovls checked
+			bepos-bbpos: max 12449, median 152, 75% < 284, 90% < 566, 99% < 2700 < 99.9% < 5740, 149874 ovls checked
+	-130MB: aepos-abpos: max 27240, median 627, 75% < 1341, 90% < 2493, 99% < 6380, 99.9% < 10726, total alignments 12891001
+			bepos-bbpos: max 26465, median 629, 75% < 1345, 90% < 2502, 99% < 6394, 99.9% < 10755, total alignments 12891001
+
 
 - each LAcall that passes if(apos>lastp[diag]) saves xxx other LAcalls:
 	-6.8MB: max 1940, median 1, 90%<10, 99%<40, total LAcalls 151378

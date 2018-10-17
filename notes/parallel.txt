@@ -1092,6 +1092,10 @@ Set default PBSIM seed to 1538399012
 Using the same seed for PBSIM to generate two datasets resulted in two identical datasets.
 The default PBSIM seed for the second dataset is 1156173320
 
+16-10-2018:
+When using TIME, it looks like 90% of the time_gpu (time spent in cuda_host) is taken by the gasal_local_kernel()
+
+
 
 TODO: create type 6 reads that have a AT/GC imbalance.
 	  create type 7 reads that are a subset from real reads, but with nice lengths, etc.
