@@ -248,8 +248,18 @@ GACT is designed to allow for an affine gap penalty, so it uses three matrices t
 The whole tile is calculated per column, so only two columns need to be kept from the matrices: the current and the previous.
 This means the implementation uses $O(T)$ memory for the score, where T is the tilesize.
 The traceback pointers need to be kept for the whole tile, this takes $O(T^2)$.
-Since the matrices and traceback pointers are read/written for every score element, it makes sense to coalesce these, to optimize the memory bandwidth.
 
+\paragraph{Coalesce matrices}
+Since the matrices and traceback pointers are read/written for every score element, it makes sense to coalesce these, to optimize the memory bandwidth and reduce the number of memory transactions.
+There are four matrices with score data, which cause 14*T*T transactions per thread.
+Swapping the current and previous column takes 8*T*T transactions per thread. 
+Initialization takes 8*T transactions per thread.
+The traceback pointers need T*T transactions for filling and 2*T-1 for initialization per thread.
+Computing the traceback path takes at most 2*T transactions, but these cannot be coalesced, because each thread can have a different path.
+After coalescing, a warp of 32 threads will have reduced the needed transactions by 32.
+Each value in these matrices is an integer.
+
+\paragraph{GASAL}
 GASAL \cite{GASAL} provides an API for GPU accelerated functions that perform different types of genomic alignment, such as local, global and semi-global.
 It can perform one-to-one, one-to-many and all-to-all alignment.
 GASAL first packs the bases in a 4-bit format, where 8 bases are packed into a 32-bit integer.
@@ -279,14 +289,26 @@ Since the order of accesses is slightly different between the CPU version and GA
 % CPBASES (for GASAL)
 
 
+\paragraph{Coalescing the returned, used tracebackpointers}
+The CPU needs to know what path the traceback took to compute the full aligned strings.
+While following the trace, the GPU writes the used pointers to an output buffer uncoalesced.
+This buffer could be coalesced, but the tracebackprocedure takes only a fraction of the GPU time.
+
 \paragraph{No score}
 If the score of the alignment is not needed, the used traceback pointers do not have to returned to the CPU.
-It also saves the time spend on building the aligned strings.
+It also saves the time spend on building the aligned strings on the CPU.
+
 
 \paragraph{Coalesce matrices}
-The score matrices in GASAL are reduced to fit in the registers, and cannot be coalesced.
+The score matrices in GASAL are small enough to fit in the registers, and cannot be coalesced.
 There are two main matrices left: the global array that stores the scores of one column, and the tracebackpointer matrix.
 The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be seperated.
+The scores are stored via 16-bit shorts, but since the smallest memory transaction is 32 bytes (Compute Capability 3.5) \cite{cuda}, and the uninterleaved elements are far enough, it causes unneccesary transactions too.
+% According to nvprof, this is not true. There is uncoalesced access reported due to accesses in the global array. Perhaps, because of the known index (ridx), the compiler optimizes these values. It could be placed in L1 cache as local memory.
+
+The matrix with tracebackpointers is stored in an array, this allows them to be coalesced.
+Each tracebackpointer occupies one byte, although it would be possible to store two pointers in one byte.
+
 
 \paragraph{Coalesce packed bases}
 The bases are uninterleaved when they are send to the GPU, and after packing.
