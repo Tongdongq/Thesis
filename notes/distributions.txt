@@ -8,8 +8,8 @@
 	- 130MB: forward:	max 190, median 24, total 3346212030
 			 reverse:	max 189, median 28, total 2234942039
 	-- without second trimming principle:
-	- 6.8MB: forward:	max 8272, median 124, 75% < 256, 90% < 764, total 17252390
-			 reverse:	max 8126, median  98, 75% < 162, 90% < 332, total 13707418
+	- 6.8MB: forward:	max 8272, median 124, 75% < 256, 90% < 764, 99% < 3626, 99.9% < 6876, total 17252390
+			 reverse:	max 8126, median  98, 75% < 162, 90% < 332, 99% < 2170, 99.9% < 5172, total 13707418
 	- 130MB: forward:	max 13522, median 428, total 3325172390
 			 reverse:	max 13530, median 214, total 1937437921
 

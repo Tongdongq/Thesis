@@ -316,20 +316,30 @@ B: GPU GASAL 64 STREAM CMAT SCORE (coalescing of dir_matrix)
 1  64 64:  5m54  1m32
 --------------------
 15-10-2018:
-637b165
+637b165 (no SCORE calculated)
 A: GPU GASAL 64 STREAM CMAT
 B: GPU GASAL 64 STREAM CMAT GLOBAL (coalescing of global)
 C: GPU GASAL 64 STREAM CMAT GLOBAL CPBASES
 D: GPU GASAL 64 STREAM CMAT CPBASES
+50MB:      A:   B:   C:   D:
+1 128 64:  1m27 1m36 1m32 1m26
+8  32 64:  1m23 1m34 1m26 1m20
 10x denovo A:   B:   C:   D:
 1  64 64:  1m3  1m6  1m6  1m3
 --------------------------
+637b165
+GPU GASAL 64 STREAM CMAT GLOBAL
 profile.sh nf 1 64 64
+PBSIM, 10x, denovo
 Tesla K40c
     gasal_pack_kernel                             avg       total
                l2_subp0_read_sector_misses       16522     8310793
         l2_subp0_total_read_sector_queries       33085    16642237
     gasal_local_kernel
+        l1_local_load_hit                      6352614
+        l1_local_load_miss                     1455640
+        l1_local_store_hit                     2111836
+        l1_local_store_miss                      20659
                l2_subp0_read_sector_misses     6410519  3218080629
         l2_subp0_total_read_sector_queries     3648417  1831505721
 
@@ -351,5 +361,108 @@ Tesla K40c
             gld_throughput     13.01 GB/s
              sm_efficiency         91.29%
         achieved_occupancy       0.125633
+
+
+637b165
+GPU GASAL 64 STREAM CMAT
+profile.sh nf 1 64 64
+PBSIM, 10x, denovo
+Tesla K40c
+    gasal_pack_kernel                                         avg     total
+        433               l2_subp0_read_sector_misses       16228     7026779
+        433        l2_subp0_total_read_sector_queries       32574    14104888
+    gasal_local_kernel
+        432               l2_subp0_read_sector_misses     6345626  2741310491
+        432        l2_subp0_total_read_sector_queries     3731684  1612087488
+
+    gasal_pack_kernel            avg
+          gld_transactions               32543
+          gst_transactions                8136
+            gld_efficiency              49.87%
+            gst_efficiency              99.69%
+            gst_throughput          17.90 GB/s
+            gld_throughput          71.59 GB/s
+             sm_efficiency              83.87%
+        achieved_occupancy            0.128003
+    gasal_local_kernel
+          gld_transactions            5220669
+          gst_transactions           12382557
+            gld_efficiency             12.24%
+            gst_efficiency             69.76%
+            gst_throughput         12.48 GB/s
+            gld_throughput         5.357 GB/s
+             sm_efficiency             90.47%
+        achieved_occupancy           0.124423
+
+637b165
+GPU GASAL 64 STREAM CMAT CPBASES
+profile.sh nf 1 64 64
+PBSIM, 10x, denovo
+Tesla K40c
+     gasal_pack_kernel                           avg        total
+                l2_subp0_read_sector_misses      20445     1574301
+         l2_subp0_total_read_sector_queries      41002     3157175
+    gasal_local_kernel
+                          l1_local_load_hit    2428198   184543089
+                         l1_local_load_miss    2487001   189012111
+                         l1_local_store_hit    4898987   372323054
+                        l1_local_store_miss      61440     4669440
+                l2_subp0_read_sector_misses    6042932   459262832
+         l2_subp0_total_read_sector_queries    2865872   217806345
+
+     gasal_pack_kernel                     avg
+           gld_transactions                40960
+           gst_transactions                10240
+             gld_efficiency               50.00%
+             gst_efficiency              100.00%
+             gst_throughput           18.404GB/s
+             gld_throughput           73.617GB/s
+              sm_efficiency               90.06%
+         achieved_occupancy             0.131617
+     gasal_local_kernel
+           gld_transactions               880014
+           gst_transactions             13296761
+             gld_efficiency               45.13%
+             gst_efficiency               77.33%
+             gst_throughput           14.172GB/s
+             gld_throughput           1.6096GB/s
+              sm_efficiency               93.71%
+         achieved_occupancy             0.132289
+
+28c3c6
+GPU GASAL 64 STREAM CMAT GLOBAL CPBASES
+profile.sh nf 1 64 64
+PBSIM, 10x, denovo
+Tesla K40m
+     gasal_pack_kernel                           avg        total
+                l2_subp0_read_sector_misses    20475
+         l2_subp0_total_read_sector_queries    41031
+    gasal_local_kernel
+                          l1_local_load_hit    1039497
+                         l1_local_load_miss    117
+                         l1_local_store_hit    212515
+                        l1_local_store_miss    3164
+                l2_subp0_read_sector_misses    6046216
+         l2_subp0_total_read_sector_queries    2837652
+
+     gasal_pack_kernel                     avg
+           gld_transactions          40960
+           gst_transactions          10240
+             gld_efficiency          50 %
+             gst_efficiency          100 %
+             gst_throughput          14.28 GB/s
+             gld_throughput          57.11 GB/s
+              sm_efficiency          92 %
+         achieved_occupancy          0.132
+     gasal_local_kernel
+           gld_transactions          5795087
+           gst_transactions          18232861
+             gld_efficiency          73.49 %
+             gst_efficiency          78.10 %
+             gst_throughput          23.32 GB/s
+             gld_throughput          11.36 GB/s
+              sm_efficiency          95 %
+         achieved_occupancy          0.133
+
 
 

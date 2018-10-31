@@ -155,7 +155,7 @@ TACC					205:		206:		207:		208:		209:
 ./run.sh 8 128 32 128r	71.50 (58)	61.26 (48)	45.49 (31)	52.86 (39)	55.32 (42)
 
 TACC					210:		211:		212:		213:		214:
-./run.sh 8 64  64 128r	48.67 (34)	74.81 (61)	74.73 (61)	68.11 (55)	58.45 (45)		
+./run.sh 8 64  64 128r	48.67 (34)	74.81 (61)	74.73 (61)	68.11 (55)	58.45 (45)
 ./run.sh 8 128 32 128r	49.07 (35)	74.69 (61)	74.64 (61)	67.99 (55)	58.80 (45)
 
 TACC					215:		216:		218:		219:		220:
@@ -342,6 +342,11 @@ TACC					237:		238:		239:		240:
 238: cdb2dbee, RM NP STREAM CABSEQ WORK B30 ABSEQ
 239: cdb2dbee, DIAGS5 RM NP STREAM CABSEQ WORK ABSEQ
 240: cdb2dbee, DIAGS5 RM NP STREAM CABSEQ WORK ABSEQ B30
+
+./generate.sh 4 3000 100000 5000 4
+TACC:                  209:
+./run.sh 8 64  64 128r 
+
 
 CPU 6f4d6c8d
 ./convert.sh 1, 64 rpairs
