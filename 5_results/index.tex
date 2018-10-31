@@ -1,0 +1,214 @@
+\documentclass[../main/thesis.tex]{subfiles}
+
+\begin{document}
+
+\chapter{Results}
+\ifdefined\main
+\acresetall
+MAIN IS TRUE
+\newcommand{\codePath}{../5_results/code/}
+\newcommand{\figPath}{../5_results/figures/}
+\else
+MAIN IS NOT TRUE
+\input{../notmain.tex}
+\fi
+
+
+\section{Daligner}
+\subsection{Runtimes}
+The different runtime configurations are indicated with A B C, where A is the number of CPU threads, B the number of GPU blocks that each CPU thread launches, and C the number of GPU threads in each block.
+Table \ref{tbl:daligner1} shows the results.
+The first column lists the used optmizations.
+
+./generate.sh 4 3000 100000 5000 4
+\begin{table}
+\centering
+\caption{Runtimes for different Daligner optimizations, with a synthetic dataset, run with 8 64 64.}
+\begin{tabular}{c c}
+& runtime (s) \\ \hline
+& 75.1 \\
+CWORK & 67.1 \\
+CAWORK & 75.1 \\
+CWORK CAWORK & 65.9 \\
+CWORK CAWORK SREAM & 50.8 \\
+CABSEQ & 71.8 \\
+CWORK CABSEQ & 61.2 \\
+CWORK CABSEQ STREAM & 46.6 \\
+CABSEQ STREAM & 53.1 \\
+STREAM & 54.8 \\
+CWORK STREAM & 48.7 \\
+CABSEQ CAABSEQ & 68.1 \\
+CABSEQ CAABSEQ CWORK & 58.5 \\
+CABSEQ CAABSEQ STREAM & 68.1 \\
+CABSEQ CAABSEQ CWORK STREAM & 58.7 \\
+CWORK WORK STREAM & 49.8 \\ \hline
+B30 STREAM & 55.0 \\
+B30 RM & 49.7 \\
+\end{tabular}
+\end{table}
+
+
+
+
+\subsection{Profiling}
+
+
+Replacing 'if(__clz(a1) == 32){abpos -= max;}' with inline PTX gave a 4\% speedup.
+The others did not give a consistent speedup.
+
+
+
+\section{Darwin}
+\subsection{Runtimes}
+
+
+\begin{table}
+\centering
+\caption{Runtimes and speedup for different scoring schemes, run on the 50MB dataset with 8 B 64.}
+\label{tbl:darwin1}
+\begin{tabular}{c c c c c}
+scoring scheme & GPU BLOCKS & CPU8 & GPU & speedup \\ \hline
+(1,-1,-1,-1) & 32 & 94m15s & 1m21s & 70x \\
+(1,-1,-2,-1) & 32 & 66m36s & 1m7s  & 60x \\
+(1,-1,-2,-2) & 16 & 63m45s & 1m5s  & 59x \\
+(1,-3,-1,-1) & 32 & 81m10s & 1m8s  & 72x \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Runtimes for different optimizations, run on the 50MB dataset, with 8 32 64 threads.}
+\label{tbl:darwin2}
+\begin{tabular}{c c c}
+optimizations & GPU \\ \hline
+baseline & 1m23 \\
+GLOBAL & 1m34 \\
+GLOBAL CPBASES & 1m26 \\
+CPBASES & 1m20 \\
+\end{tabular}
+\end{table}
+
+\subsection{Profiling}
+%global load efficiency and stuff
+
+\begin{table}
+\centering
+\caption{Profile data for different optimizations, run on the 50MB dataset, with 1 64 64 threads.}
+\label{tbl:darwin2}
+\begin{tabular}{c c c}
+optimizations & global ld efficiency \\ \hline
+baseline & 12\% \\
+GLOBAL & 49\% \\
+GLOBAL CPBASES & 73\% \\
+CPBASES & 45\% \\
+\end{tabular}
+\end{table}
+
+
+The alignment kernel consists of two distinct phases: alignment and traceback.
+The kernel was split into two kernels, and their runtimes measured, the alignment part takes 96\% of the time.
+This makes optimizing the traceback part not efficient.
+
+
+The optimization CPBASES coalesces the packed GASAL bases.
+This requires a more complex preperation on the GPU size, which interleaves the unpacked bases.
+For the 50MB dataset, ran wih 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
+The preperation and packing take more time, but this is compensated by a faster alignment phase.
+
+\begin{table}
+\centering
+\begin{tabular}{c c}
+& preperation (s) & packing (ms) & aligning (s) \\ \hline
+base & 4.2 & 54 & 41.1 \\
+CPBASES & 6.0 & 96 & 38.9 \\
+\end{tabular}
+\end{table}
+
+
+Using inline PTX did not give consistent speedup for either implementation.
+This should not be a large suprise, modern compilers are quite good at creating efficient low-level code.
+
+
+\section{Sensitivity and specificity}
+The algorithms should ultimately be used to find overlaps, the sensitivity and specificity indicate the quality of the report output.
+Sensitivity and specificity are defined as:
+$$\text{Sensivitity} = \frac{TP}{TP + FN}$$
+$$\text{Specificity} = \frac{TP}{TP + FP}$$
+where TP, FN and FP are the number of true positives, false negatives and false positives respectively.
+Sensivitity indicates how many of the overlaps that the aligner was supposed to find, were actually found.
+Specifitiy indicates how many of the reported overlaps were actually real overlaps.
+PBSIM \cite{PBSIM} is used to generate synthetic PacBio datasets.
+The only parameters that is not default is the accuracy, which is set to 0.85\%, to mimic the 15\% error rate of PacBio.
+The distribution is also changed: 1.5\% substitution, 9.0\% insertion, 4.5\% deletion.
+The reads are generated from an E.coli reference.
+\todo{Ecoli ref was sent by Yatish}
+For reference-based alignment (mapping), a read that is aligned to the reference within 50 bases of the original location is a true positive.
+For de-novo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
+The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the thrid the number of GPU threads in each of those GPU blocks.
+Since Daligner is faster of CPU than on GPU, the CPU version is used, and the number indicates the number of CPU threads.
+For Darwin, h indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n is the number of seeds that are considered for that readpair.
+For Daligner, h means the same, l is the minimum length that an overlap must have to be reported.
+Both aligners can use a minimum score threshold to further filter the found overlaps.
+This will be denoted by s.
+Daligner does not actually calculate the score, instead the score is defined here as the length of the overlap in a, minus the reported number of differences.
+
+
+\begin{table}
+\centering
+\begin{tabular}{c|c c c c c c}
+aligner & run config & runtime & parameters & sensivitify (\%) & specificity (\%) & memory usage (GB) \\ \hline
+darwin & 1 64 64 & 62s & h21 n1400 s800 & 88.7 & 98.2 & 7.8 \\
+& & & h21 n1400 s600 & 94.7 & 97.8 & \\
+& & & h21 n1400 s400 & 98.6 & 97.3 & \\
+& & & h21 n1400 s0   & 100 & 95.9 & \\
+& 1 32 32 & 82s & & & & 7.0 \\
+& 8 32 64 & 42s & & & & 13.2 \\
+& 8 32 32 & 41s & & & & 9.6 \\ \hline
+darwin & 1 64 64 & 47s & h21 n800 s800 & 88.6 & 98.1 & 7.0 \\
+& & & h21 n800 s600 & 94.7 & 97.8 \\
+& & & h21 n800 s400 & 98.6 & 97.4 \\
+& & & h21 n800 s200   & 99.9 & 96.6 \\ \hline
+darwin & 1 64 64 & 37s & h21 n400 s600 & 94.6 & 98.0 & 6.0 \\
+& & & h21 n400 s400 & 98.6 & 97.6 \\
+& & & h21 n400 s200 & 99.90 & 97.2 \\
+& & & h21 n400 s0 & 99.98 & 96.9 \\
+& 8 32 64 & 33s & & & & 11.4 \\
+& 8 32 32 & 31s & & & & 7.6 \\
+& 1 32 32 & 47s & & & & 4.7 \\ \hline
+darwin & 1 64 64 & 32s & h21 n200 s600 & 93.1 & 98.1 & 5.3 \\
+& & & h21 n200 s400 & 97.0 & 97.8 \\
+& & & h21 n200 s200 & 98.3 & 97.5 \\
+& & & h21 n200 s0   & 98.4 & 97.3 \\ \hline
+darwin & 1 64 64 & 30s & h21 n150 s600 & 89.2 & 98.0 & 5.1 \\
+& & & h21 n150 s400 & 92.9 & 97.8 \\
+& & & h21 n150 s200 & 94.2 & 97.5 \\
+& & & h21 n150 s0   & 94.3 & 97.4 \\ \hline
+darwin & 1 64 64 & 32s & h18 n150 s600 & 90.5 & 96.7 \\
+& & & h18 n150 s400 & 94.4 & 96.2 \\
+& & & h18 n150 s200 & 95.8 & 95.3 \\
+& & & h18 n150 s0   & 96.0 & 94.1 \\ \hline
+daligner & 1 & 39s & s800 & 89.1 & 98.0 & 3.1 \\
+& & & s0 & 89.1 & 97.9 \\
+& 8 & 7.4s \\
+& 1 & 39s & l500 s800 & 90.5 & 98.0 \\
+& & & l500 s600 & 95.7 & 97.7 \\
+& & & l500 s0   & 98.8 & 96.9 \\
+\end{tabular}
+\caption{PacBio, 20x, E.coli, reference-based}
+\end{table}
+ \todo{redo the 100\%}
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
