@@ -32,7 +32,7 @@ Some algorithms used in these assemblers, such as \ac{DBG} \cite{DeBruijn} would
 Since Daligner was build, new methods of using \ac{DBG} with long reads have been developed, but they rely on a short read based \ac{DBG} to correct errors in long reads \cite{DBG1}\cite{DBG2}.
 
 \section{Daligner}
-
+\todo{explain input format? Daligner uses DAZZLER DB files, Darwin fasta files}
 The first step in an \ac{OLC} assembler is usually finding overlaps between reads \cite{OLC}.
 BLASR \cite{BLASR} was the only long read aligner at the time, and inpsired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.

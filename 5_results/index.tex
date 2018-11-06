@@ -24,43 +24,61 @@ The first column lists the used optmizations.
 \begin{table}
 \centering
 \caption{Runtimes for different Daligner optimizations, with a synthetic dataset, run with 8 64 64.}
-\begin{tabular}{c c}
+\begin{tabular}{l c}
 & runtime (s) \\ \hline
-& 75.1 \\
+base & 75.1 \\
 CWORK & 67.1 \\
 CAWORK & 75.1 \\
 CWORK CAWORK & 65.9 \\
-CWORK CAWORK SREAM & 50.8 \\
+CWORK CAWORK STREAM & 50.8 \\ \hline
 CABSEQ & 71.8 \\
 CWORK CABSEQ & 61.2 \\
 CWORK CABSEQ STREAM & 46.6 \\
 CABSEQ STREAM & 53.1 \\
-STREAM & 54.8 \\
+STREAM & 54.8 \\ \hline
 CWORK STREAM & 48.7 \\
 CABSEQ CAABSEQ & 68.1 \\
 CABSEQ CAABSEQ CWORK & 58.5 \\
 CABSEQ CAABSEQ STREAM & 68.1 \\
 CABSEQ CAABSEQ CWORK STREAM & 58.7 \\
-CWORK WORK STREAM & 49.8 \\ \hline
+CWORK WORK STREAM & 49.8 \\ \hline \hline
 B30 STREAM & 55.0 \\
-B30 RM & 49.7 \\
+B30 RM STREAM & 49.7 \\
+RM STREAM & 51.0 \\
+B30 CABSEQ STREAM & 54.6 \\
+B30 CWORK STREAM & 48.3 \\
+B30 CWORK CABSEQ STREAM & 46.1 \\
+RM CWORK STREAM & 49.3 \\ \hline
+B30 RM CWORK CABSEQ STREAM WORK NP & 27.2 \\
+RM CWORK CABSEQ STREAM WORK NP & 27.8 \\
+CWORK CABSEQ STREAM WORK & 47.3 \\
+CABSEQ STREAM WORK NP & 32.1 \\
+DIAGS5 RM NP & 32.0 \\ \hline \hline
+CABSEQ WORK STREAM & 49.5 \\
+CABSEQ WORK STREAM DIAGS5 & 55.2 \\
+CABSEQ WORK STREAM DIAGS9 & 62 \\
+CABSEQ WORK STREAM DIAGS17 & 145 \\
 \end{tabular}
 \end{table}
 
 
-
-
-\subsection{Profiling}
-
-
-Replacing 'if(__clz(a1) == 32){abpos -= max;}' with inline PTX gave a 4\% speedup.
+Replacing 'if(\_\_clz(a1) == 32){abpos -= max;}' with inline PTX gave a 4\% speedup.
 The others did not give a consistent speedup.
 
 
 
+\subsection{Profiling}
+Nvprof \cite{nvprof} was used to profile the experiments.
+
+% cat 4 reads
+- CWORK reduces the L2 cache misses by 40\%, increases the global load throughput by 35\%, and the number of global load transactions by 12\%.
+- CABSEQ reduces the number of global load transactions by 15\%, and increases the global load efficiency from 11.8\% to 14.2\%.
+
+
 \section{Darwin}
 \subsection{Runtimes}
-
+Darwin has the same run configuration, A B C, where A is the number of CPU threads, B the number of GPU blocks, and C the number of threads in a block.
+Table \ref{tbl:darwin1} shows the runtimes for CPU version with 8 threads, and the fastest GPU configuration.
 
 \begin{table}
 \centering
@@ -75,6 +93,14 @@ scoring scheme & GPU BLOCKS & CPU8 & GPU & speedup \\ \hline
 \end{tabular}
 \end{table}
 
+
+% show impact individual GPU implementations
+% - first GPU baseline (naive)
+% - CMAT
+% - Coalesce bases (CBASES)
+% - 
+
+
 \begin{table}
 \centering
 \caption{Runtimes for different optimizations, run on the 50MB dataset, with 8 32 64 threads.}
@@ -87,6 +113,8 @@ GLOBAL CPBASES & 1m26 \\
 CPBASES & 1m20 \\
 \end{tabular}
 \end{table}
+
+
 
 \subsection{Profiling}
 %global load efficiency and stuff
@@ -117,7 +145,7 @@ The preperation and packing take more time, but this is compensated by a faster 
 
 \begin{table}
 \centering
-\begin{tabular}{c c}
+\begin{tabular}{c c c c}
 & preperation (s) & packing (ms) & aligning (s) \\ \hline
 base & 4.2 & 54 & 41.1 \\
 CPBASES & 6.0 & 96 & 38.9 \\
@@ -151,6 +179,8 @@ For Daligner, h means the same, l is the minimum length that an overlap must hav
 Both aligners can use a minimum score threshold to further filter the found overlaps.
 This will be denoted by s.
 Daligner does not actually calculate the score, instead the score is defined here as the length of the overlap in a, minus the reported number of differences.
+
+
 
 
 \begin{table}
@@ -196,7 +226,7 @@ daligner & 1 & 39s & s800 & 89.1 & 98.0 & 3.1 \\
 \end{tabular}
 \caption{PacBio, 20x, E.coli, reference-based}
 \end{table}
- \todo{redo the 100\%}
+
 
 
 
