@@ -168,4 +168,107 @@ shared_load				1968732		1968732		0			0			0			0			1968732		1968732
 shared_store			2684543		2684544		0			0			0			0			2684544		2684544		
 
 
+------------------
+5-11-2018:
+./generate.sh 4 3000 30000 5000 4
+./profile.sh nf 8 64 64 128r
+TACC, cdb2dbee      runtimes:
+T1: STREAM          20s
+T2: STREAM WORK     18s
+T3: STREAM CWORK    18s
+T4: STREAM ABSEQ    21s
+T5: STREAM CABSEQ   18s
+T6: STREAM WORK CWORK CABSEQ, 17s
+T7: STREAM WORK CWORK CABSEQ RM NP, 9s
+                       T1:        T2:          T3:         T4:         T5:        T6:         T7:
+inst_executed          900599400  1118910285   956049255   945873048   794435107  1081588864   419971723
+gld_inst_8bit           85917292    85917292    85917292    85917292      795061      795061      162150
+gld_inst_16bit           5409461     5409461     5409461     5409461     5409461     5409461     5320147
+gld_inst_32bit         233547585   238791665   249346490   233547585   264716479   340791646   102003991
+gld_inst_64bit          44369901    44369901    44369901    44369901    44373294    44373294    44348924
+l1_gbl_ld_transacts    398045010   351043162   407561660   404085850   343619917   347455123   123898771
+l1_gbl_st_transacts    159002466   130628466   131413623   158968768   159478535   108379071    52945776
+l1_local_load_hit        8425073    38510448     8422916    21676354     8424020    41597888     8381195
+l1_local_load_miss          4042        5872        4191        6498        4187        5197           7
+l1_local_store_hit         21060       21316       21034       21068       20906       21626         209
+l1_local_store_miss         4130        4043        4127        4373        4100        3741           2
+l2_s0_read_misses       56150680    77087467    28910062    66958369    53360104    46441983    14961014
+l2_s0_tot_read_query    98266500    95876172   102063781    99094075    83686988    98207050    35495728
+      shared_load              0           0           0           0           0           0           0
+     shared_store              0           0           0           0           0           0           0
+ shared_ld_replay              0           0           0           0           0           0           0
+ shared_st_replay              0           0           0           0           0           0           0
+ gld_transactions      387835614   344895308   403626647   394621521   325824718   344768646   123366321  
+ gst_transactions      158924953   130621741   131384971   158924949   158924938   108372796    52944709  
+   gld_efficiency         11.84%      12.32%      11.87%      11.78%      14.39%      14.67%      16.98%  
+   gst_efficiency         14.62%      15.46%      15.06%      14.62%      14.62%      15.91%      18.84%  
+   gst_throughput     9.791 GB/s  9.170 GB/s  9.808 GB/s  9.065 GB/s  10.57 GB/s  9.731 GB/s  15.00 GB/s  
+   gld_throughput     22.58 GB/s  21.84 GB/s  28.54 GB/s  21.01 GB/s  20.52 GB/s  28.78 GB/s  35.31 GB/s  
+gst_req_throughput    1.430 GB/s  1.423 GB/s  1.476 GB/s  1.324 GB/s  1.544 GB/s  1.555 GB/s  2.835 GB/s  
+gld_req_throughput    2.667 GB/s  2.695 GB/s  3.379 GB/s  2.469 GB/s  2.951 GB/s  4.238 GB/s  6.009 GB/s  
+l2_read_transacts      393480167   383067180   409262580   395447615   335407724   392797584   141126240  
+l2_write_transacts     179280318   182084132   132350419   180165188   196546948   139343934    64902868  
+shared_ld_throughput  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  
+shared_st_throughput  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  0.00   B/s  
+sm_efficiency                                                                     92.3%           87.73%   
+achieved_occupancy                                                                0.1081          0.1063   
+inst_per_warp                                                                     8.45e6         3.281e6   
+issued_ipc                                                                        0.3922          0.4922   
+stall_inst_fetch                                                                  3.57%            4.0%  
+stall_exec_dependen                                                               27.6%           34.4%  
+stall_mem_dependen                                                                51.8%           36.8%  
+stall_mem_throttle                                                                15.9%           23.3%  
+ 
+
+
+./generate.sh 1 10000 5000
+./profile.sh nf 8 64 64 128r
+T1: STREAM, 35s
+T6: STREAM WORK CWORK CABSEQ, 23s
+T7: STREAM WORK CWORK CABSEQ RM NP, 6s
+                        T1:         T6:        T7:
+inst_executed           654882328   693293832    80575048         
+gld_inst_8bit           112519228     3352640      189772         
+gld_inst_16bit           11781048    11781048    11373829         
+gld_inst_32bit          139202707   218103461    70648282         
+gld_inst_64bit           22701488    22705442    22674749         
+l1_gbl_ld_transacts     315103974    72352251    20980090         
+l1_gbl_st_transacts     106791713     7038190     1913064         
+l1_local_load_hit        14525193    21659023     2117434         
+l1_local_load_miss           5742        5692           6         
+l1_local_store_hit          28769       30035         245         
+l1_local_store_miss          4486        3477           1         
+l2_s0_read_misses        34699205      264785       23862         
+l2_s0_tot_read_query     67090631    24498631     7294088         
+      shared_load               0           0           0         
+     shared_store               0           0           0         
+ shared_ld_replay               0           0           0         
+ shared_st_replay               0           0           0         
+ gld_transactions       267998752    71634900    20791798          
+ gst_transactions       105269880     7033166     1912827          
+   gld_efficiency          11.22%      62.31%      43.74%          
+   gst_efficiency          13.79%      71.52%      96.53%          
+   gst_throughput      8.7784GB/s  3.468 GB/s  15.12 GB/s          
+   gld_throughput      18.566GB/s  9.692 GB/s  62.01 GB/s          
+gst_req_throughput     1.2102GB/s  2.480 GB/s  14.60 GB/s          
+gld_req_throughput     2.0837GB/s  6.040 GB/s  27.12 GB/s          
+l2_read_transacts       268618860    95674827    28558995          
+l2_write_transacts      119961852    18077283     6999383          
+shared_ld_throughput   0.00000B/s  0.00   B/s  0.00   B/s          
+shared_st_throughput   0.00000B/s  0.00   B/s  0.00   B/s          
+sm_efficiency              96.15%       95.3%       95.1%      
+achieved_occupancy         0.1280      0.1284      0.1286       
+inst_per_warp              5.11e6      5.42e6      6.29e5       
+issued_ipc                 0.2744      0.3642      0.7100       
+stall_inst_fetch            2.99%        5.1%       3.93%     
+stall_exec_dependen        14.88%       27.2%      41.14%      
+stall_memory_dependen      64.66%       63.5%      27.83%      
+stall_memory_throttle      16.72%        2.8%      24.61%     
+
+
+
+
+
+
+
 

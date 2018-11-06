@@ -13,6 +13,9 @@
 	- 130MB: forward:	max 13522, median 428, total 3325172390
 			 reverse:	max 13530, median 214, total 1937437921
 
+- number of waves (while iterations):
+	- 130MB: forward:   max 5887, median 153, 75% < 309, 90% < 573, 99% < 2693, 99.9% < 2761, total 12891001
+			 reverse:   max 5458, median 103, 75% < 193, 90% < 359, 99% < 1083, 99.9% < 2156, total 12891001
 
 - length snakes:
 	- 6.8MB: forward:	max 67, median 0, total 584227062, 75% equal to 0, 99.9% shorter than 9
@@ -214,6 +217,21 @@ darwin:
 number of seed hits 6.8MB: 10017+9796, of which to a unique readpair: 8040+8722, filtering would skip at most 15%
 number of seed hits  50MB: 191337+190519, of which to a unique readpair: 180460+180110, filtering would skip at most 6%
 number of seed hits 130MB: 413445+407054, of which to a unique readpair: 399967+393159, filtering would skip at most 3%
+
+31-10-2018:
+darwin tilesizes:
+0.8 PBSIM E.coli ?: 59534 tiles launched, of which 37251 with 320 320 sizes
+0.2 PBSIM E.coli ref   : 15196 tiles launched, of which 11938 with 320 320 sizes
+0.8 PBSIM E.coli denovo: 20228 tiles launched, of which 12964 with 320 320 sizes
+sacCer ref-based: 333513 tiles launched, of which 262395 with 320 320 sizes
+
+darwin traceback length:
+PBSIM E.coli ref: 14988 tiles launched, of which 169 had '200 200' traceback, 12602 had 'X 200' or '200 X' traceback, 725 had '0 0' traceback
+PBSIM E.coli denovo: 7570 tiles launched, of which 218 had '200 200', 5583 had 'X 200' or '200 X', 606 had '0 0'
+
+
+
+
 
 
 

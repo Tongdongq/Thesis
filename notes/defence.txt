@@ -13,6 +13,12 @@ How easy is it to adapt Darwin to work on protein?
 What portion of total assembly time is spent on alignment?
 Can this be used for reference based alignment?
 - yes
+Why are only 63% of the tiles 320x320 in Darwin?
+- take the average read length, how many overlapping tiles can fit in there?
+- don't forget not all traceback paths go to the corner
+Why not use DOPA?
+- DOPA does not have traceback, this is essential to the GACT algorithm
+- GASAL has a simpler implementation, which is easy to add traceback to
 
 To be answered in thesis:
 How are the sensitivity and specificity measured?
