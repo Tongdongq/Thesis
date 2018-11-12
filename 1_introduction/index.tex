@@ -1,4 +1,45 @@
 \documentclass[../main/thesis.tex]{subfiles}
 
+\begin{document}
+
 \chapter{Introduction}
+\ifdefined\main
 \acresetall
+MAIN IS TRUE
+\else
+MAIN IS NOT TRUE
+\input{../notmain.tex}
+\fi
+
+
+The processes in biology are extremely complex, especially those in multicellular organisms.
+Pretty much all of these processes are governed by DNA, the building blocks of life.
+Our kind has spent ages trying to unravel its secrets.
+Literally, because we found out that DNA consists of a double helix, which must be unwound to be used.
+
+In 2012, we discovered that the human genome consists of about three billion basepairs, wrapped up in 23 chromosomepairs \cite{human_genome_project}.
+And that it shares 60\% with the genome of a banana \cite{banana}.
+However, DNA still has many unexposed secrets.
+For example, some deseases are partially caused by genes, like breast cancer or sickle cell disease \cite{genomic_diseases}.
+
+To gain more knowledge about the influence of DNA and genes in general, they must be identified.
+This is where DNA sequencing comes in.
+With a drop of blood, or some saliva, the DNA of an individual can be mapped.
+Combining the DNA of many people can teach us what the effect is of some genes.
+However, DNA sequencing machines are not perfect, they only provide small parts of the DNA, and they contain errors too.
+These small parts must be assembled into a whole genome.
+One phase of this assembly is the alignment part, where overlaps between those small parts are found.
+Many algorithms have been developed to perform this alignment, for different lengths and error rates.
+
+Daligner and Darwin are two algorithms that find overlaps for so-called 'long reads'.
+These are produced by the third-generation of DNA sequencing machines, and can be tens of thousands of bases long, but have errors rates of 15-30\%.
+
+%TODO talk about GPUs
+
+
+\end{document}
+
+
+
+
+
