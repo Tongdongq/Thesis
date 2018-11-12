@@ -20,44 +20,65 @@ The different runtime configurations are indicated with A B C, where A is the nu
 Table \ref{tbl:daligner1} shows the results.
 The first column lists the used optmizations.
 
-./generate.sh 4 3000 100000 5000 4
+%./generate.sh 4 3000 100000 5000 4
 \begin{table}
 \centering
-\caption{Runtimes for different Daligner optimizations, with a synthetic dataset, run with 8 64 64.}
+\caption{Runtimes for different Daligner optimizations, with 3000 bp custom PacBio reads, run with 8 64 64, note that B30 and NP change the output.}
 \begin{tabular}{l c}
 & runtime (s) \\ \hline
 base & 75.1 \\
 CWORK & 67.1 \\
 CAWORK & 75.1 \\
-CWORK CAWORK & 65.9 \\
-CWORK CAWORK STREAM & 50.8 \\ \hline
+%CWORK CAWORK & 65.9 \\
+%CWORK CAWORK STREAM & 50.8 \\ \hline
 CABSEQ & 71.8 \\
 CWORK CABSEQ & 61.2 \\
 CWORK CABSEQ STREAM & 46.6 \\
 CABSEQ STREAM & 53.1 \\
-STREAM & 54.8 \\ \hline
+STREAM & 54.8 \\ 
 CWORK STREAM & 48.7 \\
-CABSEQ CAABSEQ & 68.1 \\
-CABSEQ CAABSEQ CWORK & 58.5 \\
-CABSEQ CAABSEQ STREAM & 68.1 \\
-CABSEQ CAABSEQ CWORK STREAM & 58.7 \\
-CWORK WORK STREAM & 49.8 \\ \hline \hline
+%CABSEQ CAABSEQ & 68.1 \\
+%CABSEQ CAABSEQ CWORK & 58.5 \\
+%CABSEQ CAABSEQ STREAM & 68.1 \\
+CABSEQ CAABSEQ CWORK STREAM & 58.7 \\ \hline
+%CWORK WORK STREAM & 49.8 \\ \hline \hline
 B30 STREAM & 55.0 \\
 B30 RM STREAM & 49.7 \\
 RM STREAM & 51.0 \\
-B30 CABSEQ STREAM & 54.6 \\
-B30 CWORK STREAM & 48.3 \\
-B30 CWORK CABSEQ STREAM & 46.1 \\
-RM CWORK STREAM & 49.3 \\ \hline
-B30 RM CWORK CABSEQ STREAM WORK NP & 27.2 \\
-RM CWORK CABSEQ STREAM WORK NP & 27.8 \\
-CWORK CABSEQ STREAM WORK & 47.3 \\
-CABSEQ STREAM WORK NP & 32.1 \\
-DIAGS5 RM NP & 32.0 \\ \hline \hline
-CABSEQ WORK STREAM & 49.5 \\
-CABSEQ WORK STREAM DIAGS5 & 55.2 \\
-CABSEQ WORK STREAM DIAGS9 & 62 \\
-CABSEQ WORK STREAM DIAGS17 & 145 \\
+%B30 CABSEQ STREAM & 54.6 \\
+%B30 CWORK STREAM & 48.3 \\
+B30 CWORK CABSEQ STREAM & 46.1 \\ \hline
+%RM CWORK STREAM & 49.3 \\ \hline
+RM NP CWORK CABSEQ STREAM WORK & 27.8 \\
+RM NP CWORK CABSEQ STREAM WORK B30 & 27.2 \\
+%CWORK CABSEQ STREAM WORK & 47.3 \\
+%CABSEQ STREAM WORK NP & 32.1 \\
+%DIAGS5 RM NP & 32.0 \\ \hline \hline
+%CABSEQ WORK STREAM & 49.5 \\
+%CABSEQ WORK STREAM DIAGS5 & 55.2 \\
+%CABSEQ WORK STREAM DIAGS9 & 62 \\
+%CABSEQ WORK STREAM DIAGS17 & 145 \\
+RM NP STREAM CABSEQ WORK & 27.5 \\
+RM NP STREAM CABSEQ WORK B30 & 26.7 \\
+DIAGS5 RM NP STREAM CABSEQ WORK & 25.0 \\
+DIAGS9 RM NP STREAM CABSEQ WORK & 25.4 \\
+DIAGS17 RM NP STREAM CABSEQ WORK & 33.3 \\
+DIAGS5 RM NP STREAM CABSEQ WORK B30 & 24.0 \\
+DIAGS9 RM NP STREAM CABSEQ WORK B30 & 23.8 \\
+DIAGS17 RM NP STREAM CABSEQ WORK B30 & 28.1 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Divergence counteracts the effect of optimizations}
+\label{tbl:daligner2}
+\begin{tabular}{c|c|c}
+type of reads & implementation & runtime (s) \\ \hline
+uniform reads & STREAM & 35 \\
+& STREAM WORK CWORK CABSEQ RM NP & 6 \\ \hline
+3000 bp custom PacBio reads & STREAM & 20 \\
+& STREAM WORK CWORK CABSEQ RM NP & 9 \\
 \end{tabular}
 \end{table}
 
@@ -71,8 +92,22 @@ The others did not give a consistent speedup.
 Nvprof \cite{nvprof} was used to profile the experiments.
 
 % cat 4 reads
-- CWORK reduces the L2 cache misses by 40\%, increases the global load throughput by 35\%, and the number of global load transactions by 12\%.
-- CABSEQ reduces the number of global load transactions by 15\%, and increases the global load efficiency from 11.8\% to 14.2\%.
+For 3000 bp reads from a custom PacBio generator:
+\begin{itemize}
+\item CWORK reduces the L2 cache misses by 40\%, increases the global load throughput by 35\%, and the number of global load transactions by 12\%. \vspace{-10pt}
+\item CABSEQ reduces the number of global load transactions by 15\%, and increases the global load efficiency from 11.8\% to 14.2\%.
+\end{itemize}
+
+% cat 1 reads
+For 10000 bp uniform reads:
+\begin{itemize}
+\item DIAGS5 reduces global memory traffic by 25-30\%, and increases the number of executed instructions by 35-40\%. \vspace{-10pt}
+\item B30 reduced global memory traffic by 28\%. \vspace{-10pt}
+\item ABSEQ reduced the number of global load transactions by 80\%, increased the efficiency of global loads from 41\% to 91\%, reduced the number of L2 cache reads by 60\%, and L1 global loads by 80\%.
+\end{itemize}
+
+For uniform reads, the optimizations can reach global read and store efficiencies of 92\% and 96\% respectively, for fixed length simulated PacBio reads, this effect diminishes greatly.
+The result of the divergence can also be observed in the runtimes in Table \ref{tbl:daligner2}
 
 
 \section{Darwin}
@@ -165,6 +200,8 @@ $$\text{Specificity} = \frac{TP}{TP + FP}$$
 where TP, FN and FP are the number of true positives, false negatives and false positives respectively.
 Sensivitity indicates how many of the overlaps that the aligner was supposed to find, were actually found.
 Specifitiy indicates how many of the reported overlaps were actually real overlaps.
+To boost sensitivity, if an overlap between A and B was found (denovo), the overlap between B and A is also assumed to be found.
+
 PBSIM \cite{PBSIM} is used to generate synthetic PacBio datasets.
 The only parameters that is not default is the accuracy, which is set to 0.85\%, to mimic the 15\% error rate of PacBio.
 The distribution is also changed: 1.5\% substitution, 9.0\% insertion, 4.5\% deletion.
