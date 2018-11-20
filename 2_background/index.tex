@@ -5,11 +5,9 @@
 \chapter{Background}
 \ifdefined\main
 \acresetall
-MAIN IS TRUE
 \newcommand{\codePath}{../2_background/code/}
 \newcommand{\figPath}{../2_background/figures/}
 \else
-MAIN IS NOT TRUE
 \input{../notmain.tex}
 \fi
 
@@ -641,7 +639,7 @@ This problem can be described as finding a Hamiltonian Path \cite{Euler_Hamil_pa
 A Hamiltonian Path includes all vertices of a graph exactly once.
 Assemblers that use the OLC approach are Newbler \cite{newbler}, SGA \cite{sga} and Edena \cite{edena}.
 
-\figC{width=.6\textwidth}{olc.jpeg}{Overlaps are found and put in a graph, each arrow represents an overlap, a Hamiltonian path is found to create the contig, source: \cite{old_fig}}{fig:olc}
+\figC{width=.6\textwidth}{olc.jpeg}{Overlaps are found and put in a graph, each arrow represents an overlap, a Hamiltonian path is found to create the contig, source: \cite{olc_fig}}{fig:olc}
 
 To build a de Bruijn Graph, each read is divided into kmers.
 Each kmer represents a directed edge between two vertices, where the source vertex represents the first k-1 bases of the kmer, and the destination vertex the last k-1 bases of the kmer.
