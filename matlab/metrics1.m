@@ -1,4 +1,7 @@
 
+% convert .fig to .pdf on matlab cmd:
+% s='name_figure';f=openfig(strcat(s,'.fig'));print(f,'-dpdf',strcat(s,'.pdf'));
+
 % plot sensitivity vs score thres and number of seeds
 % darwin, 20x ref
 
