@@ -249,7 +249,7 @@ daligner: 1, 2m46,                  score >= 250,         95.3, 89.2
                                     score >=   0,         96.9, 84.0
 
 
-PBSIM, 15% error, 20x, E.coli
+PBSIM, 15% error, 20x, E.coli, ce-cuda
 random darwin ref profile (compiled with TIME), 1 64 64:
 - seedpos table construction:      2.7s
 - time finding seeds:              7.2s
@@ -262,7 +262,7 @@ random darwin ref profile (compiled with TIME), 1 64 64:
 - total time:                      37s
 48k ovls
 
-PBSIM, 15% error, 20x, E.coli
+PBSIM, 15% error, 20x, E.coli, ce-cuda
 random darwin denovo profile (compiled with TIME), 1 256 64:
 - seedpos table construction:      33s
 - time finding seeds:               9.6s
@@ -275,7 +275,7 @@ random darwin denovo profile (compiled with TIME), 1 256 64:
 - total time:                     204s
 576k ovls
 
-PBSIM, 15% error, 20x, E.coli
+PBSIM, 15% error, 20x, E.coli, ce-cuda
 random daligner ref profile, T1:   T8:
 - Sort_Kmers ablock         0.6s   0.4s
 - Sort_Kmers bblock        13.8s   2.4s
@@ -287,7 +287,7 @@ random daligner ref profile, T1:   T8:
 - total_time:              39.4s   7.4s
 34k ovls
 
-PBSIM, 15% error, 20x, E.coli
+PBSIM, 15% error, 20x, E.coli, ce-cuda
 random daligner denovo profile, T1:   T8:
 - Sort_Kmers ablock            11s    2.0s
 - Sort_Kmers bblock            12s    1.9s
@@ -298,4 +298,151 @@ random daligner denovo profile, T1:   T8:
 - Match_Filter                 77s   11.4s
 - total_time:                 219s    33s
 840k ovls
+
+--------------------
+8-11-2018:
+Yatish told me that his denovo based Darwin on Github needs the same file twice, this means it will report all the trivial overlaps as well (read X overlaps with read X).
+
+4d9d42d264, my branch, without minimizers
+PBSIM 10x denovo  0% error, ref vs ref: sens spec
+s >= X, l >= X
+   850     990                          98.0 89.7
+   800     990                          98.0 89.0
+   800       0                          98.0 79.6
+     0     990                          98.2 68.1
+     0       0                          98.3 46.2
+
+PBSIM 10x denovo 15% error, ref vs ref: sens spec
+s >= X, l >= X
+   850     990                          86.0 93.8
+   800     990                          89.0 93.1
+   700     990                          95.4 92.0
+   600     990                          97.6 88.2
+   600       0                          97.6 84.8
+     0     990                          97.6 82.6
+     0       0                          97.6 59.3
+without trivial ovls
+s >= X, l >= X
+   800     990                          88.0 83.7
+   700     990                          94.9 83.8
+   600     990                          97.4 80.6
+   600       0                          97.4 77.5
+     0     990                          97.4 75.5
+     0       0                          97.4 54.2
+
+PBSIM 20x denovo 15% error, ref vs ref: sens spec
+s >= X, l >= X
+   800     990                          88.8 92.9
+   700     990                          95.2 91.8
+   600     990                          97.5 87.8
+   600       0                          97.5 84.5
+     0     990                          97.5 82.2
+     0       0                          97.5 58.9
+without trivial ovls
+s >= X, l >= X
+   800     990                          88.1 86.5
+   700     990                          94.9 86.1
+   600     990                          97.4 82.6
+   600       0                          97.4 79.5
+     0     990                          97.4 77.3
+     0       0                          97.4 55.4
+
+----------------
+Fixed ref_pos > ref_len bug, due to minimizers, 7d264c63ef0
+Changed measurement script, 3e0f5ba
+
+PBSIM 10x denovo  0% error, ref vs ref: sens spec
+extra = remove_trivial = 1, w=13, TACC
+s >= X, l >= X
+   850     990                         99.86 84.5
+   800     990                         99.86 83.3
+   750     990                         99.86 82.3
+   700     990                         99.86 81.1
+   650     990                         99.86 80.0
+   600     990                         99.86 78.5
+     0     990                         99.86 55.6
+     0       0                       99.9982 38.6
+
+
+
+
+PBSIM 10x denovo 15% error, ref vs ref: sens spec
+extra = remove_trivial = 1, TACC
+s >= X, l >= X
+   850     990                          86.9 91.4
+   800     990                          90.3 90.6
+   750     990                          93.7 90.0
+   700     990                          97.0 89.3
+   650     990                         99.16 87.4
+   600     990                         99.33 85.0
+     0     990                         99.33 78.2
+     0       0                         99.34 56.4
+
+PBSIM 10x denovo 15% error, ref vs ref, no thresholds
+num_seeds = 1400, seed_occ = 64, CBT: 1 64 64, TACC
+w=13, 95.9, 1m44.4
+w=9, 98.4 , 1m54.0
+w=7, 99.05, 1m57.2
+w=6, 99.20, 1m54.9
+w=5, 99.33, 1m45.7
+w=4, 99.34, 1m45.6
+w=3, 99.09, 1m43.4
+w=2, 98.4 , 1m34.5
+
+seed_occ=64, w=4, CBT: 1 64 64
+        s>=X, l>=X         sens spec runtime TACC  ce-cuda
+n=1400     0     0        99.34 56.4 1m45.6        62.8
+           0   990        99.33 78.2
+         600   990        99.33 85.0
+         650   990        99.16 87.4
+         700   990         97.0 89.3
+         750   990         93.7 90.0
+n=1100     0     0         98.9 56.8 1m34.2        56.1
+           0   990         98.9 78.8
+         600   990         98.9 85.4
+         650   990         98.7 87.8
+         700   990         96.5 89.7
+         750   990         93.0 90.4
+n= 800     0     0         97.8 57.6 1m29.4        48.5
+           0   990         97.8 80.1
+         600   990         97.8 86.2
+         650   990         97.6 88.6
+         700   990         95.2 90.5
+         750   990         91.5 91.1
+         800   990         87.7 91.6
+
+daligner, 10x 15%, ref vs ref, ce-cuda CPU
+                    s>=X
+    runtime                   sens spec
+      32.5s            0     99.79 86.7
+                     200     99.78 86.7
+                     220     99.62 87.1
+                     240      97.6 89.0
+                     260      92.3 90.4
+        6s T8
+      31.5s h45        0     99.59 86.8
+                     200     99.58 86.8
+                     220     99.42 87.2
+                     240      97.4 89.0
+                     260      92.1 90.4
+      31.6s  k15       0      98.9 87.1
+                     200      98.9 87.1
+                     220      98.7 87.5
+                     240      96.7 89.2
+                     260      91.6 90.5
+      29.4s  k16       0      96.9 87.5
+                     200      96.9 87.5
+                     220      96.7 87.9
+                     240      94.8 89.6
+                     260      89.9 90.8
+
+daligner, 10x 15%, ref vs read, ce-cuda CPU
+runtime
+1m1, base
+57.6, h45
+56.9, k15
+55.2, k16
+
+
+
 

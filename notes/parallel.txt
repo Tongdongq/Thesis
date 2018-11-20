@@ -1095,6 +1095,27 @@ The default PBSIM seed for the second dataset is 1156173320
 16-10-2018:
 When using TIME, it looks like 90% of the time_gpu (time spent in cuda_host) is taken by the gasal_local_kernel()
 
+8-11-2018:
+Combined github/darwin with own Darwin branches, includes minimizers, crashes due to 'out_of_range' for substr()
+Caused by minimizers producing seeds with ref_pos > ref_len, this leads to negative tile_sizes during forward extension. Fixed by setting ref_pos = ref_len in that case, 7d264c63ef
+
+9-11-2018:
+Higher window_size lead to higher sensitivity and lower runtime!
+Highest sensitivity for 0-error reads is 99.9982%, sensitivity increases for higher window sizes. For 15%-error reads, this optimum lies at w=4.
+Highest window_size is 13, for Kmer_size = 14.
+
+12-11-2018:
+Redoing benchmarks for GPU without GASAL is very difficult.
+We want: GPU and GPU CMAT, to show the impact of CMAT, later show CBASES too.
+Then we show that GASAL is even faster than GPU CMAT CBASES
+
+19-11-2018:
+Moved ref_pos > ref_len fix to CPU as well.
+Removed printing of trivial alignments, because CPU and BATCH differs, now output ok, eacc139
+
+
+
+
 
 
 TODO: create type 6 reads that have a AT/GC imbalance.

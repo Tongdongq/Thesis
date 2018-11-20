@@ -303,4 +303,15 @@ GPU 320 128 1 128 64  67.4s, 70x
 
 
 
+----------------------------------------
+14-11-2018
+retest output for GACT
+
+ce-cuda, 1d2a4af28281b17a57c87d48d87923e6a1411c7a
+./generate.sh 3 800 2000 1 1 15
+T400 O100 H1 BLOCKS1 TPB128
+CPU and BATCH differ
+BATCH GPU differs from CPU, but seems equal to BATCH
+BATCH GPU CMAT CBASES differs from CPU, but equal to BATCH GPU
+
 

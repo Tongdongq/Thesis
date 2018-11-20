@@ -464,5 +464,154 @@ Tesla K40m
               sm_efficiency          95 %
          achieved_occupancy          0.133
 
+-----------------------
+13-11-2018
+TACC, 10x denovo, 15%, ref vs ref
+(match=1,mismatch=-1,open=-1,extend=-1)
+CPU8: 36m30
+GPU 8 32 64: 8m7, GPU CMAT STREAM 64 CBASES SCORE
+
+
+
+tests using 1x E.coli PBSIM 15% error ref vs read
+
+c0aa55a8e9ded8356c386582f4da604a70c9dafc
+watch the params, it should have 'match' and 'mismatch' entries
+CPU and BATCH have same output
+BATCH GPU crashes immediately, because size_matrices was too small, fixed now, but segfaults eventually, same as BATCH GPU CMAT
+BATCH GPU CMAT segfaults eventually, during the main loop in gact.cpp: Program received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x3effffe6f180 (LWP 38723)]
+0x00003fffb7b0d634 in strerror_l () from /lib/powerpc64le-linux-gnu/libc.so.6
+BATCH GPU CMAT CBASES output correct
+
+
+4671078c1fb0a4bd306db9d5a9e72270deb61e0d
+assumes wrap_len = 50 for fasta files
+CPU and BATCH are different, especially BATCH is weird
+
+
+6dbe70b
+- assumes wrap_len = 50 for fasta files
+- print format is different, CPU version does not include score
+- params.cfg launches 16 threads per default, regardsless of run.sh params
+- whole reference is printed
+TACC:
+CPU and BATCH have same output
+BATCH GPU segfaults eventually: Program received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x3effffe6f180 (LWP 38723)]
+0x00003fffb7b0d634 in strerror_l () from /lib/powerpc64le-linux-gnu/libc.so.6
+
+ce-cuda:
+CPU and BATCH have same output
+BATCH GPU segfaults eventually: Thread 4 "reference_guide" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffe2abf700 (LWP 15553)]
+0x00007ffff6d15cee in __memcpy_ssse3 () from /lib64/libc.so.6, probably because of trying to copy bases for a thread that did not have a GACTcall.
+BATCH GPU CMAT segfaults the same
+BATCH GPU CMAT CBASES has same output as CPU and BATCH
+
+BATCH GPU did not increase cuda_host.cu:ref_curr for idle threads, so active threads had their bases placed in the wrong area.
+bugfix: GACTcalls with pos==0 stayed in reverse too long
+
+BATCH GPU and CPU have the same output, 0.5x dataset
+1x dataset:
+CPU 8 32: 3m34
+BATCH GPU  8 32: 2m39, output same as CPU
+BATCH GPU 16 32: 1m35, output same as CPU
+1.5x dataset:
+CPU 1 8 32: 8m22
+CPU 4 8 32: 2m59, same output as CPU
+BATCH GPU   8 32: 5m28, output same as CPU
+BATCH GPU 4 8 32: 6m16, output same as CPU
+1.75x dataset:
+CPU 4 8 32: 4m2
+BATCH GPU 4 8 32: 8m10, output same as CPU
+2x dataset:
+CPU     : 14m28, 9222 ovls
+CPU 4   : 5m17
+CPU 8   : 3m26
+BATCH 4 8 32: 6m23
+BATCH GPU 1  8 32: 9m26
+BATCH GPU 1 32 32: 2m52
+BATCH GPU 1 64 32: 2m43
+BATCH GPU CBASES 1 64 32: 2m29
+BATCH GPU CMAT   1 64 32: 58s
+BATCH GPU CMAT CBASES 1 64 32: 54s
+
+ce-cuda:
+762eca5:
+2x dataset:
+CPU 8: 3m30
+BATCH 8 8 32: 3m24, output ok
+BATCH GPU 8 16 32: 
+
+
+TACC:
+762eca5:
+BATCH GPU CMAT has differences when using chars in the dir_matrix, now fixed for CMAT
+Cannot use BATCH GPU without GPU, since size_matrices assumes dir_matrix is char*, must increase size_matrices in that case.
+Looks like GASAL cannot be used without STREAM
+2x dataset:
+CPU                                 8: 1m6
+BATCH                         8 16 32: 1m6, output ok
+BATCH GPU                     8 16 32: 7m38, output ok
+BATCH GPU CBASES              8 16 32: 7m20, output ok
+BATCH GPU CMAT                8 16 32: 4m5, output ok
+BATCH GPU CMAT CBASES         8 16 32: 4m5, output ok
+BATCH GPU CMAT CBASES STREAM  8 16 32: 1m16, output ok
+GPU GASAL STREAM              8 16 32: 21s, output ok
+GPU GASAL STREAM CMAT         8 16 32: 13s, output ok
+GPU GASAL STREAM CMAT CPBASES 8 16 32: 14s, output ok
+
+Added minimizers
+2x dataset ref vs read:
+CPU                                 8: 1m22
+BATCH                         8 16 32: 1m27, output ok
+BATCH GPU                     8 16 32: 9m11, output ok
+BATCH GPU STREAM              8 16 32: 4m39, output ok
+BATCH GPU STREAM CMAT         8 16 32: 1m23, output ok
+BATCH GPU STREAM CBASES       8 16 32: 4m29, output ok
+BATCH GPU STREAM CMAT CBASES  8 16 32: 1m22, output ok
+GPU GASAL STREAM              8 16 32: 22s, output ok
+GPU GASAL STREAM CMAT         8 16 32: 10s, output ok
+GPU GASAL STREAM CMAT CPBASES 8 16 32: 11s, output ok
+
+
+-------------------------
+19-11-2018
+TACC
+50MB ref vs ref 800 seeds:
+CPU                                    8: 64m35
+CPU                                   32: 29m54
+CPU                                   64: 
+BATCH                            8 32 64: 
+BATCH GPU STREAM 64 CMAT         8 32 64: 14m20
+BATCH GPU STREAM 64 CBASES       8 32 64: 
+BATCH GPU STREAM 64 CMAT CBASES  8 32 64: 11m28
+GPU GASAL STREAM 64              8 32 64: 11m40
+GPU GASAL STREAM 64 CMAT         8 32 64: 1m18
+GPU GASAL STREAM 64 CMAT CPBASES 8 32 64: 1m13
+
+ce-cuda
+50MB ref vs ref 800 seeds:
+CPU                                    8: 
+CPU                                   32: 
+BATCH                            8 32 64: 
+BATCH GPU STREAM 64 CMAT         8 32 64: 
+BATCH GPU STREAM 64 CBASES       8 32 64: 
+BATCH GPU STREAM 64 CMAT CBASES  8 32 64: 
+GPU GASAL STREAM 64              8 32 64: 
+GPU GASAL STREAM 64 CMAT         8 32 64: 
+GPU GASAL STREAM 64 CMAT CPBASES 8 32 64: 
+
+
+
+
+
+
+---------
+branch: tmp, 73de4832116823c1ce9fe63bbaf5da0172c4e65b
+Do not use BATCH without SCORE.
+
+
 
 
