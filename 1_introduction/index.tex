@@ -4,13 +4,9 @@
 
 \chapter{Introduction}
 \ifdefined\main
-\acresetall
-MAIN IS TRUE
 \else
-MAIN IS NOT TRUE
 \input{../notmain.tex}
 \fi
-
 
 The processes in biology are extremely complex, especially those in multicellular organisms.
 Pretty much all of these processes are governed by DNA, the building blocks of life.
@@ -34,10 +30,28 @@ Many algorithms have been developed to perform this alignment, for different len
 Daligner and Darwin are two algorithms that find overlaps for so-called 'long reads'.
 These are produced by the third-generation of DNA sequencing machines, and can be tens of thousands of bases long, but have errors rates of 15-30\%.
 
-%TODO talk about GPUs
+Performing the normal, exact way of alignment using Smith-Waterman is not feasible, especially for these long reads.
+Daligner and Darwin are heuristics, that reduce the amount of computation needed, without comprimising the output much.
+Still, they do a lot of computation.
+
+Since DNA alignment is inherently parallel (comparing reads A and B does not depend on the result of comparing reads C and D, or even A and C), speedup can be gained by parallising the workload.
+GPUs are build for graphics applications, but modern, programmable GPUs allow for GPGPU (General-Purpose computing on GPUs).
+This means that any algorithm can be run on a GPU.
+
+In this work, Daligner and Darwin are implemented to run on a GPU, in particular a Tesla K40.
+
+\paragraph{Outline}
+Chapter 2 Background contains details about the working of DNA in biology, as well as DNA sequencing and assembly techniques.
+Chapter 3 Concept further explains the algorithmes of Daligner and Darwin.
+Chapter 4 Specification contains measured statistics that help understand the working of the algorithm, as well as all the implementations/optimizations done on both algorithms.
+The evaluation of these implementations is presented in Chapter 5 Results.
+Chapter 6 Conclusion discusses some of these results, and makes recommemdations for future work.
 
 
 \end{document}
+
+
+
 
 
 
