@@ -364,8 +364,7 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 \todo{mention protein alignment?}
 \section{DNA Alignment}
 DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
-This information can be used to reconstruct the whole genome, during the assembly phase.
-\todo{possibly refer to the next section 'DNA Assembly'}
+This information can be used to reconstruct the whole genome, during the assembly phase, which is discussed in Section \ref{sec:dna_assembly}
 An example of an alignment is shown in Figure \ref{fig:alignment}.
 Alignment algorithms are also useful in applications like textcomparison \cite{SW_plagiarism}.
 
@@ -374,7 +373,7 @@ Alignment algorithms are also useful in applications like textcomparison \cite{S
 If the two reads originate from the same part of the genome, the mismatches can be explained by sequencing errors.
 But copying the genome during cell division can also cause errors \cite{dna_replication_errors}.
 Since DNA sequencing is usually performed on more than one cell, the variations in these cells are all sequenced.
-\todo{citation needed}
+\todo{citation needed?}
 
 The mismatches between reads can be distinguished between substitutions, insertions and deletions.
 A substitution is shown between the fifth bases in the figure.
@@ -388,12 +387,11 @@ Exact or heuristic algorithms can be used to determine the best alignment betwee
 Exact algorithms are guaranteed to find the best alignment, heuristic algorithms reduce the search space, which (dramatically) improves runtime, but the results might be worse than exact algorithms.
 
 A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
-\todo{citation needed}
+\todo{citation needed?}
 This is why an affine gap penalty in the form of $y = a*N+b$ is often used, where $b$ is the gap open penalty, $a$ the gap extend penalty, and $N$ the number of bases in the gap - 1.
 Other variations in gap penalty include constant ($y = a$), double affine (), convex ($y = a+b\cdot ln(N)$).
-\todo{add double affine description}
+\todo{double affine description?}
 
-\todo{SW and NW, global vs local}
 Global alignment aligns the full length of both sequences.
 Every base will either have a match/mismatch with a base from the other read, or a gap.
 Local alignment will look for the two subsequences from the reads that have the highest score.
@@ -405,7 +403,7 @@ Figure \ref{fig:global_vs_local_alignment_fig} shows another example of a case w
 
 \figC{width=.6\textwidth}{global_vs_local.png}{Local alignment can find small, overlapping regions very well, source: \cite{global_vs_local_alignment_fig}}{fig:global_vs_local_alignment_fig}
 
-\todo{should this be a seperate subsection? Could be an appendix as well}
+\todo{should dynamic programming be a seperate subsection? Could be an appendix as well}
 \subsection{Dynamic programming}
 Dynamic programming is a programming technique that solves problems by dividing them recursively into smaller, simpler problems \cite{Dynamic_programming1}.
 An important aspect is that the subproblems overlap, saving the results of one subproblem to use in another subproblem.
@@ -422,7 +420,7 @@ Bottom-up firsts solves the subproblems, and uses these results to build the sol
 For global alignment, the Needleman-Wunsch (NW) algorithm \cite{NeedlemanWunsch} is widely used.
 It was published in 1970, and designed to compare sequences of amino acids, but as both are represented by letters, comparing nucleotides works in the same way.
 Needleman-Wunsch is an exact algorithm, producing the optimal global alignment.
-\todo{mention and cite that NW is proven optimal}
+\todo{cite/prove that NW is proven optimal?}
 
 In Needleman-Wunsch, the smallest subproblems are trivial alignments, such as aligning two bases, or aligning zero bases in one read with N bases in the other.
 The first can result in two cases: a match or a mismatch, the latter results in N gaps.
@@ -568,11 +566,11 @@ Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
 \subsection{Multiple Sequence Alignment}
 Multiple Sequence Alignment algorithms \cite{MSA_survey} try to align three or more sequences, usually of similar length.
-The results can be used to create phylogenetic trees or to study evolutionary relationships \cite{MSA}
+The results can be used to create phylogenetic trees or to study evolutionary relationships \cite{MSA}.
 \todo{expand this section?}
 
 
-\section{DNA Assembly}
+\section{DNA Assembly}\label{sec:dna_assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
 These length and error rate of these reads depend of the sequencing technique used, but they all have one thing in common: they have to be assembled to be useful.
 DNA assembly tries to combine the reads into large, high quality parts.
@@ -633,7 +631,7 @@ Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble read
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
 For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG).
-\todo{give examples of OLC and dBG assemblers}
+
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.
 During the layout phase, the graph is analyzed to find paths, corresponding to segments of the original genome.
@@ -722,7 +720,6 @@ This can be done by local denovo assembly, or a consensus algorithm \cite{consen
 
 \section{GPU processing}
 
-\todo{also talk about OpenCL?}
 % why GPU in the first place? What do they look like, what are they good at?
 % CUDA was released in 2006, source: programming guide
 
@@ -815,12 +812,14 @@ These operations can be overlapped or pipelined by using streams. Figure \ref{fi
 
 \figC{scale=.2}{streams.png}{Different versions of the same computation \cite{streams}}{fig:streams}
 
+\todo{add section on OpenCL?}
+%\section{OpenCL}
 
 
 
 
-\todo{include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation}
-\section{Heterogeneous computing}
+%\todo{include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation}
+%\section{Heterogeneous computing}
 %\cite{hetero_survey}
 
 
@@ -852,10 +851,11 @@ It can be used to speed up numerous algorithms.
 
 \figC{scale=.2}{SeqNFind.jpg}{An image of the SeqNFind hardware, source \cite{SeqNFind}}{fig:SeqNFind}
 
-CUSHAW is an accelerated short read aligner that uses BWT.
-\todo{citation CUSHAW}
+CUSHAW \cite{cushaw} is an accelerated short read aligner that uses BWT.
+It uses CUDA and is optimized for the Fermi architecture.
+Each GPU thread is assigned a short read and its complement to align to the reference.
 
-\todo{mention other/more GPU algorithms}
+\todo{mention other/more GPU algorithms?}
 
 
 
