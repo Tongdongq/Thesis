@@ -27,8 +27,7 @@ MAIN IS NOT TRUE
 
 \subsection{Daligner}
 Gprof \cite{gprof} was used to profile Daligner, the function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
-An arbitrary 130MB dataset from the Human 54x dataset from PacBio has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
-\todo{add citation for 54x dataset}
+An arbitrary 130MB dataset from the Human 54x dataset from PacBio \cite{54x} has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
 Since Local\_Alignment() is the most timeconsuming function, that will be the first one the be considered for acceleration.
 Each Local\_Alignment() call originates from a particular readpair $A, B$, so executing multiple Local\_Alignment() instances from different readpairs causes no datahazards.
 This is why Daligner is able to use multiple threads, each one running the filter-align function report\_thread() on its own list of readpairs.
@@ -171,8 +170,6 @@ Each GPU thread is assigned a readpair, and each readpair can have multiple LAca
 The host side will assign an LAcall to each GPU thread (unless there are not enough readpairs).
 The GPU performs the local alignment, and returns the results.
 If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new readpair.
-
-\todo{figure on skipping seed hits 'apos > lasta[diag]'}
 
 
 % multiple implementations:
@@ -324,6 +321,12 @@ There are multiple places where this technique was used:
 - loading data based on the max of three values
 - keeping track of furthest reaching point in the current wave
 
+\paragraph{Maxrregcount = 64}
+The number of register assigned to a thread can be limited.
+This can increase the number of active threads on an SMX, since the number of registers on an SMX is also limited.
+The tradeoff lies with the reduced capacilities of the thread, the data that was stored in those registers now spills to local memory.
+The optimal registercount was found to be 64.
+
 \subsubsection{Splitting the alignment between GPU and CPU}
 There are other ways of using the GPU, the implementations GPU\_SINGLE, GPU\_SNAKE and COMPRESS\_ABSEQ try to do that.
 GPU\_SINGLE lets the GPU compute a large bitmatrix, where 0 means a mismatch, and 1 means a match.
@@ -341,7 +344,7 @@ The clz and ctz operations return undefined values when the input is zero, so th
 
 
 \subsection{Darwin}
-\todo{maybe refer to pseudocode in lstlisting}
+\todo{maybe refer to pseudocode?}
 It is possible to run the whole GACT kernel on the GPU, for both left and right extension.
 However, since it is not known how long the resulting alignment will be, and all GPU threads have to wait until all threads are done, this will cause lots of idle time.
 Instead, it is chosen to only have a single tile aligned per GPU-thread per GPU-invocation.
@@ -352,7 +355,7 @@ It is not necessary to implement skipping seeds/Kmer matches for Darwin, since i
 
 
 
-It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism \todo{cite}
+It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism \todo{cite wavefront parallelism?}
 The tilesize of 320 should be enough to allow for enough utilization.
 This method uses less memory, since the Smith-Waterman matrices and the sequences are shared.
 However, this complicates the implementation, since the number of elements on an anti-diagonal is often not equal to 32.
@@ -425,7 +428,7 @@ The scores are stored via 16-bit shorts, but since the smallest memory transacti
 % According to nvprof, this is not true. There is uncoalesced access reported due to accesses in the global array. Perhaps, because of the known index (ridx), the compiler optimizes these values. It could be placed in L1 cache as local memory.
 
 
-\paragraph{Coalesce packed bases}
+\paragraph{Coalesce packed bases (CPBASES)}
 The bases are uninterleaved when they are send to the GPU, and after packing.
 This means that during alignment, they cause uncoalesced reads.
 To prevent this, the writing of the packed bases can interleave them, but this means the packing kernel has write in an uncoalesced manner.
@@ -434,6 +437,9 @@ When preparing the bases on the CPU, they are interleaved, so that the packing k
 \paragraph{Inline PTX}
 This technique was used to keep track of the maximum score of the tile, and the coordinates of that element.
 It was also used to find the maximum of four values in the alignment kernel.
+
+\paragraph{Maxrregcount = 64}
+As with Daligner, the optimal registercount was found to be 64.
 
 
 
