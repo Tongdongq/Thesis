@@ -515,7 +515,7 @@ S(i,j-1) + gap \\
 S(i-1,j-1) + s(a_i,b_j) \\
 0 \\
 \end{cases}
-\label{eq:NW_recursion}
+\label{eq:SW_recursion}
 \end{equation}
 
 These changes allow stretches with a negative alignment score to be ignored.
@@ -630,7 +630,7 @@ Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble read
 
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
-For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG).
+For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG) \cite{OLC_DBG}.
 
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.

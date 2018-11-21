@@ -14,7 +14,7 @@
 \section{Pacbio reads}
 Daligner finds alignments between long, noisy reads.
 Pacific Biosciences has commercially launched its first sequencer in 2011.
-It is able to output reads with an average of 1000 bases, which is significantly longer than \ac{NGS} reads \cite{PBlaunch1}.
+It is able to output reads with an average of 1000 bases, which is significantly longer than Next-Generation Sequencing (NGS) reads \cite{PBlaunch1}.
 In 2014, a new polymerase-chemistry combination was released, called P6-C4.
 This version can output average read lengths of 10000-15000 bases, and its longest reads can exceed 40000 bases \cite{Longreads}.
 While the drawback is that these reads have an error rate of 12-15\%, this can be compensated by the distribution of these errors \cite{Daligner}.
@@ -25,20 +25,17 @@ This means that if the reads are long enough to handle repetitive regions, in pr
 
 Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
 And how to build an assembler that is able to deal with high error rates and long reads?
-Most previous assemblers work with \ac{NGS} reads, which are much shorter and have much lower error rates.
-Some algorithms used in these assemblers, such as \ac{DBG} \cite{DeBruijn} would grow too large for high error rates and long reads.
-Since Daligner was build, new methods of using \ac{DBG} with long reads have been developed, but they rely on a short read based \ac{DBG} to correct errors in long reads \cite{DBG1}\cite{DBG2}.
+Most previous assemblers work with NGS reads, which are much shorter and have much lower error rates.
+Some algorithms used in these assemblers, such as De Bruijn Graph (DBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
+Since Daligner was build, new methods of using DBG with long reads have been developed, but they rely on a short read based DBG to correct errors in long reads \cite{DBG1}\cite{DBG2}.
 
 \section{Daligner}
-\todo{explain input format? Daligner uses DAZZLER DB files, Darwin fasta files}
-The first step in an \ac{OLC} assembler is usually finding overlaps between reads \cite{OLC}.
+The first step in an Overlap-Layout-Consensus (OLC) assembler is usually finding overlaps between reads \cite{OLC}.
 BLASR \cite{BLASR} was the only long read aligner at the time, and inpsired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
-\todo{is seed-extend already introduced?}
 The most time-consuming step is extending the seed hit to find an alignment.
 To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a datastructure that describes a sparse path from the seed hit to the furthest reaching point.
 
-\todo{daligner paper includes a small section on results}
 \todo{next part is copied straight from daligner paper}
 Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
 It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
@@ -62,15 +59,19 @@ a_i \\ b_j
 \end{bmatrix}$} if $i,j > 0$.
 \end{itemize}
 
-\todo{insert picture of edit graph}
+Figures \ref{fig:edit_graph1} and \ref{fig:edit_graph2} show images from a tool, created by Nicholas Butler \cite{edit_graph}, that shows how the edit graph is traversed by the O(nd) algorithm.
+
+\figC{width=.7\textwidth}{edit_graph.png}{An empty edit graph, source: \cite{edit_graph}}{fig:edit_graph}
+\figC{width=.7\textwidth}{edit_graph2.png}{A filled edit graph, the dark blue lines represent mismatches and their subsequent snakes, the light blue lines are the d-waves, the brown lines are odd diagonals, yellow lines are even diagonals, the red path is the shortest path, source: \cite{edit_graph}}{fig:edit_graph2}
+
 
 An alignment between $A[i+1,g]$ and $B[j+1,h]$ is described as a sequence of labels from vertex $(i,j)$ to $(g,h)$.
 A diagonal edge can be either be a match edge, when $a_i = b_j$, or a substitution edge.
 If a match edge has weight 0, and the other edges have weight 1, the weight of the total path is the number of differences in the alignment it represents.
 To find suitable alignments, we have to find a read subset pairs P such that $len(P)\ge \tau$ and the weight of the lowest scoring path between $(i,j)$ and $(g,h)$ in the edit graph of $A_a$ and $B_b$ is not more than $2\epsilon\cdot len(P)$.
 
-\todo{include something about SW and if Daligner is actually SW with certain penalty values?
-A naive but exact way to calculate the lowest scoring path is described in the paper from Smith and Waterman \cite{SW}.}
+%\todo{include something about SW and if Daligner is actually SW with certain penalty values?
+%A naive but exact way to calculate the lowest scoring path is described in the paper from Smith and Waterman \cite{SW}.}
 
 The O(ND) algorithm tries to find progressive waves of furthest reaching (f.r.) points until the endpoint is reached.
 The goal is to find longest possible paths starting at a starting point $\rho = (i,j)$ with 0 differences, then 1 difference, then 2 and so on.
@@ -139,14 +140,14 @@ Note that only bases in matching $k$-mers are counted, not the number of $k$-mer
 When there are k+1 matching consecutive bases, two $k$-mers are generated.
 These are less 'valuable' than two non-overlapping $k$-mers.
 If $Count(d) \ge h$ for any diagonal band $d$, there is a seed hit for each position $(i,j$) in the band $d$ unless position $i$ was already in the range of a previously calculated local alignment.
+In that case the seed is called 'skippable', Figure \ref{fig:skippable} illustrates this concept.
 
-\todo{insert image of diagonal bands}
+\figC{width=.7\textwidth ,clip, trim = 50 570 100 100 }{skippable_LAcalls.pdf}{s1 (red) and s2 are seeds, s1 is extended first, and its extension (blue) includes s2. If s2 were to be extended, its extension would be the same as that of s1, therefore s2 does not need to be extended}{fig:skippable}
+
 
 The best values for $h$ and $s$ depend on things like $\epsilon$ and the read lengths.
 
 For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
-
-\todo{include time analysis?}
 
 
 \subsection{Seeding: implementation}
@@ -182,8 +183,6 @@ Each sweep can be prefetched if it is small enough.
 This means a smaller $B$ is better for caching behaviour, but this increases the number of passes $hbit/B$ that are needed.
 On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{Daligner}.
 The optimal number of threads is more complex, because they usually do not have their own caches.
-
-\todo{insert thread scaling timing measurements from 270MB on hpc1, also describe hpc1 hardware}
 
 
 \subsection{Local Alignment}
@@ -258,11 +257,6 @@ true &\text{ if } x = 0
 \end{cases}
 \end{align}
 
-\todo{include summary of Daligner algorithm?}
-\todo{include summary of Daligner results wrt sensitivity and running time?}
-
-
-
 
 \section{Darwin}
 Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{Darwin1}\cite{Darwin2}.
@@ -286,12 +280,10 @@ As oppose to Daligner, D-SOFT only considers the Kmer matches from one bin, not 
 \figC{width=.7\textwidth}{D_SOFT.png}{Illustration of D-SOFT algorithm, source: \cite{Darwin2}}{fig:D_SOFT}
 
 First, a lookup table for the Kmer all Kmers and their positions is made.
-This can be done with any implementation, like seed position tables, suffix arrays or BWT or FM based indices.
-\todo{add citations for those implementations?}
+This can be done with any implementation, like seed position tables, suffix arrays \cite{SA} or BWT \cite{BWT} based indices.
 
 D-SOFT uses two arrays, \textit{bp\_count} and \textit{last\_hit\_pos}.
 Both have N$_{B}$ values, and store the number of bases in Kmer matches, and the last seed hit position for that bin, respectively.
-\todo{explain D-SOFT algorithm? Maybe include code?}
 
 A newer version of Darwin uses minimizers \cite{minimizers}.
 This technique reduces the amount of storage needed to store seeds, at the cost of some sensitivity.
@@ -302,7 +294,6 @@ Whenever this window size is not mentioned, it is equal to one.
 Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratric for the length of the reads.
 Numerous efforts to accelerate Smith-Waterman have been made, both by using hardware and by using heuristics.
 \todo{name accelerated variants here, or in Chapter 2 Background?}
-\todo{banded alignment is mentioned later this subsection}
 Even when using heuristics, the memory requirements are still linear.
 GACT finds the alignment between reads of arbitrary length using constant traceback memory.
 It performs normal Smith-Waterman on a submatrix called a tile of size T, and then moves to the next tile, which overlaps with the previous tile with O bases.
@@ -334,7 +325,7 @@ The traceback is ended earlier for higher overlaps, so that the tiles will overl
 The performance of GACT is linear ($O(max(m,n)\cdot T)$) with respect to the length of the reads.
 It is more suited to long reads than banded alignment, because banded alignment uses a static band around the main diagonal.
 GACT allows for flexible bands, since the position of the new tile depends on the traceback path, this is useful for long reads that have high indel rates.
-\todo{flexible bands are better when indels are present, should I prove/cite that it does not matter when only having substitutions?}
+\todo{flexible bands are better when indels are present, prove/cite that it does not matter when only having substitutions?}
 
 
 
