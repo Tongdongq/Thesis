@@ -327,6 +327,10 @@ This can increase the number of active threads on an SMX, since the number of re
 The tradeoff lies with the reduced capacilities of the thread, the data that was stored in those registers now spills to local memory.
 The optimal registercount was found to be 64.
 
+\paragraph{Streaming CUDA functions (STREAM)}
+Certain CUDA functions, like copying data from or to the device, and kernels, can be executed at the same time if different streams are used.
+This function only matters if multiple CPU threads are used.
+
 \subsubsection{Splitting the alignment between GPU and CPU}
 There are other ways of using the GPU, the implementations GPU\_SINGLE, GPU\_SNAKE and COMPRESS\_ABSEQ try to do that.
 GPU\_SINGLE lets the GPU compute a large bitmatrix, where 0 means a mismatch, and 1 means a match.
@@ -441,6 +445,8 @@ It was also used to find the maximum of four values in the alignment kernel.
 \paragraph{Maxrregcount = 64}
 As with Daligner, the optimal registercount was found to be 64.
 
+\paragraph{Streaming CUDA functions (STREAM)}
+Same as for Daligner.
 
 
 \end{document}
