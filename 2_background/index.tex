@@ -46,9 +46,9 @@ The 5'-positions can bind a phosphate group, the 3'-positions can bind a sugar.
 This leads to a \textit{backbone} of alternating sugar and phosphate groups.
 The two strands are \textit{antiparallel}, this means one strands 5'-end is matched to the others 3'-end.
 The orientation of the strand is significant: replication and translation can only be done in 5'$\rightarrow$3' direction.
-Figure \ref{fig:dna_replications2} shows XXXXXXXXXXXXXXXXX
+Figure \ref{fig:dna_replication2} shows how DNA is replicated.
 
-\figC{width=\textwidth}{dna-replication.png}{DNA replication, source \cite{dna_replication_fig2}}{fig:dna_replication2}
+\figC{width=.8\textwidth}{dna-replication.png}{DNA replication, note that the lagging strand is copied in multiple pieces, source \cite{dna_replication_fig2}}{fig:dna_replication2}
 
 During DNA replication, the two strands are split, so the nucleotides can be read.
 Single-stranded binding (SSB) proteins prevent the DNA strands from bonding together (annealing) again.
@@ -144,9 +144,10 @@ The speed of the fragment is inversely proportional to its weight, so the shorte
 The resolution is high enough to separate chains that differ in length by one base.
 A laser excites the dye-labeled dideoxynucleotides, which emits a light at a characteristic wavelength.
 These lights are detected and interpreted to get the actual DNA sequence.
+Figure \ref{fig:sanger_sequencing} shows the process of Sanger of sequencing.
 
 \figC{scale=.5}{ddNTP.png}{Normal nucleotides and dideoxynucleotides, source: \cite{sanger_sequencing2}}{fig:ddNTP}
-\figC{scale=.5}{sanger_sequencing.png}{Workflow of Sanger sequencing, source: \cite{sanger_sequencing2}}{fig:sanger_sequencing}
+\figC{scale=.7}{sanger_sequencing.png}{Workflow of Sanger sequencing, source: \cite{sanger_sequencing2}}{fig:sanger_sequencing}
 
 \subsection{Next Generation Sequencing}
 Next Generation Sequencing (NGS) involves a number of different techniques.
@@ -172,7 +173,7 @@ The whole sequencing process is shown in Figure \ref{fig:pyro_sequencing}.
 
 The newest pyrosequencing machines can produce readlengths up to 700 basepairs.
 
-\figC{scale=.5}{pyro_sequencing.jpg}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
+\figC{scale=.9}{pyro_sequencing_1.jpg}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
 %%%%%%%%
 
@@ -187,15 +188,17 @@ The unused nucleotides are washed away, and the dye of the bound nucleotides is 
 
 Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history}\cite{pyro_sequencing1}).
 
-\figC{scale=.5}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
-\figC{scale=.5}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
+\figC{scale=.65}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
+\figC{scale=.75}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
 Illumina also developed paired-end (PE) sequencing.
 Both ends of a DNA strand are sequenced, with an unsequenced gap in the middle, this creates more data per DNA strand, but also valuable information, since the length of the strand is known.
-These paired-end reads can be used during assembly, namely during the scaffolding phase.
+These paired-end reads can be used during assembly, namely during the scaffolding (see Section \ref{sec:dna_assembly}).
+Figure \ref{fig:paired_end} shows how they can be used to resolve repetitive regions.
+\todo{find paired-end lengths?}
 
-\figC{scale=.5}{paired_end.jpg}{Source: \cite{paired_end_fig}}{fig:paired_end}
-
+\figC{scale=.6, clip, trim=0 170 0 0}{paired_end.jpg}{Paired-end sequenced reads can be used to resolve repetitive regions due to their length.
+  Source: \cite{paired_end_fig}}{fig:paired_end}
 %%%%%%%%
 
 The third major NGS method is Sequencing by Oligonucleotide Ligation and Detection (SOLiD), released by Applied Biosystems Instruments (ABI), which later became Life Technologies \cite{history_sequencing}.
@@ -208,7 +211,7 @@ Now the DNA ligase can add oligonucleotides, these are strands of eight nucleoti
 The first two bases have to be complementary to the bases in the template strand.
 The degenerate and universal bases are not used.
 Silver ions are used to cleave the link between bases five and six, allowing the dye to be observed.
-The cleave leave a normal 5' end, which can be used to bind new oligonucleotides.
+The cleave leaves a normal 5' end, which can be used to bind new oligonucleotides.
 After the first round of sequencing, the new chain is removed, and a second round is started, but with a primer of length N-1.
 Multiple rounds with primers with different lengths ensure that each bases is measured twice.
 After the rounds, the colors can be decoded to get the actual bases, like in Figure \ref{fig:solid_color_decoding}.
@@ -219,7 +222,7 @@ A downside is that the read lengths are usually short, 50 to 75 basepairs \cite{
 
 \figC{scale=.5}{solid_color_coding.jpg}{Color coding of SOLiD sequencing results, source: \cite{solid_color_coding}}{fig:solid_color_coding}
 \figC{scale=.3}{solid_color_decoding.png}{Color decoding of SOLiD sequencing results, source: \cite{solid_color_decoding}}{fig:solid_color_decoding}
-\figC{scale=.4}{solid_sequencing.png}{Workflow of SOLiD sequencing, source: \cite{ngs_sequencing_atdbio}}{fig:solid_workflow}
+\figC{scale=.35}{solid_sequencing_2.png}{Workflow of SOLiD sequencing, source: \cite{solid_sequencing_fig}}{fig:solid_workflow}
 
 There are two other popular NGS techniques: DNA Nanoball Sequencing (DNBS) and Ion Torrent.
 DNBS relies on Rolling Circle Amplification to clone the DNA strands that need to be sequenced.
@@ -254,8 +257,8 @@ The diameter of the well is important, because it is smaller than the wavelength
 The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
 There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer, this creates a high signal-to-noise ratio \cite{window_tgs}.
 As the polymerase does not have to wait for the nucleotides to be washed away, the process is realtime, which greatly increases the sequencing speed.
-Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}.
-The fluorescent dyes are attached to the phosphate chain, which is cleaved off naturally when incorporated into the DNA strand, as shown in Figures \ref{fig:dna_replication_fig} \ref{fig:pacbio_dye}.
+Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}, Figure \ref{fig:pacbio_readlength} shows a distribution of the readlengths.
+The fluorescent dyes are attached to the phosphate chain, which is cleaved off naturally when incorporated into the DNA strand, as shown in Figures \ref{fig:dna_replication_fig}, \ref{fig:pacbio_dye} and \ref{fig:pacbio}.
 
 \figC{scale=.4}{pacbio_dye.jpeg}{(a) A zero-mode waveguide with a DNA polymerase molecule at the bottom (b) a dyed base is incorporated into the strand, and the phosphate groups with tye dye are cleaved off, source: \cite{pacbio_dye}}{fig:pacbio_dye}
 
@@ -263,7 +266,7 @@ The fluorescent dyes are attached to the phosphate chain, which is cleaved off n
 
 \figC{width=.8\textwidth}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:pacbio_readlength}
 
-A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}.
+A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}, shown in Figure \ref{SMRTbell}.
 The double-stranded DNA region and single-stranded loops are called insert and hairpins respectively.
 The insert can be of any length, where lengths from 40 bp to 25000 bp have been tested \cite{SMRTbell}.
 The hairpins contain a sequence to which a primer can bind to.
@@ -272,6 +275,7 @@ The primer is separated from the SMRTbell, and the sequencing can continue.
 This means that length of the sequence can become much larger than the length of the insert, depending on the lifetime of the polymerase \cite{pacbio}.
 After sequencing, the reads can be split up by removing the hairpin regions, to obtain subreads.
 Since each base can be sequenced multiple times, a consensus sequence can be constructed from all subreads, with a quality score for each base.
+This process is shown in Figure \ref{fig:SMRTbell2}.
 
 \figC{width=.6\textwidth}{SMRTbell.jpeg}{(a) A SMRTbell template has a double-stranded region (insert) and two hairpin loops on the side. The orange part is a primer. (b) As the regions split, a circular template is formed, which is sequenced from both template and coding strand. The separated part contains the orange primer, source: \cite{SMRTbell}}{fig:SMRTbell}
 
@@ -320,19 +324,20 @@ To be able to read the bases, the DNA's natural state, a double helix, must be f
 Figure \ref{fig:flatDNA1} shows the different forms of DNA.
 Some ways to prepare the DNA molecules include combing \cite{combing1}\cite{combing2}, molecular threading \cite{molecular_threading} and transfer printing \cite{transfer_printing}.
 
+\figC{width=.6\textwidth}{tem_label.png}{Single-strand DNA is primed and a complementary strand is synthesized. Thymine nucleotides have a heavy atom attached, source: \cite{tem}}{fig:tem_label}
+
+\figC{width=.6\textwidth}{flatDNA2.png}{A labeled DNA molecule, ready to be read. Image on the right shows an image from an ADF STEM, source: \cite{tem2}}{fig:flatDNA2}
+
 \figC{width=.6\textwidth}{flatDNA1.png}{Different forms of double-stranded DNA, source: \cite{tem2}}{fig:flatDNA1}
+
 
 ZS Genetics uses annular dark-field (ADF) imaging \cite{ADF}.
 Dark-field imaging measures the photons/electrons that have come into contact with the object, leaving out the uninterrupted beam.
 Light-field imaging is the opposite: it measures the amount that did not get interrupted.
 Annular dark-field imaging uses an annular (ring) to capture the photons/electrons, as shown in Figure \ref{fig:ADF}.
 
-
 \figC{width=.6\textwidth}{ADF.png}{Top: electrons are scattered by heavy atoms and detected. Bottom: unlabeled DNA bases scatter fewer electrons and are harder to detect, source: \cite{tem}}{fig:ADF}
 
-\figC{width=.6\textwidth}{tem_label.png}{Single-strand DNA is primed and a complementary strand is synthesized. Thymine nucleotides have a heavy atom attached, source: \cite{tem}}{fig:tem_label}
-
-\figC{width=.6\textwidth}{flatDNA2.png}{A labeled DNA molecule, ready to be read. Image on the right shows an image from an ADF STEM, source: \cite{tem2}}{fig:flatDNA2}
 
 Another microscope capable of sequencing DNA is the Scanning Tunneling Microscope (STM) \cite{STM}.
 The machine is invented in 1982 by Binnig and Rohrer, for which they won the 1986 Nobel Prize in Physics \cite{STM_nobel}.
@@ -360,12 +365,12 @@ In either case, the read out of the current is in the order of tens or hundreds 
 The new approach measures the tunnelling current between two electrodes that make up a nanopore.
 Using tunnelling currents can potentially be orders of magnitude faster than using ionic currents, because electrical currents can easily be detected in ranges of over MHz and possibly tens of MHz for the current amplitudes (tens of pA to nA) \cite{nanopore_tunnel2}.
 By applying a trans-membrane voltage, the movement of the DNA strands can be controlled, and using tunnelling current gives a fast, accurate readout.
-Figure \ref{fig_nanopore_tunnel} shows the two different methods.
+Figure \ref{fig:nanopore_tunnel} shows the two different methods.
 In 2005, it was shown that each nucleotide has a unique electrical signature, which is independent of its nearest-neighbours \cite{nanopore_tunnel}.
 In 2013, Quantum Biosystems was founded \cite{quantum_biosystems}.
 They have two generations of devices, and use nanopores with a diameter of 0.8 nm \cite{quantum_biosystems2}.
 
-\figC{width=.6\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunnelling nanopore measuring the tunnelling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
+\figC{width=.5\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunnelling nanopore measuring the tunnelling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
 \todo{mention protein alignment?}
 \section{DNA Alignment}
@@ -598,7 +603,7 @@ De-novo assembly compares each read with every other read, resulting in a naive 
 De-novo assembly is an NP-hard problem \cite{denovo_NP}.
 Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
 
-The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different streches of DNA are filtered away, this results in a biased assembly.
+The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different stretches of DNA are filtered away, this results in a biased assembly.
 Reference based assembly is good at finding small variations between the sampled DNA and the reference \cite{denovo_vs_reference}.
 
 \subsection{Denovo assembly}
