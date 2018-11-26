@@ -1,2 +1,64 @@
+\documentclass[../main/thesis.tex]{subfiles}
+
+
+\begin{document}
+
 \chapter{Conclusion}
-\acresetall
+\ifdefined\main
+\else
+\input{../notmain.tex}
+\fi
+
+\section{Performance}
+GPU implementations for both Daligner and Darwin were made.
+For Daligner, the CPU version is clearly the better choice.
+Considering the nature of this algorithm, this is not very surprising.
+Darwin showed better results on GPU, with substantial speedups. %TODO 'up to xxx'
+However, Daligner can produce more sensitive alignments in a shorter time.
+The main reason is the amount of work that needs to be done by the algorithms, Daligner calculates around 26 diagonals on average, Darwin calculates $T^2=102400$ SW elements.
+The main advantage of Darwin is that is calculates an actual SW score, instead of doing match/mismatches.
+This means Darwin can be configured to prefer substitutions or gaps, and customize it to suit a particular sequencing technology.
+
+A clear tradeoff between sensitivity and specificity can be observed from the experiments.
+This shows that both algorithms can be configured to suit the input requirements of later stages in the assembly pipeline.
+
+
+\section{Future Work}
+
+%TODO future work
+% - Yatish told me about transitive overlaps:
+% - - if A and B overlap, and B and C too, then A and C probably also overlap
+
+% stuff here depends on the profile results to identify bottlenecks
+
+
+
+A way to interpret the produced overlaps more efficiently is to use transitive overlaps.
+If reads A and B overlap, and B and C too, then A and C could also overlap.
+However, this should only result in marginal improvements of the sensitivity, since the overlap between A and C should already be found.
+\todo{Yatish told me this, how to cite?}
+
+
+
+The CPU version could be optimized as well.
+The current multithreaded version has no load balancing.
+All CPU threads can a roughly equal amount of reads that must be test by D-SOFT.
+The number of seeds that emerge can vary (observed values are 17000 and 30655), this is partially caused by the different readlengths.
+Another reason for the imbalance is that the extension phase for each seed can have a different duration.
+One way to solve this is to create a large list with all the seeds, possibly partioned so that the threads can write to this list in parallel.
+When starting the GACT phase, each thread gets a batch of reads to extend.
+When a thread is done with its batch, or has less seeds than GPU threads, it gets another batch from the large list.
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
