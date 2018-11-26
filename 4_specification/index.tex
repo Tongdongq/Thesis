@@ -28,7 +28,7 @@ MAIN IS NOT TRUE
 \subsection{Daligner}
 Gprof \cite{gprof} was used to profile Daligner, the function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio \cite{54x} has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
-Since Local\_Alignment() is the most timeconsuming function, that will be the first one the be considered for acceleration.
+Since Local\_Alignment() is the most time-consuming function, that will be the first one the be considered for acceleration.
 Each Local\_Alignment() call originates from a particular readpair $A, B$, so executing multiple Local\_Alignment() instances from different readpairs causes no datahazards.
 This is why Daligner is able to use multiple threads, each one running the filter-align function report\_thread() on its own list of readpairs.
 The Local\_Alignment() function consists mainly of forward\_wave() and reverse\_wave(), which implement the snakefinding algorithm in both directions respectively.
@@ -45,11 +45,12 @@ This is why GACT will be implemented on GPU.
 \subsection{Daligner}
 Numerous metrics have been measured to characterize the process performed by Daligner.
 The 130MB dataset was used.
-Tables \ref{tbl:41} to \ref{tbl:4x} show the results.
+Tables \ref{tbl:daligner_dist1} to \ref{tbl:daligner_dist7} show the results.
 A column with 75\% indicates that 75\% of the observed values is less than or equal to the listed value.
 
 \begin{table}[h]
 \caption{Width of the d-wave, the last two rows indicate the width if it was not trimmed}
+\label{tbl:daligner_dist1}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c}
@@ -59,10 +60,10 @@ reverse & 189 & 28 \\ \hline
 forward* & 13522 & 428 \\
 reverse* & 13530 & 214 \\
 \end{tabular}
-\end{table}
 
-\begin{table}[h]
+\bigskip
 \caption{Number of waves}
+\label{tbl:daligner_dist2}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c c c}
@@ -70,10 +71,10 @@ reverse* & 13530 & 214 \\
 forward & 5887 & 153 & 309 & 573 & 2693 & 2761 \\
 reverse & 5458 & 103 & 193 & 359 & 1083 & 2156 \\
 \end{tabular}
-\end{table}
 
-\begin{table}[h]
+\bigskip
 \caption{Length of snake}
+\label{tbl:daligner_dist3}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c c c}
@@ -81,20 +82,20 @@ reverse & 5458 & 103 & 193 & 359 & 1083 & 2156 \\
 forward & 87 & 0 & 0 & 1 & 5 & 9 \\
 reverse & 78 & 0 & 0 & 1 & 5 & 9 \\
 \end{tabular}
-\end{table}
 
-\begin{table}[h]
+\bigskip
 \caption{Number of Kmer matches per readpair}
+\label{tbl:daligner_dist4}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c}
 max & median & 75\% & 99\% \\ \hline
 32733 & 4 & 6 & 34 \\
 \end{tabular}
-\end{table}
 
-\begin{table}[h]
-\caption{Max drift (|initial diag - observed diag|)}
+\bigskip
+\caption{Max drift ($\mid$initial diag - observed diag$\mid$)}
+\label{tbl:daligner_dist5}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c}
@@ -102,21 +103,21 @@ max & median & 75\% & 99\% \\ \hline
 forward & 1938 & 41 \\
 reverse & 1323 & 37 \\
 \end{tabular}
-\end{table}
 
+\bigskip
 % 'apos > lasta[diag]'
-\begin{table}[h]
 \caption{Number of skippable LAcalls per performed LAcall}
+\label{tbl:daligner_dist6}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c}
 max & median & 90\% & 99\% \\ \hline
 18384 & 2 & 15 & 70 \\
 \end{tabular}
-\end{table}
 
-\begin{table}[h]
+\bigskip
 \caption{Length of overlap}
+\label{tbl:daligner_dist7}
 \centering
 \vspace{-5pt}
 \begin{tabular}{c|c c c c c c}
@@ -162,7 +163,7 @@ An option is to assign two readpairs to a block, each readpair would then have 1
 This means that the half-warp is fully utilised more often, but when the width of the d-wave is larger than 16, there well be idle threads.
 
 For this reason, coarse-grained parallelism is chosen to be implemented.
-The alignment and filter functions are seperated, instead, filter() produces a large list of seed hits (LAcalls), which should be send to the local alignment function.
+The alignment and filter functions are separated, instead, filter() produces a large list of seed hits (LAcalls), which should be send to the local alignment function.
 An advantage of having alignment and filtering intertwined is that Kmer matches that are included in previous alignments can be skipped, Figure \ref{fig:skip} illustrates this.
 This advantage is lost when generated the large list, but can be reimplemented using a scheduler that keeps track of the furthest position that was reached in an alignment for each readpair.
 Each Kmer match that has enough neighbouring Kmer matches constitutes its own LAcall in the large list, but these are filtered out later.
@@ -217,6 +218,8 @@ T cannot be easily reduced in size without reducing C, although M can be removed
 CWORK reduces the memory per diagonal per thread from 8 ints to 5 ints.
 
 \begin{table}
+\caption{The minimum and maximum values for different variables.}
+\label{tbl:value_range}
 \centering
 \begin{tabular}{c|c c}
 & min & max \\ \hline
@@ -254,14 +257,14 @@ This can be combined wih encoding these data arrays (CWORK).
 
 \paragraph{Cache main diagonals in shared memory (DIAGSX)}
 Since caching in registers is relatively expensive (registers are sparse), caching in shared memory might be a better idea.
-An SMX of compute capacility 3.x has 64KB of on-chip memory that can be divided among L1 cache and shared memory.
+An SMX of compute capability 3.x has 64KB of on-chip memory that can be divided among L1 cache and shared memory.
 There are three settings: 48KB shared memory / 16KB L1 cache, 32KB shared memory / 32KB L1 cache, 16KB shared memory / 48KB L1 cache \cite{shared_mem}.
 Shared memory is designed to be shared among all threads in a threadblock, but can be used as local memory, when carefully calculating the addresses.
 To avoid bank conflicts, the data can be stored as shown in Figure \ref{fig:DIAGS}.
 
 \figC{width=\textwidth , clip, trim=60 170 130 120}{DIAGS.pdf}{Encoding of data in shared memory, NA and NB are not shown. A name $X_{n}[m]$ indicates thread n, array X, index m.}{fig:DIAGS}
 
-Since shared memory is expensive, this technique can be combined with RM and NP to reduce the memoryrequirement per diagonal.
+Since shared memory is expensive, this technique can be combined with RM and NP to reduce the memory requirements per diagonal.
 
 Diagonals are cached per $2^n+1$, because the diagonal in the last cached position must be moved to the first one, and detecting if the current diagonal is a factor $2^n$ away from the first one in the wave is easy.
 The diagonals are recached every $2^n$ diagonals.
@@ -292,7 +295,7 @@ By counting the leading zeros via the intrinsic \_\_clz() \cite{CUDA_math} and d
 If the result contains 32 zeros, the next integers must also be checked.
 The position that needs to be checked might not be divisible by eight, in this case, the integers that hold the encoded bases must be shifted and masked to prevent comparison between sequences of unequal length.
 Another option is to have 16 copies of the encoded bases, so that there is always an integer available that starts at the correct position, eliminating the need for shifting and masking, but it costs 16x more memory, and shifts and masks are relatively cheap on a GPU.
-The T vector is filled with the appropiate amount of ones afterwards.
+The T vector is filled with the appropriate amount of ones afterwards.
 
 \paragraph{Cache bases (CAABSEQ)}
 The bases are reused a few times, if the loads are expensive, caching them can save some time.
@@ -309,7 +312,7 @@ This is similar to writing inline assembly.
 An example of where this could be useful is for conditions.
 Instructions like 'if' or 'for' can cause divergence, making part of the warp wait for the other, increasing execution time.
 Sometimes, a loop can be unrolled.
-Accordin to section 5.4.2 Control Flow Instruction in the programming guide\cite{cuda}, an 'if' can be translated to predicated instructions instead.
+According to section 5.4.2 Control Flow Instruction in the programming guide\cite{cuda}, an 'if' can be translated to predicated instructions instead.
 These are instructions whose execution depends on the value of the predicate, which is either true o false.
 The compiler decides if the number of instructions controlled by the condition is small enough.
 In an earlier version, that number used to be 7, if the compiler determines that the condition is likely to produce many divergent warps, and 4 when otherwise \cite{PTX3}.
@@ -324,7 +327,7 @@ There are multiple places where this technique was used:
 \paragraph{Maxrregcount = 64}
 The number of register assigned to a thread can be limited.
 This can increase the number of active threads on an SMX, since the number of registers on an SMX is also limited.
-The tradeoff lies with the reduced capacilities of the thread, the data that was stored in those registers now spills to local memory.
+The tradeoff lies with the reduced capabilities of the thread, the data that was stored in those registers now spills to local memory.
 The optimal registercount was found to be 64.
 
 \paragraph{Streaming CUDA functions (STREAM)}
@@ -352,7 +355,7 @@ The clz and ctz operations return undefined values when the input is zero, so th
 It is possible to run the whole GACT kernel on the GPU, for both left and right extension.
 However, since it is not known how long the resulting alignment will be, and all GPU threads have to wait until all threads are done, this will cause lots of idle time.
 Instead, it is chosen to only have a single tile aligned per GPU-thread per GPU-invocation.
-The scheduling and preperation of the tiles will be done by the CPU.
+The scheduling and preparation of the tiles will be done by the CPU.
 Tracking the full alignment in two strings is also done on the CPU, they are used to calculate the total alignment score.
 The CPU will receive a large list with seed hit positions, for each hit, the GACT algorithm is performed.
 It is not necessary to implement skipping seeds/Kmer matches for Darwin, since it generates less redundant seeds than Daligner.
@@ -391,7 +394,7 @@ GASAL first packs the bases in a 4-bit format, where 8 bases are packed into a 3
 The integers are padded with 'N' nucleotides, these do not affect the score when aligned.
 The packed bases do not have to be copied back to the CPU, because they are used during alignment.
 The second phase is the actual alignment, since there are 8 bases in one integer, the matrix is divided into 8x8 tiles.
-Figures \ref{GASAL1} and \ref{GASAL2} show the order of the tiles and elements in which they are calculated.
+Figures \ref{fig:GASAL1} and \ref{fig:GASAL2} show the order of the tiles and elements in which they are calculated.
 
 
 \figC{width=.7\textwidth , clip, trim=70 490 260 120}{GASAL.pdf}{Illustration of GASAL algorithm, high level.}{fig:GASAL1}
@@ -427,8 +430,8 @@ It also saves the time spend on building the aligned strings on the CPU.
 \paragraph{Coalesce global matrix (GLOBAL)}
 The score matrices in GASAL are small enough to fit in the registers, and cannot be coalesced.
 There are two main matrices left: the global array that stores the scores of one column, and the tracebackpointer matrix.
-The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be seperated.
-The scores are stored via 16-bit shorts, but since the smallest memory transaction is 32 bytes (Compute Capability 3.5) \cite{cuda}, and the uninterleaved elements are far enough, it causes unneccesary transactions too.
+The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be separated.
+The scores are stored via 16-bit shorts, but since the smallest memory transaction is 32 bytes (Compute Capability 3.5) \cite{cuda}, and the uninterleaved elements are far enough, it causes unnecessary transactions too.
 % According to nvprof, this is not true. There is uncoalesced access reported due to accesses in the global array. Perhaps, because of the known index (ridx), the compiler optimizes these values. It could be placed in L1 cache as local memory.
 
 

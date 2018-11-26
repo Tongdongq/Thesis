@@ -16,11 +16,11 @@ Literally, because we found out that DNA consists of a double helix, which must 
 In 2012, we discovered that the human genome consists of about three billion basepairs, wrapped up in 23 chromosomepairs \cite{human_genome_project}.
 And that it shares 60\% with the genome of a banana \cite{banana}.
 However, DNA still has many unexposed secrets.
-For example, some deseases are partially caused by genes, like breast cancer or sickle cell disease \cite{genomic_diseases}.
+For example, some diseases are partially caused by genes, like breast cancer or sickle cell disease \cite{genomic_diseases}.
 
 To gain more knowledge about the influence of DNA and genes in general, they must be identified.
 This is where DNA sequencing comes in.
-With a drop of blood, or some saliva, the DNA of an individual can be mapped.
+With a blood sample, or some saliva, the DNA of an individual can be mapped.
 Combining the DNA of many people can teach us what the effect is of some genes.
 However, DNA sequencing machines are not perfect, they only provide small parts of the DNA, and they contain errors too.
 These small parts must be assembled into a whole genome.
@@ -31,21 +31,21 @@ Daligner and Darwin are two algorithms that find overlaps for so-called 'long re
 These are produced by the third-generation of DNA sequencing machines, and can be tens of thousands of bases long, but have errors rates of 15-30\%.
 
 Performing the normal, exact way of alignment using Smith-Waterman is not feasible, especially for these long reads.
-Daligner and Darwin are heuristics, that reduce the amount of computation needed, without comprimising the output much.
+Daligner and Darwin are heuristics, that reduce the amount of computation needed, without compromising the output much.
 Still, they do a lot of computation.
 
-Since DNA alignment is inherently parallel (comparing reads A and B does not depend on the result of comparing reads C and D, or even A and C), speedup can be gained by parallising the workload.
-GPUs are build for graphics applications, but modern, programmable GPUs allow for GPGPU (General-Purpose computing on GPUs).
+Since DNA alignment is inherently parallel (comparing reads A and B does not depend on the result of comparing reads C and D, or even A and C), speedup can be gained by parallelising the workload.
+GPUs are built for graphics applications, but modern, programmable GPUs allow for GPGPU (General-Purpose computing on GPUs).
 This means that any algorithm can be run on a GPU.
 
 In this work, Daligner and Darwin are implemented to run on a GPU, in particular a Tesla K40.
 
 \paragraph{Outline}
 Chapter 2 Background contains details about the working of DNA in biology, as well as DNA sequencing and assembly techniques.
-Chapter 3 Concept further explains the algorithmes of Daligner and Darwin.
+Chapter 3 Concept further explains the algorithms of Daligner and Darwin.
 Chapter 4 Specification contains measured statistics that help understand the working of the algorithm, as well as all the implementations/optimizations done on both algorithms.
 The evaluation of these implementations is presented in Chapter 5 Results.
-Chapter 6 Conclusion discusses some of these results, and makes recommemdations for future work.
+In Chapter 6 Conclusion, conclusions and recommendations for future work are presented.
 
 
 \end{document}

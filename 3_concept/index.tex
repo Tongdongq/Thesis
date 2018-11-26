@@ -21,9 +21,9 @@ While the drawback is that these reads have an error rate of 12-15\%, this can b
 First, the set of reads is a nearly Poisson sampling of the sampled genome.
 This implies that there exists a coverage c for every target coverage k, such that every region of the genome is covered k times \cite{Poisson}.
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
-This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage \cite{Daligner}.
+This means that if the reads are long enough to handle repetitive regions, in principle a near perfect denovo assembly of the genome is possible, given enough coverage \cite{Daligner}.
 
-Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
+Important points for denovo DNA sequencing are: what level of coverage is needed for high quality assembly?
 And how to build an assembler that is able to deal with high error rates and long reads?
 Most previous assemblers work with NGS reads, which are much shorter and have much lower error rates.
 Some algorithms used in these assemblers, such as De Bruijn Graph (DBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
@@ -31,7 +31,7 @@ Since Daligner was build, new methods of using DBG with long reads have been dev
 
 \section{Daligner}
 The first step in an Overlap-Layout-Consensus (OLC) assembler is usually finding overlaps between reads \cite{OLC}.
-BLASR \cite{BLASR} was the only long read aligner at the time, and inpsired Daligner.
+BLASR \cite{BLASR} was the only long read aligner at the time, and inspired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
 The most time-consuming step is extending the seed hit to find an alignment.
 To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a datastructure that describes a sparse path from the seed hit to the furthest reaching point.
@@ -78,7 +78,7 @@ The goal is to find longest possible paths starting at a starting point $\rho = 
 After d differences, the possible paths can end in diagonals $\kappa \pm d$, where $\kappa = i-j$ is the diagonal of the starting point.
 The furthest reaching point on diagonal $k$ that can be reached from $\rho$ with $d$ differences is called $F_\rho(d,k)$.
 A collection of these points for a particular value of $d$ is called the $d$-wave emanating from $\rho$, and defined as $W_\rho(d) = \{F_\rho(d,\kappa-d),...,F_\rho(d,\kappa+d)\}$.
-$F_\rho(d,k)$ will be refered to as $F(d,k)$, where $\rho$ is implicitely understood from the context.
+$F_\rho(d,k)$ will be referred to as $F(d,k)$, where $\rho$ is implicitly understood from the context.
 
 In the O(ND) paper it is proven that:
 \begin{equation}
@@ -97,7 +97,7 @@ The f.r. $d$-point on diagonal $k$ is calculated by finding the furthest of
 and then continuing as far as possible along the slide.
 A point $(i,j)$ is furthest when its anti-diagonal $i+j$ is greatest.
 The best alignment between reads A and B is the smallest $d$ such that $(m,n)\in W_{(0,0)}(d)$, where $m$ and $n$ are the length of reads A and B.
-The O(ND) algorithm cimputes $d$-waves from starting point $(0,0)$ until the end point $(m,n)$ is reached.
+The O(ND) algorithm computes $d$-waves from starting point $(0,0)$ until the end point $(m,n)$ is reached.
 The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive sequences \cite{Daligner}.
 Because seeds are not always at the beginning, so waves are computed in both forward and reverse direction.
 The latter is easily done by reversing the direction of edges in the edit graph.
@@ -108,7 +108,7 @@ A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity t
 Finding a seed includes finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
 Previous methods to match $k$-mers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
 
-Assuming that the $k$-mer matches are independent, the probablity that a $k$-mer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
+Assuming that the $k$-mer matches are independent, the probability that a $k$-mer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
 The number of conserved $k$-mers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ $k$-mers are expected in this alignment.
 An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved $k$-mers is 10.
 Only $.046\%$ of the expected readpairs have 1 or fewer $k$-mers, and only $0.26\%$ have 2 of fewer.
@@ -168,7 +168,7 @@ There are a lot of parallel sorting algorithms \cite{parRadix1}\cite{parRadix2},
 Each thread sorts a contiguous segment of size $part = \lceil N/T\rceil$ of $src$ into $trg$, where $T$ is the number of threads.
 This means each thread $t \in [0,T-1]$ has a bucket array $bucket[t]$ where $bucket[t][b] = \{i: src[i] < b$ or $src[i] = b$ and $i/part < t\}$.
 To reduce the number of passes, a bucket array for the next pass is filled during the current pass.
-Each thread counts the number of $B$-bit digits that will be handled in the next pass by itself and every other thread seperately.
+Each thread counts the number of $B$-bit digits that will be handled in the next pass by itself and every other thread separately.
 If the number at index $i$ will be at index $j$ and in bucket $b$ next pass, then the count in the current pass must not be recorded for the thread $i/part$ that currently sorts the number, but for thread $j/part$ that will sort it in the next pass.
 To do this we need to count the number of these events in $next[j/part][i/part][b]$ where $next$ is a $T\times T\times 2^B$ matrix.
 If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
@@ -269,7 +269,7 @@ On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup f
 \subsection{D-SOFT}
 Like Daligner, D-SOFT filters by counting bases in Kmer matches.
 For each band of diagonals (bin), a particular threshold must be exceeded to constitute a seed hit, thus invoking the GACT algorithm.
-When using D-SOFT to do de-novo alignment, each read is padded with unknown nucleotides (N), so that each read starts at the start of a bin.
+When using D-SOFT to do denovo alignment, each read is padded with unknown nucleotides (N), so that each read starts at the start of a bin.
 Figure \ref{fig:D_SOFT} illustrates the working of D-SOFT for k = 4, N = 10, h = 8, N$_{B}$ = 6.
 N is the number of Kmer matches that are considered, h is the minimum number of unique bases that the Kmer matches in a particular bin must have, N$_{B}$ is the number of bins.
 The start positions of the matches are marked by red dots, the rest of the seed is a red line.

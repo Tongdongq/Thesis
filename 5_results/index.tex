@@ -13,17 +13,29 @@ MAIN IS NOT TRUE
 \input{../notmain.tex}
 \fi
 
+\section{Hardware}
+Tests on two systems were done: TACC and ce-cuda.
+
+TACC nodes have an IBM Power8 S824L, 256 GB RAM and a Tesla K40m.
+The CUDA version for TACC is 7.5.
+
+ce-cuda has an Intel Xeon E5-2620 @ 2.4 GHz, 32 GB RAM and a Tesla K40c.
+The clocks on the K40 were 745 MHz and 3004 MHz for core and memory respectively.
+The CUDA version for ce-cuda is 9.2.
+
+The K40c and K40m have the same performance, the only difference lies in their cooling solution \cite{K40m}.
 
 \section{Daligner}
 \subsection{Runtimes}
 The different runtime configurations are indicated with A B C, where A is the number of CPU threads, B the number of GPU blocks that each CPU thread launches, and C the number of GPU threads in each block.
 Table \ref{tbl:daligner1} shows the results.
-The first column lists the used optmizations.
+The first column lists the used optimizations.
 
 %./generate.sh 4 3000 100000 5000 4
 \begin{table}
 \centering
 \caption{Runtimes for different Daligner optimizations, with 3000 bp custom PacBio reads, run with 8 64 64, note that B30 and NP change the output.}
+\label{tbl:daligner1}
 \begin{tabular}{l c}
 & runtime (s) \\ \hline
 base & 75.1 \\
@@ -88,6 +100,21 @@ The others did not give a consistent speedup.
 
 
 
+\begin{table}
+\centering
+\caption{Runtimes for different Daligner parameters, one CPU thread, run on ce-cuda, 10x E.coli, denovo. Sensitivity and specificity are measured for A vs A, using a score threshold of 200.}
+\begin{tabular}{c|cccc}
+parameters & runtime A vs A (s) & runtime A vs B & sensitivity & specificity \\ \hline
+default & 32.5 & 61.0 & 99.78 & 86.7 \\
+h45  & 31.5 & 57.6 & 99.58 & 86.8 \\
+k15  & 31.6 & 56.9 & 98.9 & 87.1 \\
+k16  & 29.4 & 55.2 & 96.9 & 87.5 \\
+\end{tabular}
+\label{tbl:daligner3}
+\end{table}
+
+
+
 \subsection{Profiling}
 Nvprof \cite{nvprof} was used to profile the experiments.
 
@@ -115,39 +142,133 @@ The result of the divergence can also be observed in the runtimes in Table \ref{
 Darwin has the same run configuration, A B C, where A is the number of CPU threads, B the number of GPU blocks, and C the number of threads in a block.
 Table \ref{tbl:darwin1} shows the runtimes for CPU version with 8 threads, and the fastest GPU configuration.
 
+
+
 \begin{table}
 \centering
-\caption{Runtimes and speedup for different scoring schemes, run on the 50MB dataset with 8 B 64.}
+\caption{Runtimes and speedup for different implementations, all variantions have STREAM, run on a 2x E.coli dataset with 8 16 32 on TACC.}
 \label{tbl:darwin1}
 \begin{tabular}{c c c c c}
-scoring scheme & GPU BLOCKS & CPU8 & GPU & speedup \\ \hline
-(1,-1,-1,-1) & 32 & 94m15s & 1m21s & 70x \\
-(1,-1,-2,-1) & 32 & 66m36s & 1m7s  & 60x \\
-(1,-1,-2,-2) & 16 & 63m45s & 1m5s  & 59x \\
-(1,-3,-1,-1) & 32 & 81m10s & 1m8s  & 72x \\
+implementation & runtime (s) & speedup \\ \hline
+baseline & 82 & -\\
+BATCH & 87 & 0.94 \\
+GPU & 279 & 0.29 \\
+GPU CBASES & 269 & 0.30 \\
+GPU CMAT 83 & 0.99 \\
+GPU CMAT CBASES & 82 & 1.00 \\
+GASAL & 22 & 3.7 \\
+GASAL CMAT & 10 & 8.2 \\
+GASAL CMAT CPBASES & 11 & 7.5 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on TACC.}
+\label{tbl:darwin2}
+\begin{tabular}{c c c c c}
+implementation & runtime & speedup vs CPU 64 \\ \hline
+CPU 8 threads & 64m35 & - \\
+CPU 32 threads & 29m54 & - \\
+CPU 64 threads & 27m56 & - \\
+BATCH 32 8 64 & 37m17 & 0.75 \\
+GPU CMAT & 14m20 & 1.95 \\
+GPU CMAT CBASES & 11m28 & 2.44 \\
+GASAL & 11m40 & 2.39 \\
+GASAL CMAT & 1m17 & 21.8 \\
+GASAL CMAT CPBASES & 1m9 & 23.0 \\
+GASAL CMAT CPBASES NOSCORE & 58s0 & 28.9 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on ce-cuda.}
+\label{tbl:darwin3}
+\begin{tabular}{c c c c c}
+implementation & runtime & speedup vs CPU 8 \\ \hline
+CPU 8 threads & 138m21 & - \\
+%BATCH 32 8 64 &  &  \\
+%GPU CMAT &  &  \\
+GPU CMAT CBASES & 11m26 & 12.1 \\
+GASAL & 11m46 & 11.8 \\
+GASAL CMAT & 1m19 & 105 \\
+GASAL CMAT CPBASES & 1m16 & 109 \\
+GASAL CMAT CPBASES NOSCORE & 56s1 & 148 \\
 \end{tabular}
 \end{table}
 
 
-% show impact individual GPU implementations
-% - first GPU baseline (naive)
-% - CMAT
-% - Coalesce bases (CBASES)
-% - 
+
+%TODO add final profiling, identify bottleneck to make recommendations in Future Work
+
+%\begin{table}
+%\centering
+%\caption{Runtimes and speedup for different scoring schemes, run on the 50MB dataset with 8 32 64.}
+%\label{tbl:darwin4}
+%\begin{tabular}{c c c c c}
+%scoring scheme & & CPU8 & GPU & speedup \\ \hline
+%%(1,-1,-1,-1) & 94m15s & 1m21s & 70x \\
+%%(1,-1,-2,-1) & 66m36s & 1m7s  & 60x \\
+%%(1,-1,-2,-2) & 63m45s & 1m5s  & 59x \\
+%%(1,-3,-1,-1) & 81m10s & 1m8s  & 72x \\
+%\end{tabular}
+%\end{table}
+
+%\begin{table}
+%\centering
+%\caption{Runtimes for different optimizations, run on the 50MB dataset, with 8 32 64 threads.}
+%\label{tbl:darwin5}
+%\begin{tabular}{c c c}
+%optimizations & GPU \\ \hline
+%baseline & 1m23 \\
+%GLOBAL & 1m34 \\
+%GLOBAL CPBASES & 1m26 \\
+%CPBASES & 1m20 \\
+%\end{tabular}
+%\end{table}
+
+
 
 
 \begin{table}
 \centering
-\caption{Runtimes for different optimizations, run on the 50MB dataset, with 8 32 64 threads.}
-\label{tbl:darwin2}
-\begin{tabular}{c c c}
-optimizations & GPU \\ \hline
-baseline & 1m23 \\
-GLOBAL & 1m34 \\
-GLOBAL CPBASES & 1m26 \\
-CPBASES & 1m20 \\
+\caption{Runtimes for different Darwin parameters, 1 64 64, 10x E.coli, denovo, A vs A. Sensitivity and specificity are measured using thresholds of 600 and 990 for score and length respectively.}
+\label{tbl:darwin4}
+\begin{tabular}{c|cccc}
+number of seeds (N) & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & specificity \\ \hline
+1400 & 105.6 & 62.8 & 99.33 & 85.0 \\
+1100 & 94.2 & 56.1 & 98.9 & 85.4 \\
+800 & 89.4 & 48.5 & 97.8 & 86.2 \\
 \end{tabular}
 \end{table}
+
+
+
+\begin{table}
+\centering
+\caption{Runtimes for different Darwin run configurations, 50MB dataset, denovo, A vs A.}
+\label{tbl:darwin6}
+\begin{tabular}{c|cc}
+Run configuration & runtime TACC (s) \\ \hline
+ 8 32 64 & 1m9 \\
+16 16 64 & 1m32 \\
+16  8 64 & 2m6 \\
+ 4 32 64 & 1m19 \\
+ 4 64 64 & 1m17 \\
+ 1 64 64 & 2m25 \\
+1 128 64 & 2m14 \\
+1 256 64 & 2m28 \\
+ 32 8 64 & 3m8 \\
+\end{tabular}
+\end{table}
+
+%TODO add ce-cuda runtimes as well?
+
+
+
+
+
 
 
 
@@ -157,7 +278,7 @@ CPBASES & 1m20 \\
 \begin{table}
 \centering
 \caption{Profile data for different optimizations, run on the 50MB dataset, with 1 64 64 threads.}
-\label{tbl:darwin2}
+\label{tbl:darwin_prof}
 \begin{tabular}{c c c}
 optimizations & global ld efficiency \\ \hline
 baseline & 12\% \\
@@ -167,19 +288,16 @@ CPBASES & 45\% \\
 \end{tabular}
 \end{table}
 
+Coalescing of the GLOBAL array and coalescing of the packed bases did improve the global load efficiency, as shown in Table \ref{tbl:darwin_prof}.
 
 The alignment kernel consists of two distinct phases: alignment and traceback.
 The kernel was split into two kernels, and their runtimes measured, the alignment part takes 96\% of the time.
 This makes optimizing the traceback part not efficient.
 
-
-The optimization CPBASES coalesces the packed GASAL bases.
-This requires a more complex preperation on the GPU size, which interleaves the unpacked bases.
-For the 50MB dataset, ran wih 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
-The preperation and packing take more time, but this is compensated by a faster alignment phase.
-
 \begin{table}
 \centering
+\caption{CPBASES saves some time in alignment, but adds preperation time.}
+\label{tbl:CPBASES}
 \begin{tabular}{c c c c}
 & preperation (s) & packing (ms) & aligning (s) \\ \hline
 base & 4.2 & 54 & 41.1 \\
@@ -187,9 +305,35 @@ CPBASES & 6.0 & 96 & 38.9 \\
 \end{tabular}
 \end{table}
 
+The optimization CPBASES coalesces the packed GASAL bases.
+This requires a more complex preparation on the GPU size, which interleaves the unpacked bases.
+For the 50MB dataset, ran wih 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
+The preparation and packing take more time, but this is compensated by a faster alignment phase.
+
+
 
 Using inline PTX did not give consistent speedup for either implementation.
-This should not be a large suprise, modern compilers are quite good at creating efficient low-level code.
+This should not be a large surprise, modern compilers are quite good at creating efficient low-level code.
+
+\begin{table}
+\centering
+\label{tbl:darwin7}
+\caption{Percentage spent in GACT, run configuration: 1 64 128, N = 800, w = 4.}
+\begin{tabular}{c|c c c}
+& total runtime (s) & GACT time (s) & percentage GACT \\ \hline
+130MB A vs A & 240 & 232 & 97 \\
+130MB A vs B & 237 & 193 & 81 \\
+\end{tabular}
+\end{table}
+
+%For a 10x denovo 15\% error dataset that took 62.8 seconds, xx\% was taken by GACT.
+During a 240 second run of the 130MB dataset, 232 seconds (97\%) was spent on GACT.
+This is shown in Table \ref{tbl:darwin7}.
+
+
+A common performance metric for Smith-Waterman based solutions is CUPS, which stands for Cell Updates Per Second.
+For 10x denovo A vs A, the Darwin GPU implementation did 11.1 GCUPS.
+It did up to 13.3 GCUPS during the 130MB dataset, A vs A, and 13.5 for A vs B.
 
 
 \section{Sensitivity and specificity}
@@ -206,22 +350,63 @@ PBSIM \cite{PBSIM} is used to generate synthetic PacBio datasets.
 The only parameters that is not default is the accuracy, which is set to 0.85\%, to mimic the 15\% error rate of PacBio.
 The distribution is also changed: 1.5\% substitution, 9.0\% insertion, 4.5\% deletion.
 The reads are generated from an E.coli reference.
-\todo{Ecoli ref was sent by Yatish}
+\todo{Ecoli ref was sent by Yatish, mention?}
 For reference-based alignment (mapping), a read that is aligned to the reference within 50 bases of the original location is a true positive.
 For de-novo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
 The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the thrid the number of GPU threads in each of those GPU blocks.
 Since Daligner is faster of CPU than on GPU, the CPU version is used, and the number indicates the number of CPU threads.
-For Darwin, h indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n is the number of seeds that are considered for that readpair.
-For Daligner, h means the same, l is the minimum length that an overlap must have to be reported.
+For Darwin, h (default:21) indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n (1400) is the number of seeds that are considered for that readpair, and w (4) is the size of the window for the minimizers.
+The overlap length threshold is set to 990 during denovo alignment.
+For Daligner, h (35) means the same, l (1000) is the minimum length that an overlap must have to be reported.
 Both aligners can use a minimum score threshold to further filter the found overlaps.
 This will be denoted by s.
 Daligner does not actually calculate the score, instead the score is defined here as the length of the overlap in a, minus the reported number of differences.
 
+Darwin is not designed to compare two different files against each other, but a particular file against itself.
+This will be denoted by 'A vs A', if two different files are compared against each other, this is 'A vs B'.
+
+%%% ref
+% daligner
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{daligner_sens_spec_l_ref.pdf}{Sensitivity vs specificity tradeoff depends on the setting of l.}{fig:daligner1}
+
+% darwin
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_N_runtime_ref.pdf}{Sensitivity and runtime depend on number of seeds (N), w = 1.}{fig:darwin1}
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_sens_S_ref.pdf}{Sensitivity as a function of score threshold (s) and number of seeds (n), the runtimes are shown in Table \ref{tbl:darwin3}, w = 1.}{fig:darwin2}
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_spec_S_ref.pdf}{Specificity as a function of score threshold (s) and number of seeds (n), the runtimes are shown in Table \ref{tbl:darwin3}, w = 1.}{fig:darwin3}
+
+%%% denovo
+% daligner
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{daligner_sens_S_denovo.pdf}{Sensitivity for different Daligner options, their runtimes are listed in Table \ref{tbl:daligner3}}{fig:daligner2}
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{daligner_spec_S_denovo.pdf}{Specificity for different Daligner options, their runtimes are listed in Table \ref{tbl:daligner3}}{fig:daligner3}
+
+% darwin
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_sens_runtime_w_denovo.pdf}{Runtime and sensitivity for different window sizes (w).}{fig:darwin4}
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_sens_S_denovo.pdf}{Sensitivity as a function of score threshold (s) and number of seeds (n), w = 4.}{fig:darwin5}
+
+\figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_spec_S_denovo.pdf}{Specificity as a function of score threshold (s) and number of seeds (n), w = 4.}{fig:darwin6}
 
 
+Figure \ref{fig:daligner1} shows the clear tradeoff between sensitivity and specificity.
+The exact sensitivities for l200 and l100 are 99.97\% and 100.00\% respectively.
+PBSIM generates reads with a minimum size of 100, this is why lowering the default minimum overlap length of 1000bp increases the sensitivity in reference-based alignment.
+Figures \ref{fig:darwin2} and \ref{fig:darwin3} show a similar tradeoff between sensitivity and specificity.
+It is also clear that lowering the number of seeds below 400 lowers the sensitivity significantly.
 
+Figures \ref{fig:daligner2} and \ref{fig:daligner3} show the same tradeoff as the others.
+The score thresholds below 200 give the same result, that is why part of the x-axis is missing.
+The output reacts quite strongly to score thresholds between 220 and 260.
 
-
+Figure \ref{fig:darwin4} combines the sensitivity and runtime, for different windows sizes.
+The sensitivity shows a peak when window size is four, so this is the default size for the denovo experiments.
+For the last to experiments, the sensitivity remains constant between score thresholds 0 and 600, so part of the x-axis is missing again.
 
 
 \end{document}
