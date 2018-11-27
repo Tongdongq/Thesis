@@ -39,7 +39,7 @@ The four different nucleobases are: adenine (A), thymine (T), cytosine (C) and g
 The bases of one strand bond with bases in the opposite strand, but adenine can only bond with thymine, and cytosine only with guanine.
 Figure \ref{fig:dna_structure} shows a schematic overview of the components of DNA.
 
-\figC{width=\textwidth}{dna_structure.jpeg}{Structure of DNA \cite{dna_structure_fig}}{fig:dna_structure}
+\figC{width=\textwidth}{dna_structure.jpeg}{Structure of DNA, source: \cite{dna_structure_fig}}{fig:dna_structure}
 
 Each strand has two ends: the \textit{5'-end} (pronounced five-prime) and the \textit{3'-end}.
 The 5'-positions can bind a phosphate group, the 3'-positions can bind a sugar.
@@ -173,7 +173,7 @@ The whole sequencing process is shown in Figure \ref{fig:pyro_sequencing}.
 
 The newest pyrosequencing machines can produce readlengths up to 700 basepairs.
 
-\figC{scale=.9}{pyro_sequencing_1.jpg}{Workflow of pyrosequencing, source: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
+\figC{scale=.9}{pyro_sequencing_1.jpg}{Workflow of pyrosequencing, adapted from: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
 %%%%%%%%
 
@@ -266,7 +266,7 @@ The fluorescent dyes are attached to the phosphate chain, which is cleaved off n
 
 \figC{width=.8\textwidth}{pacbio_readlength.jpeg}{A distribution of read lengths, from a human library, source: \cite{pacbio_readlength} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:pacbio_readlength}
 
-A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}, shown in Figure \ref{SMRTbell}.
+A new application of SMRT sequencing includes adding single-stranded loops to a double-stranded template, creating a circular template called a SMRTbell \cite{SMRTbell}, shown in Figure \ref{fig:SMRTbell}.
 The double-stranded DNA region and single-stranded loops are called insert and hairpins respectively.
 The insert can be of any length, where lengths from 40 bp to 25000 bp have been tested \cite{SMRTbell}.
 The hairpins contain a sequence to which a primer can bind to.
@@ -771,10 +771,9 @@ Kernels for CUDA are written in C++.
 Kernels can be launched from the CPU in a \textit{grid} with a certain number of thread blocks or \textit{blocks} and \textit{threads}.
 A grid is one-/two- or three-dimensional, and has an array of blocks in each direction.
 Each block itself is also one-/two- or three-dimensional, and has an array of threads in each direction.
-Figure \ref{cuda:hierarchy} shows a full grid.
+Figure \ref{fig:cuda_hierarchy} shows a full grid.
 
-\todo{add picture of hierarchy, possible source in comments}
-% possible source: http://international.download.nvidia.com/pdf/kepler/NVIDIA-Kepler-GK110-GK210-Architecture-Whitepaper.pdf
+\figC{scale=.9}{cuda_hierarchy.png}{A CPU thread can launch a grid, which contains one or more blocks, each block contains one or more threads. Both grids and blocks can be organised in up to three dimensions, source: \cite{cuda}}{fig:cuda_hierarchy}
 
 Each thread executes the kernel code, although they usually operate on different data.
 Threads in a block can communicate via shared memory.
