@@ -282,7 +282,7 @@ This process is shown in Figure \ref{fig:SMRTbell2}.
 \figC{scale=.5}{SMRTbell2.jpg}{Since the SMRTbell is circular, the insert can be sequenced multiple times, the resulting read is split, and a consensus sequence is created, source: \cite{SMRTbell2} Courtesy of Pacific Biosciences of California, Inc., Menlo Park, CA, USA}{fig:SMRTbell2}
 
 PacBio's SMRT sequencing also has some disadvantages: throughput and error rate.
-Only 23-46\% of the ZMWs produce succesful reads \cite{history_sequencing}.
+Only 23-46\% of the ZMWs produce successful reads \cite{history_sequencing}.
 This can be caused by failing to attach a polymerase molecule to the bottom of a ZMW, or by loading more than one DNA strand in a ZMW.
 The throughput of the older RS II system is about 2 billion bases per day, but the newer Sequel System can produce 20 billion bases per day \cite{pacbio_throughput}.
 Still, this is much lower than the high throughput offered by Illumina HiSeq 2500, with HiSeq SBS v4 reagent kits, it can produce about 167 billion bases per day in High Output Run Mode \cite{pacbio}.
@@ -295,7 +295,7 @@ The nanopore are usually made of biological proteins, or synthetic structures li
 Oxford Nanopore Technologies (ONT) has build a system for DNA sequencing where three natural biological molecules form a nanopore.
 This system is called MinION and is a tiny portable DNA sequencer, shown in Figure \ref{fig:minION}.
 The nanopore is put in a synthetic lipid bilayer, which consists of two sheets of lipid molecules forming a thin polar membrane.
-A voltage is applied accross the bilayer, causing an ionic current through the nanopore.
+A voltage is applied across the bilayer, causing an ionic current through the nanopore.
 The double-stranded DNA is extended with a lead adaptor with a molecular motor, a hairpin adaptor, and a trailing adaptor.
 These adaptors enable the nanopore and DNA molecule to bond.
 The motor includes a processive enzyme, which denatures the DNA strands, and moves one strand through the nanopore at sufficient speed.
@@ -339,7 +339,7 @@ Annular dark-field imaging uses an annular (ring) to capture the photons/electro
 \figC{width=.6\textwidth}{ADF.png}{Top: electrons are scattered by heavy atoms and detected. Bottom: unlabeled DNA bases scatter fewer electrons and are harder to detect, source: \cite{tem}}{fig:ADF}
 
 
-Another microscope capable of sequencing DNA is the Scanning Tunneling Microscope (STM) \cite{STM}.
+Another microscope capable of sequencing DNA is the Scanning Tunnelling Microscope (STM) \cite{STM}.
 The machine is invented in 1982 by Binnig and Rohrer, for which they won the 1986 Nobel Prize in Physics \cite{STM_nobel}.
 The conductive tip of the machine is located very close to the sample, which is deposited on a conductive surface.
 The tip is extremely thin, to allow for very precise spatial measurements.
@@ -562,13 +562,13 @@ Heuristics are often used to reduce the runtime, and a well designed heuristic w
 In DNA alignment, a heuristic will often reduce the number of elements in a NW or SW matrix that are calculated.
 
 Many heuristic aligners implement a seed-and-extend technique \cite{seed_extend}.
-A seed is a small piece that contains k consecutive nucleotides, also known as kmer, where k is usually 3-25.
-Exact kmer matches are found, and the overlap is extended from there.
+A seed is a small piece that contains k consecutive nucleotides, also known as Kmer, where k is usually 3-25.
+Exact Kmer matches are found, and the overlap is extended from there.
 
 A small k will result in lots of hits, many of which will not result in a convincing overlap.
 A large k will limit the number of hits, but also reduces the sensitivity, since actual overlaps could have zero large consecutive matching nucleotides.
 To increase the sensitivity when using a large k, one could allow one or more mismatches in the seed, to create so-called spaced seeds \cite{spaced_seeds}.
-To reduce the number of hits, multiple nearby kmer matches can be required to start extension, since an actual overlap is likely to have lots of matching nucleotides.
+To reduce the number of hits, multiple nearby Kmer matches can be required to start extension, since an actual overlap is likely to have lots of matching nucleotides.
 
 For the extension phase, a variant of dynamic programming can be used, which forces the traceback to start at the end of the seed.
 The dynamic programming can include an area that is smaller than the matrix that would be calculated by regular Smith-Waterman.
@@ -596,11 +596,11 @@ Figure \ref{fig:dna_assembly} shows a simplified assembly process.
 
 \figC{width=.6\textwidth}{DNA_assembly.png}{A DNA strand is cloned and sequenced, the reads are assembled and the original DNA strand is recovered, source: \cite{dna_assembly_fig}}{fig:dna_assembly}
 
-There are two types of assembly: de-novo and reference based.
-De-novo assembly works as described above, but reference based assembly first maps the reads to a reference.
+There are two types of assembly: denovo and reference based.
+Denovo assembly works as described above, but reference based assembly first maps the reads to a reference.
 If multiple reads map to the same place in the reference, they are likely to be overlapping.
-De-novo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
-De-novo assembly is an NP-hard problem \cite{denovo_NP}.
+Denovo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
+Denovo assembly is an NP-hard problem \cite{denovo_NP}.
 Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
 
 The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different stretches of DNA are filtered away, this results in a biased assembly.
@@ -634,14 +634,14 @@ Examples of string-based assemblers are SSAKE \cite{ssake}, SHARCGS \cite{sharcg
 The greedy approach works like this: from the set of reads, pick the two strings that have the 'best' overlap and merge them, repeat until there is one string left or there are no suitable overlaps anymore.
 The 'best' overlap can differ: a perfect overlap between two strings s and t is a string y, such that s = xy and t = yz for some non-empty strings x and z \cite{denovo2}, but different scoring schemes allowing a few mismatches here and there are possible.
 A suitable overlap will have a minimum length: since there are only four different bases, a set will likely have two reads with an overlap of one base, one can imagine merging these is not likely to be correct.
-The greedy approach requires all reads to be compared with all reads, which is not suited for the high throughput of ngs systems.
+The greedy approach requires all reads to be compared with all reads, which is not suited for the high throughput of NGS systems.
 Another problem are repeat regions, which are very common in eukaryotic genomes, the human genome can contain more than 50\% repeats or repetitive areas \cite{repeats1}\cite{repeats2}.
 
 Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble reads containing a repeat region.
 
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
-For ngs reads, graph-based assemblers are used, which come in two flavors: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG) \cite{OLC_DBG}.
+For NGS reads, graph-based assemblers are used, which come in two flavours: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG) \cite{OLC_DBG}.
 
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.
@@ -654,11 +654,11 @@ Figure \ref{fig:olc} shows the general workflow for an OLC assembler.
 
 \figC{width=.6\textwidth}{olc.jpeg}{Overlaps are found and put in a graph, each arrow represents an overlap, a Hamiltonian path is found to create the contig, source: \cite{olc_fig}}{fig:olc}
 
-To build a de Bruijn Graph, each read is divided into kmers.
-Each kmer represents a directed edge between two vertices, where the source vertex represents the first k-1 bases of the kmer, and the destination vertex the last k-1 bases of the kmer.
+To build a de Bruijn Graph, each read is divided into Kmers.
+Each Kmer represents a directed edge between two vertices, where the source vertex represents the first k-1 bases of the Kmer, and the destination vertex the last k-1 bases of the Kmer.
 When a particular k-1 vertex does not exist, it is created, otherwise the existing one is reused.
 This means there are at most $4^{k-1}$ vertices in the graph.
-The weights of the edges indicate how many times a particular kmer is encountered.
+The weights of the edges indicate how many times a particular Kmer is encountered.
 The next step is to find an Eulerian Path \cite{Euler_Hamil_paths}, which is a path that includes all edges of a graph exactly once.
 A small value of k means the number of vertices is limited, but it also creates more edges, and loses more information.
 Examples of dBG assemblers are Velvet \cite{velvet}, ABySS \cite{abyss} and SOAPdenovo2 \cite{soapdenovo2}.
@@ -666,9 +666,9 @@ Examples of dBG assemblers are Velvet \cite{velvet}, ABySS \cite{abyss} and SOAP
 Constructing a dBG is easier than constructing an OLC graph, since no overlaps are computed.
 It is also easier to find an Eulerian Path than to find a Hamiltonian Path.
 However, there can be an exponential number of Eulerian Paths in a graph, where only one is needed.
-De Bruijn Graphs are quite susceptible to sequencing errors, one substituted base causes k incorrect kmers.
+De Bruijn Graphs are quite susceptible to sequencing errors, one substituted base causes k incorrect Kmers.
 Pair this with a often-used value of k between 19 and 27 and a PacBio error rate of about 15\%, and it is clear that the graph will contain a lot of incorrect edges.
-Another drawback of using this strategy is that information is lost when dividing the reads into kmers.
+Another drawback of using this strategy is that information is lost when dividing the reads into Kmers.
 This information could overcome short repeats in the genome.
 That is the reason why a variant of the Eulerian Path problem was formulated: the Eulerian Superpath problem \cite{Eulerian_Superpath}.
 It tries to find an Eulerian path, that contains a set of subpaths, given a graph and the set of subpaths.
@@ -688,12 +688,12 @@ The biggest part in reference based assembly is finding the location in the refe
 Mapping is usually done by a 'seed-and-extend' method.
 This means that first a position is found that is promising (seed), and then the algorithm looks at both ends of the seed to see if those parts also match with the reference.
 
-The most used method of finding seeds is to divide the reads into k-mers.
-A k-mer is a piece of DNA with exactly k bases \cite{Kmer}.
-The reference is also divided into k-mers, and exact k-mer matches are found using various methods.
+The most used method of finding seeds is to divide the reads into Kmers.
+A Kmer is a piece of DNA with exactly k bases \cite{Kmer}.
+The reference is also divided into Kmers, and exact Kmer matches are found using various methods.
 A popular and basic method is hashing, used by MAQ \cite{maq}, Seqmap \cite{seqmap}, Mosaik \cite{mosaik}, Snap \cite{snap}, Shrimp2 \cite{shrimp2}, Stampy \cite{stampy} and SeqAlto \cite{seqalto}.
 A different approach uses BWT \cite{BWT} or suffix arrays \cite{SA} to find matches, used by BWA \cite{bwa}, Soap2 \cite{soap2}, Bowtie2 \cite{bowtie2}, BWA-SW \cite{bwa-sw}, Aryana \cite{aryana} and BFAST \cite{bfast}.
-An uncommon approach is to use sorting to find matching k-mers, like in merge-sort \cite{mergesort}\cite{sorting}.
+An uncommon approach is to use sorting to find matching Kers, like in merge-sort \cite{mergesort}\cite{sorting}.
 This technique is used by Slider \cite{slider} and Syzygy \cite{syzygy}.
 
 The value of k is very important: too low and there will be too many hits, too high and there will not be enough hits.
@@ -746,18 +746,19 @@ A sequential implementation would have taken $N\times M$ cycles, where $N$ and $
 CPUs usually have large caches and a complex instruction set and execution that includes out-of-order execution and branch prediction \cite{CPUvsGPU1}\cite{CPUvsGPU2}.
 
 GPUs cannot operate on their own, they must be guided by a CPU.
-A general workflow using a GPU is shown in Figure \ref{gpu:workflow}.
-
-\todo{include figure gpu:workflow}
-
-\begin{itemize}
-\item Copy data from CPU to GPU
-\item Let GPU process the data
-\item Copy results from GPU to CPU
-\end{itemize}
-
 The functions that run on a GPU are called \textit{kernels}, and are usually launched by a CPU.
 Kernels can also be called from other kernels.
+A general workflow using a GPU is shown in Figure \ref{fig:gpu_workflow}.
+
+
+\figC{width=.6\textwidth}{gpu_workflow.jpg}{1: data is copied from main memory to the GPU memory, 2: the CPU launches the GPU kernel, 3: the GPU executes the kernel, using the GPU memory, 4: results are copied from the GPU to the main memory, source: \cite{gpu_workflow_fig}}{fig:gpu_workflow}
+
+%\begin{itemize}
+%\item Copy data from CPU to GPU
+%\item Let GPU process the data
+%\item Copy results from GPU to CPU
+%\end{itemize}
+
 
 
 \todo{maybe divide into subsections}
@@ -792,7 +793,7 @@ Uncoalesced memory accesses cause multiple memory transactions.
 
 \figC{scale=.5}{gpu_coalesced.png}{Uncoalesced accesses are inefficient, source: \cite{gpu_coalesced_fig}}{fig:gpu_coalesced}
 
-\todo{include figure of hardware, possible source in comments}
+%\todo{include figure of hardware, possible source in comments}
 %https://www.techpowerup.com/img/12-05-17/155a.jpg
 
 %Tesla-Fermi-Kepler-Maxwell-Pascal-Volta

@@ -34,7 +34,7 @@ The first step in an Overlap-Layout-Consensus (OLC) assembler is usually finding
 BLASR \cite{BLASR} was the only long read aligner at the time, and inspired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
 The most time-consuming step is extending the seed hit to find an alignment.
-To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a datastructure that describes a sparse path from the seed hit to the furthest reaching point.
+To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a data structure that describes a sparse path from the seed hit to the furthest reaching point.
 
 \todo{next part is copied straight from daligner paper}
 Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
@@ -105,40 +105,40 @@ The latter is easily done by reversing the direction of edges in the edit graph.
 \subsection{Seeding: concept}
 To find suitable starting points for the edit graphs, seeding is done.
 A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
-Finding a seed includes finding matching $k$-mers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
-Previous methods to match $k$-mers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
+Finding a seed includes finding matching Kmers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
+Previous methods to match Kmers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
 
-Assuming that the $k$-mer matches are independent, the probability that a $k$-mer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
-The number of conserved $k$-mers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ $k$-mers are expected in this alignment.
-An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved $k$-mers is 10.
-Only $.046\%$ of the expected readpairs have 1 or fewer $k$-mers, and only $0.26\%$ have 2 of fewer.
-To filter with $99.74\%$ sensitivity, only readpairs with 3 or more $k$-mer matches need to be examined.
+Assuming that the Kmer matches are independent, the probability that a Kmer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
+The number of conserved Kmers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ Kmers are expected in this alignment.
+An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved Kmers is 10.
+Only $.046\%$ of the expected readpairs have 1 or fewer Kmers, and only $0.26\%$ have 2 of fewer.
+To filter with $99.74\%$ sensitivity, only readpairs with 3 or more Kmer matches need to be examined.
 
 The specificity of the filter is increased in two ways:
 \begin{itemize}
-\item computing the number of $k$-mer matches in diagonal bands of width $2^s$ instead of in the whole reads
-\item thresholding on the number of bases in $k$-mer matches, instead of the number of $k$-mers themselves
+\item computing the number of Kmer matches in diagonal bands of width $2^s$ instead of in the whole reads
+\item thresholding on the number of bases in Kmer matches, instead of the number of Kmers themselves
 \end{itemize}
 
-The first way decreases the false positive rate because it only allows readpairs that have their $k$-mer matches relatively close, indicating a smaller region with higher similarity.
-The second way relies on the fact that 3 overlapping $k$-mers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint $k$-mers with $3k$ basepairs ($\pi^3$).
+The first way decreases the false positive rate because it only allows readpairs that have their Kmer matches relatively close, indicating a smaller region with higher similarity.
+The second way relies on the fact that 3 overlapping Kmers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint Kmers with $3k$ basepairs ($\pi^3$).
 
 
-The actually find the $k$-mer matches, Daligner uses a sort-merge procedure:
+The actually find the Kmer matches, Daligner uses a sort-merge procedure:
 \begin{itemize}
-\item Build a list $List_X = \{(kmer(X_x,i),x,i)\}_{x,i}$ of all $k$-mers for database $X \in \{\mathcal{A},\mathcal{B}\}$, where $kmer(R,i)$ is the $k$-mer $R[i-k+1,i]$.
-\item Sort both lists in order of their $k$-mers.
-\item Merge the two lists and build $List_M=\{(a,b,i,j): kmer(A_a,i) = kmer(B_b,j)\}$ of read and position pairs that have the same $k$-mer.
+\item Build a list $List_X = \{(kmer(X_x,i),x,i)\}_{x,i}$ of all Kmers for database $X \in \{\mathcal{A},\mathcal{B}\}$, where $kmer(R,i)$ is the Kmer $R[i-k+1,i]$.
+\item Sort both lists in order of their Kmers.
+\item Merge the two lists and build $List_M=\{(a,b,i,j): kmer(A_a,i) = kmer(B_b,j)\}$ of read and position pairs that have the same Kmer.
 \item Sort $List_M$ lexicographically on $a$, $b$ and $i$ where $a$ is most significant.
 \end{itemize}
 
 All entries for a certain read pair $(a,b)$ are in a continuous segment of the list.
-This makes it easy to determine if that read pair has enough $k$-mers and in the right places to constitute a seed hit.
+This makes it easy to determine if that read pair has enough Kmers and in the right places to constitute a seed hit.
 Given parameters $h$ and $s$, each entry $(a,b,i,j)$ for the current read pair is placed in diagonal bands $d = \lfloor(i-j)/2^s\rfloor$ and $d+1$.
-Now determine the number of bases in the A-read covered by $k$-mers in each pair of neighbouring diagonal bands.
-Note that only bases in matching $k$-mers are counted, not the number of $k$-mers.
-When there are k+1 matching consecutive bases, two $k$-mers are generated.
-These are less 'valuable' than two non-overlapping $k$-mers.
+Now determine the number of bases in the A-read covered by Kmers in each pair of neighbouring diagonal bands.
+Note that only bases in matching Kmers are counted, not the number of Kmers.
+When there are k+1 matching consecutive bases, two Kmers are generated.
+These are less 'valuable' than two non-overlapping Kmers.
 If $Count(d) \ge h$ for any diagonal band $d$, there is a seed hit for each position $(i,j$) in the band $d$ unless position $i$ was already in the range of a previously calculated local alignment.
 In that case the seed is called 'skippable', Figure \ref{fig:skippable} illustrates this concept.
 
@@ -160,8 +160,9 @@ The sort needs $P$ passes, where each pass sorts the elements on a $B$-bit digit
 Each pass is done with a bucket sort \cite{sorting} with $2^B$ buckets.
 Instead of a linked list, the integers in the list $src$ are moved in precomputed segments $trg[bucket[b]...bucket[b+1]-1]$ of an array $trg[0...N-1]$ with the same size as $src$.
 For the $p^{th}$ pass, $bucket[b] = \{i: src[i]_p < b\}$ for each $b \in [0,2^B-1]$.
+The pseudocode is shown is Listing \ref{code:radix1}.
 
-\lstinputlisting{\codePath radix1.c}
+\lstinputlisting[caption=Basic radix sort, label=code:radix1]{\codePath radix1.c}
 
 The algorithm takes $O(P(N+2^B))$ time, but $B$ and $P$ are small fixed numbers so it is effectively $O(N)$.
 There are a lot of parallel sorting algorithms \cite{parRadix1}\cite{parRadix2}, but Daligner uses a new method that needs half the number of passes that traditional methods use.
@@ -173,8 +174,9 @@ If the number at index $i$ will be at index $j$ and in bucket $b$ next pass, the
 To do this we need to count the number of these events in $next[j/part][i/part][b]$ where $next$ is a $T\times T\times 2^B$ matrix.
 If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
 This algorithm takes $O(N/T+T^2)$ time, assuming $B$ and $P$ are fixed.
+The new algorithm is shown in Listing \ref{code:radix2}.
 
-\lstinputlisting{\codePath radix2.c}
+\lstinputlisting[caption=Radix sort in Daligner, label=code:radix2]{\codePath radix2.c}
 
 This algorithm is particularly cache efficient because each bucket sort uses two small arrays $bucket$ and $next$ that will usually fit in the L1 cache.
 Each bucket sort makes one sweep through $src$ and $2^B$ sweeps through the bucket segments of $trg$.
@@ -291,7 +293,7 @@ The window size (w) is the most important parameter of the minimizers, and must 
 Whenever this window size is not mentioned, it is equal to one.
 
 \subsection{GACT}
-Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratric for the length of the reads.
+Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratic for the length of the reads.
 Numerous efforts to accelerate Smith-Waterman have been made, both by using hardware and by using heuristics.
 \todo{name accelerated variants here, or in Chapter 2 Background?}
 Even when using heuristics, the memory requirements are still linear.

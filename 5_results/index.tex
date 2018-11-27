@@ -352,7 +352,7 @@ The distribution is also changed: 1.5\% substitution, 9.0\% insertion, 4.5\% del
 The reads are generated from an E.coli reference.
 \todo{Ecoli ref was sent by Yatish, mention?}
 For reference-based alignment (mapping), a read that is aligned to the reference within 50 bases of the original location is a true positive.
-For de-novo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
+For denovo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
 The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the thrid the number of GPU threads in each of those GPU blocks.
 Since Daligner is faster of CPU than on GPU, the CPU version is used, and the number indicates the number of CPU threads.
 For Darwin, h (default:21) indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n (1400) is the number of seeds that are considered for that readpair, and w (4) is the size of the window for the minimizers.
@@ -360,6 +360,7 @@ The overlap length threshold is set to 990 during denovo alignment.
 For Daligner, h (35) means the same, l (1000) is the minimum length that an overlap must have to be reported.
 Both aligners can use a minimum score threshold to further filter the found overlaps.
 This will be denoted by s.
+The scoring scheme for Darwin is: match = 1, mismatch = -1, gap\_open = -1, gap\_extend = -1, unless noted otherwise.
 Daligner does not actually calculate the score, instead the score is defined here as the length of the overlap in a, minus the reported number of differences.
 
 Darwin is not designed to compare two different files against each other, but a particular file against itself.
@@ -394,19 +395,30 @@ This will be denoted by 'A vs A', if two different files are compared against ea
 \figC{width=.8\textwidth ,clip,trim=100 240 100 240}{darwin_spec_S_denovo.pdf}{Specificity as a function of score threshold (s) and number of seeds (n), w = 4.}{fig:darwin6}
 
 
-Figure \ref{fig:daligner1} shows the clear tradeoff between sensitivity and specificity.
+Figure \ref{fig:daligner1} shows the clear tradeoff between sensitivity and specificity for reference-based alignment.
 The exact sensitivities for l200 and l100 are 99.97\% and 100.00\% respectively.
 PBSIM generates reads with a minimum size of 100, this is why lowering the default minimum overlap length of 1000bp increases the sensitivity in reference-based alignment.
-Figures \ref{fig:darwin2} and \ref{fig:darwin3} show a similar tradeoff between sensitivity and specificity.
-It is also clear that lowering the number of seeds below 400 lowers the sensitivity significantly.
+If the input data is longer than that, or not aligning those shorter reads is acceptable, the setting for l can be higher.
+Figures \ref{fig:darwin2} and \ref{fig:darwin3} show a similar tradeoff between sensitivity and specificity for Darwin.
+While the default value for the number of seeds is 1400, this number can be lowered to 400 without noticable impact on the sensitivity.
+When going lower than 400, the sensitivity is reduced, but the runtime is also lower.
+The runtime and number of seeds have an affine relation, so trading runtime for sensitivity is easy.
+The specificity is higher when the number of seeds is low, it makes sense that producing less GACTcalls by reducing the number of seeds in the seedposition table reduces the number of false positives.
+However, the N = 1400 and 800 options have a higher specificity when also using a high score threshold.
+A tradeoff between sensitivity and specificity can also be observed from the figures.
 
 Figures \ref{fig:daligner2} and \ref{fig:daligner3} show the same tradeoff as the others.
 The score thresholds below 200 give the same result, that is why part of the x-axis is missing.
-The output reacts quite strongly to score thresholds between 220 and 260.
+The output reacts quite strongly when changing the score threshold from 220 to 260.
+Larger Kmers result in lower sensitivity, and higher specificity, as can be expected.
+
 
 Figure \ref{fig:darwin4} combines the sensitivity and runtime, for different windows sizes.
 The sensitivity shows a peak when window size is four, so this is the default size for the denovo experiments.
-For the last to experiments, the sensitivity remains constant between score thresholds 0 and 600, so part of the x-axis is missing again.
+For the last two experiments, the sensitivity remains constant between score thresholds 0 and 600, so part of the x-axis is missing again.
+The exact threshold where the sensitivity starts dropping will depend on the scoring scheme.
+It makes sense that there is such a threshold, since the theoretical overlaps have a minimum length of 1000 bp, which should produce a certain score given the scoring scheme and the distribution of errors.
+
 
 
 \end{document}
