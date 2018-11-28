@@ -17,7 +17,7 @@ MAIN IS NOT TRUE
 Tests on two systems were done: TACC and ce-cuda.
 
 TACC nodes have an IBM Power8 S824L, 256 GB RAM and a Tesla K40m.
-The CUDA version for TACC is 7.5.
+The CUDA version for TACC is 7.5, and the operating system Ubuntu 3.19.0-28-generic.
 
 ce-cuda has an Intel Xeon E5-2620 @ 2.4 GHz, 32 GB RAM and a Tesla K40c.
 The clocks on the K40 were 745 MHz and 3004 MHz for core and memory respectively.
@@ -28,32 +28,68 @@ The K40c and K40m have the same performance, the only difference lies in their c
 \section{Daligner}
 \subsection{Runtimes}
 The different runtime configurations are indicated with A B C, where A is the number of CPU threads, B the number of GPU blocks that each CPU thread launches, and C the number of GPU threads in each block.
-Table \ref{tbl:daligner1} shows the results.
-The first column lists the used optimizations.
+Table \ref{tbl:daligner1} shows the CPU results.
+Note that B30 and NP change the output.
+Using B30 does not make a large difference, it makes sense, since a CPU thread uses a 32-bit register, instead of 64-bit register, per diagonal.
+Registers may not be cheap for CPUs, but the data is cached, so it is likely loaded as fast as without B30.
+NP reduces the runtime significantly for all implementations, which is as expected, since creating Pebbles takes both time and memory.
+What is interesting is that CABSEQ increases the runtime for all run configurations.
+The instructions to count leading/trailing zeros, and popcount are likely causes.
+The number of instructions is also much higher, but it reduces the amount of branches.
+The GPU is more likely to benefit from this tradeoff, since it is worse at executing branch instructions than the CPU.
+
+
 
 %./generate.sh 4 3000 100000 5000 4
 \begin{table}
 \centering
-\caption{Runtimes for different Daligner optimizations, with 3000 bp custom PacBio reads, run with 8 64 64, note that B30 and NP change the output.}
+\caption{Runtimes for different Daligner CPU implementations, with 3000 bp custom PacBio reads, run on TACC, A vs B.}
 \label{tbl:daligner1}
+\begin{tabular}{c c c c}
+implementation & number of threads & runtime (s) & runtime with NP (s) \\ \hline
+baseline & 1 & 124.1 & 92.0 \\
+& 8 & 22.7 & 17.3 \\
+& 32 & 14.6 & 11.8 \\ \hline
+B30 & 1 & 124.2 & 92.5 \\
+& 8 & 22.7 & 17.4 \\
+& 32 & 14.4 & 11.6 \\ \hline
+CABSEQ & 1 & 132 & 89.1 \\
+& 8 & 32.1 & 17.2 \\
+& 32 & 15.4 & 12.4 \\
+\end{tabular}
+\end{table}
+
+Table \ref{tbl:daligner2} shows runtimes for GPU implementations, which have the same output as the original.
+All listed GPU configurations use STREAM.
+Running the fastest configuration (CWORK CABSEQ) with 1 256 64 results in a runtime of 82.9, which is faster than the singlethreaded CPU implementation.
+However, running singlethreaded is not a realistic scenario on this hardware.
+
+\begin{table}
+\centering
+\caption{Runtimes for different Daligner optimizations, with 3000 bp custom PacBio reads, run with 8 64 64 on TACC, A vs B.}
+\label{tbl:daligner2}
 \begin{tabular}{l c}
 & runtime (s) \\ \hline
-base & 75.1 \\
-CWORK & 67.1 \\
-CAWORK & 75.1 \\
-%CWORK CAWORK & 65.9 \\
-%CWORK CAWORK STREAM & 50.8 \\ \hline
-CABSEQ & 71.8 \\
-CWORK CABSEQ & 61.2 \\
-CWORK CABSEQ STREAM & 46.6 \\
-CABSEQ STREAM & 53.1 \\
-STREAM & 54.8 \\ 
-CWORK STREAM & 48.7 \\
-%CABSEQ CAABSEQ & 68.1 \\
-%CABSEQ CAABSEQ CWORK & 58.5 \\
-%CABSEQ CAABSEQ STREAM & 68.1 \\
-CABSEQ CAABSEQ CWORK STREAM & 58.7 \\ \hline
-%CWORK WORK STREAM & 49.8 \\ \hline \hline
+CPU 1 & 124 \\
+CPU 8 & 22.6 \\
+CPU 32 & 14.6 \\
+base GPU & 54.8 \\ 
+CABSEQ & 53.1 \\
+CWORK & 48.7 \\
+CWORK CABSEQ & 46.6 \\
+CABSEQ CAABSEQ & 68.1 \\
+CABSEQ CAABSEQ CWORK & 58.7 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+\centering
+\caption{Runtimes for different Daligner optimizations, with 3000 bp custom PacBio reads, run with 8 64 64 on TACC, A vs B, note that B30 and NP change the output.}
+\label{tbl:daligner3}
+\begin{tabular}{l c}
+& runtime (s) \\ \hline
+CPU B30 & \\
 B30 STREAM & 55.0 \\
 B30 RM STREAM & 49.7 \\
 RM STREAM & 51.0 \\
@@ -84,7 +120,7 @@ DIAGS17 RM NP STREAM CABSEQ WORK B30 & 28.1 \\
 \begin{table}
 \centering
 \caption{Divergence counteracts the effect of optimizations}
-\label{tbl:daligner2}
+\label{tbl:daligner4}
 \begin{tabular}{c|c|c}
 type of reads & implementation & runtime (s) \\ \hline
 uniform reads & STREAM & 35 \\
@@ -95,25 +131,25 @@ uniform reads & STREAM & 35 \\
 \end{table}
 
 
-Replacing 'if(\_\_clz(a1) == 32){abpos -= max;}' with inline PTX gave a 4\% speedup.
-The others did not give a consistent speedup.
+Replacing 'if(\_\_clz(a1) == 32)\{abpos -= max;\}' with inline PTX gave a 4\% speedup.
+Other inline PTX implementations did not give a consistent speedup.
 
 
-
+\todo{combine this table with Darwin?}
 \begin{table}
 \centering
 \caption{Runtimes for different Daligner parameters, one CPU thread, run on ce-cuda, 10x E.coli, denovo. Sensitivity and specificity are measured for A vs A, using a score threshold of 200.}
+\label{tbl:daligner5}
 \begin{tabular}{c|cccc}
-parameters & runtime A vs A (s) & runtime A vs B & sensitivity & specificity \\ \hline
+parameters & runtime A vs A (s) & runtime A vs B (s) & sensitivity & specificity \\ \hline
 default & 32.5 & 61.0 & 99.78 & 86.7 \\
 h45  & 31.5 & 57.6 & 99.58 & 86.8 \\
 k15  & 31.6 & 56.9 & 98.9 & 87.1 \\
 k16  & 29.4 & 55.2 & 96.9 & 87.5 \\
 \end{tabular}
-\label{tbl:daligner3}
 \end{table}
 
-
+\newpage
 
 \subsection{Profiling}
 Nvprof \cite{nvprof} was used to profile the experiments.
@@ -140,13 +176,30 @@ The result of the divergence can also be observed in the runtimes in Table \ref{
 \section{Darwin}
 \subsection{Runtimes}
 Darwin has the same run configuration, A B C, where A is the number of CPU threads, B the number of GPU blocks, and C the number of threads in a block.
-Table \ref{tbl:darwin1} shows the runtimes for CPU version with 8 threads, and the fastest GPU configuration.
+Table \ref{tbl:darwin1} shows the runtimes for CPU baseline with 8 threads, and incremental GPU configurations, for a small dataset.
+Tables \ref{tbl:darwin2} and \ref{tbl:darwin3} show similar results for a larger, 50MB dataset.
+Note that the speedup for TACC is measured against 64 CPU threads, and for ce-cuda against 8 CPU threads.
+The configuration 'GPU GASAL CPBASES' has the same output as the CPU baseline, when using NOSCORE, the output differs slightly.
+All configurations use STREAM if applicable.
+Table \ref{tbl:darwin8} shows that the speedup holds for scoring schemes that favour gaps, and for schemes that favour mismatches/substitutions.
+The scoring scheme is encoded as follows: (match, mismatch, gap\_open, gap\_extend).
+The third scoring scheme is based on the default one from EMBOSS Water tool \cite{emboss}.
 
+\begin{table}
+\centering
+\caption{Runtimes for different Darwin implementations, with 3000 bp custom PacBio reads, run with 8 32 64 on TACC, A vs B.}
+\label{tbl:darwin0}
+\begin{tabular}{c c c}
+implementation & runtime (s) & speedup vs CPU 64 \\ \hline
+CPU 64 & 25m47 & -\\
+GASAL CMAT CPBASES & 93.7 & 16.5 \\
+\end{tabular}
+\end{table}
 
 
 \begin{table}
 \centering
-\caption{Runtimes and speedup for different implementations, all variantions have STREAM, run on a 2x E.coli dataset with 8 16 32 on TACC.}
+\caption{Runtimes and speedup for different implementations, run on a 2x E.coli dataset with 8 16 32 on TACC, A vs A.}
 \label{tbl:darwin1}
 \begin{tabular}{c c c c c}
 implementation & runtime (s) & speedup \\ \hline
@@ -154,7 +207,7 @@ baseline & 82 & -\\
 BATCH & 87 & 0.94 \\
 GPU & 279 & 0.29 \\
 GPU CBASES & 269 & 0.30 \\
-GPU CMAT 83 & 0.99 \\
+GPU CMAT & 83 & 0.99 \\
 GPU CMAT CBASES & 82 & 1.00 \\
 GASAL & 22 & 3.7 \\
 GASAL CMAT & 10 & 8.2 \\
@@ -164,7 +217,7 @@ GASAL CMAT CPBASES & 11 & 7.5 \\
 
 \begin{table}
 \centering
-\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on TACC.}
+\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on TACC, A vs A.}
 \label{tbl:darwin2}
 \begin{tabular}{c c c c c}
 implementation & runtime & speedup vs CPU 64 \\ \hline
@@ -183,7 +236,7 @@ GASAL CMAT CPBASES NOSCORE & 58s0 & 28.9 \\
 
 \begin{table}
 \centering
-\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on ce-cuda.}
+\caption{Runtimes and speedup for different implementations, N = 800, run on the 50MB dataset with 8 32 64 on ce-cuda, A vs A.}
 \label{tbl:darwin3}
 \begin{tabular}{c c c c c}
 implementation & runtime & speedup vs CPU 8 \\ \hline
@@ -198,35 +251,24 @@ GASAL CMAT CPBASES NOSCORE & 56s1 & 148 \\
 \end{tabular}
 \end{table}
 
+\begin{table}
+\centering
+\caption{Runtimes and speedup for different scoring schemes, N = 800, run on the 50MB dataset with 8 32 64 on TACC, A vs A.}
+\label{tbl:darwin8}
+\begin{tabular}{c||c|c|c}
+& (2, -1, -2, -2) & (1, -3, -1, -1) & (5, -4, -10, -1) \\ \hline
+CPU 64 & 31m15 & 21m28 & 31m27 \\ \hline
+GASAL CMAT CPBASES & 76.0s & 59.3s & 78.0s \\
+speedup vs CPU 64 & 24.7 & 21.7 & 24.2 \\ \hline
+GASAL CMAT CPBASES NOSCORE & 63.5s & 48.5s & 64.5s \\
+speedup vs CPU 64 & 29.5 & 26.6 & 29.3 \\
+\end{tabular}
+\end{table}
+
+
 
 
 %TODO add final profiling, identify bottleneck to make recommendations in Future Work
-
-%\begin{table}
-%\centering
-%\caption{Runtimes and speedup for different scoring schemes, run on the 50MB dataset with 8 32 64.}
-%\label{tbl:darwin4}
-%\begin{tabular}{c c c c c}
-%scoring scheme & & CPU8 & GPU & speedup \\ \hline
-%%(1,-1,-1,-1) & 94m15s & 1m21s & 70x \\
-%%(1,-1,-2,-1) & 66m36s & 1m7s  & 60x \\
-%%(1,-1,-2,-2) & 63m45s & 1m5s  & 59x \\
-%%(1,-3,-1,-1) & 81m10s & 1m8s  & 72x \\
-%\end{tabular}
-%\end{table}
-
-%\begin{table}
-%\centering
-%\caption{Runtimes for different optimizations, run on the 50MB dataset, with 8 32 64 threads.}
-%\label{tbl:darwin5}
-%\begin{tabular}{c c c}
-%optimizations & GPU \\ \hline
-%baseline & 1m23 \\
-%GLOBAL & 1m34 \\
-%GLOBAL CPBASES & 1m26 \\
-%CPBASES & 1m20 \\
-%\end{tabular}
-%\end{table}
 
 
 
@@ -268,7 +310,7 @@ Run configuration & runtime TACC (s) \\ \hline
 
 
 
-
+\newpage
 
 
 
@@ -299,7 +341,7 @@ This makes optimizing the traceback part not efficient.
 \caption{CPBASES saves some time in alignment, but adds preperation time.}
 \label{tbl:CPBASES}
 \begin{tabular}{c c c c}
-& preperation (s) & packing (ms) & aligning (s) \\ \hline
+& preparation (s) & packing (ms) & aligning (s) \\ \hline
 base & 4.2 & 54 & 41.1 \\
 CPBASES & 6.0 & 96 & 38.9 \\
 \end{tabular}
@@ -307,7 +349,7 @@ CPBASES & 6.0 & 96 & 38.9 \\
 
 The optimization CPBASES coalesces the packed GASAL bases.
 This requires a more complex preparation on the GPU size, which interleaves the unpacked bases.
-For the 50MB dataset, ran wih 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
+For the 50MB dataset, ran with 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
 The preparation and packing take more time, but this is compensated by a faster alignment phase.
 
 
@@ -318,21 +360,22 @@ This should not be a large surprise, modern compilers are quite good at creating
 \begin{table}
 \centering
 \label{tbl:darwin7}
-\caption{Percentage spent in GACT, run configuration: 1 64 128, N = 800, w = 4.}
+\caption{Percentage spent in GACT, 130MB, A vs A, N = 800, w = 4.}
 \begin{tabular}{c|c c c}
-& total runtime (s) & GACT time (s) & percentage GACT \\ \hline
-130MB A vs A & 240 & 232 & 97 \\
-130MB A vs B & 237 & 193 & 81 \\
+run configuration & total runtime (s) & GACT time (s) & percentage GACT \\ \hline
+8 32 64 & 157 & 136 & 87 \\
+1 128 64 & 378 & 328 & 87 \\
 \end{tabular}
 \end{table}
 
 %For a 10x denovo 15\% error dataset that took 62.8 seconds, xx\% was taken by GACT.
-During a 240 second run of the 130MB dataset, 232 seconds (97\%) was spent on GACT.
-This is shown in Table \ref{tbl:darwin7}.
+As shown in Table \ref{tbl:darwin7}, during runs on the 130MB dataset, the majority of the time was spent on GACT.
+This shows that despite large speedups, the bottleneck is still extending the seeds using GACT.
+For the 1 128 64 run, 55\% of the GACT time is spent on the CPU, preparing the new GPU arguments, and handling finished alignments.
+In the 8 32 64 run, this percentage drops to 15\%.
 
-
-A common performance metric for Smith-Waterman based solutions is CUPS, which stands for Cell Updates Per Second.
-For 10x denovo A vs A, the Darwin GPU implementation did 11.1 GCUPS.
+A common performance metric for Smith-Waterman based solutions is CUPS, which stands for Cell Updates Per Second, where a cell is a score element in the matrix.
+For 10x denovo A vs A, the Darwin GPU implementation peaked at 11.1 GCUPS.
 It did up to 13.3 GCUPS during the 130MB dataset, A vs A, and 13.5 for A vs B.
 
 
@@ -342,8 +385,8 @@ Sensitivity and specificity are defined as:
 $$\text{Sensivitity} = \frac{TP}{TP + FN}$$
 $$\text{Specificity} = \frac{TP}{TP + FP}$$
 where TP, FN and FP are the number of true positives, false negatives and false positives respectively.
-Sensivitity indicates how many of the overlaps that the aligner was supposed to find, were actually found.
-Specifitiy indicates how many of the reported overlaps were actually real overlaps.
+Sensitivity indicates how many of the overlaps that the aligner was supposed to find, were actually found.
+Specificity indicates how many of the reported overlaps were actually real overlaps.
 To boost sensitivity, if an overlap between A and B was found (denovo), the overlap between B and A is also assumed to be found.
 
 PBSIM \cite{PBSIM} is used to generate synthetic PacBio datasets.
@@ -353,7 +396,7 @@ The reads are generated from an E.coli reference.
 \todo{Ecoli ref was sent by Yatish, mention?}
 For reference-based alignment (mapping), a read that is aligned to the reference within 50 bases of the original location is a true positive.
 For denovo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
-The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the thrid the number of GPU threads in each of those GPU blocks.
+The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the third the number of GPU threads in each of those GPU blocks.
 Since Daligner is faster of CPU than on GPU, the CPU version is used, and the number indicates the number of CPU threads.
 For Darwin, h (default:21) indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n (1400) is the number of seeds that are considered for that readpair, and w (4) is the size of the window for the minimizers.
 The overlap length threshold is set to 990 during denovo alignment.

@@ -33,8 +33,10 @@ A Kmer is a piece of K consecutive nucleotides.
 Many different techniques exist to split and store the reads into Kmers.
 The reads are compared to eachother, reads that have enough matching Kmers in a small enough region, are extended using various methods.
 Another approach is a deBruijn graph, each Kmer is a vertex, and an edge is created for each next Kmer.
+For example, the read 'ATC' would result in vertices 'AT' and 'TC', with a directed edge with weight one between them.
 This results in a large graph with up to $4^K$ vertices, and even more edges, a normal value for K is 21.
 The resulting assembly is found by calculating the Hamiltonian Path \cite{Euler_Hamil_paths}.
+
 So called Next Generation Sequencing (NGS) techniques produce reads with lengths anywhere from 50 to 700.
 They can be produced very quickly, but a drawback is their length.
 DNA can contain repeat regions, where a certain piece of DNA is repeated many times back-to-back, or a repeat could appear in many different places in the genome.
@@ -46,7 +48,7 @@ A major drawback is that they also contain more errors, 15-30\%, depending on th
 
 Daligner and Darwin are two algorithms that find overlaps for so-called 'long reads'.
 They are heuristics, that reduce the amount of computation needed, without compromising the output much.
-Still, they do a lot of computation, Daligner takes 15,600 CPU hours to align a Human genome with 54x oversampling.
+Still, they do a lot of computation, Daligner takes 15,600 CPU hours to align a Human genome with 54x oversampling \cite{Daligner}.
 
 Since DNA alignment is inherently parallel (comparing reads A and B does not depend on the result of comparing reads C and D, or even A and C), speedup can be gained by parallelising the workload.
 GPUs are built for graphics applications, but modern, programmable GPUs allow for GPGPU (General-Purpose computing on GPUs).
@@ -55,7 +57,8 @@ The GPU must be explicitly told what to do, and using the GPU also introduces co
 Moreover, GPU cores use a simpler instruction set than CPU cores, and run on lower clocks.
 To gain speedup with a GPU, the workload must be divided well, to ensure the available hardware is sufficiently utilised.
 
-In this work, Daligner and Darwin are implemented to run on a GPU, in particular a Tesla K40.
+In this work, Daligner and Darwin are implemented to run on a GPU, in particular a Tesla K40 \cite{K40}, which features 2880 CUDA cores, 12 GB of VRAM, and the Kepler architecture.
+
 
 \paragraph{Outline}
 Chapter 2 Background contains details about the working of DNA in biology, as well as DNA sequencing and assembly techniques.

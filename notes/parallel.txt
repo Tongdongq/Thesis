@@ -1113,9 +1113,11 @@ Then we show that GASAL is even faster than GPU CMAT CBASES
 Moved ref_pos > ref_len fix to CPU as well.
 Removed printing of trivial alignments, because CPU and BATCH differs, now output ok, eacc139
 
+20-11-2018:
+Old FALCON logs indicate the Daligner part of the FALCON chain takes 80-90% of runtime.
 
-
-
+21-11-2018:
+Fixed NOSCORE in 'master', NOSCORE reduces 1-2% of TP and FP, sensitivity drops from 97.75 to 97.71% in 4x E.coli.
 
 
 TODO: create type 6 reads that have a AT/GC imbalance.

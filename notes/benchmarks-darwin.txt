@@ -578,30 +578,95 @@ GPU GASAL STREAM CMAT CPBASES 8 16 32: 11s, output ok
 
 -------------------------
 19-11-2018
-TACC
-50MB ref vs ref 800 seeds:
-CPU                                    8: 64m35
-CPU                                   32: 29m54
-CPU                                   64: 
-BATCH                            8 32 64: 
-BATCH GPU STREAM 64 CMAT         8 32 64: 14m20
-BATCH GPU STREAM 64 CBASES       8 32 64: 
-BATCH GPU STREAM 64 CMAT CBASES  8 32 64: 11m28
-GPU GASAL STREAM 64              8 32 64: 11m40
-GPU GASAL STREAM 64 CMAT         8 32 64: 1m18
-GPU GASAL STREAM 64 CMAT CPBASES 8 32 64: 1m13
+TACC 50MB ref vs ref 800 seeds:
+CPU                                            8: 64m35
+CPU                                           32: 29m54
+CPU                                           64: 27m56
+BATCH                                   32  8 64: 37m17, 38m50
+BATCH GPU STREAM 64 CMAT                 8 32 64: 14m20
+BATCH GPU STREAM 64 CBASES               8 32 64: 
+BATCH GPU STREAM 64 CMAT CBASES          8 32 64: 11m28
+GPU GASAL STREAM 64                      8 32 64: 11m40
+GPU GASAL STREAM 64 CMAT                 8 32 64: 1m17
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 1m9
+GPU GASAL STREAM 64 CMAT CPBASES        16 16 64: 1m32
+GPU GASAL STREAM 64 CMAT CPBASES        16  8 64: 2m6
+GPU GASAL STREAM 64 CMAT CPBASES         4 32 64: 1m19
+GPU GASAL STREAM 64 CMAT CPBASES         4 64 64: 1m17
+GPU GASAL STREAM 64 CMAT CPBASES         1 64 64: 2m25
+GPU GASAL STREAM 64 CMAT CPBASES        1 128 64: 2m14
+GPU GASAL STREAM 64 CMAT CPBASES        1 256 64: 2m28
+GPU GASAL STREAM 64 CMAT CPBASES         32 8 64: 3m8
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 58s0
+
+TACC 130MB ref vs ref 800 seeds:
+CPU                                            8: 
+CPU                                           32: 73m4
+CPU                                           64: 70m59
+BATCH                                   32  8 64: 
+BATCH GPU STREAM 64 CMAT                 8 32 64: 
+BATCH GPU STREAM 64 CBASES               8 32 64: 
+BATCH GPU STREAM 64 CMAT CBASES          8 32 64: 26m58
+GPU GASAL STREAM 64                      8 32 64: 33m21
+GPU GASAL STREAM 64 CMAT                 8 32 64: 2m58
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 2m46
+GPU GASAL STREAM 64 CMAT CPBASES        1  64 64: 6m39
+GPU GASAL STREAM 64 CMAT CPBASES        1 128 64: 6m10
+GPU GASAL STREAM 64 CMAT CPBASES        1 256 64: 
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 2m15
+
+TACC 6.8MB ref vs ref 800 seeds:
+CPU                                           32: 1m27
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 20s9
+GPU GASAL STREAM 64 CMAT CPBASES         2 32 64: 13s4
+profile done with 2 32 64
+
+
+
 
 ce-cuda
 50MB ref vs ref 800 seeds:
-CPU                                    8: 
-CPU                                   32: 
-BATCH                            8 32 64: 
-BATCH GPU STREAM 64 CMAT         8 32 64: 
-BATCH GPU STREAM 64 CBASES       8 32 64: 
-BATCH GPU STREAM 64 CMAT CBASES  8 32 64: 
-GPU GASAL STREAM 64              8 32 64: 
-GPU GASAL STREAM 64 CMAT         8 32 64: 
-GPU GASAL STREAM 64 CMAT CPBASES 8 32 64: 
+CPU                                            8: 138m21
+BATCH                                    8 32 64: 
+BATCH GPU STREAM 64 CMAT                 8 32 64: 13m54
+BATCH GPU STREAM 64 CBASES               8 32 64: 
+BATCH GPU STREAM 64 CMAT CBASES          8 32 64: 11m26
+GPU GASAL STREAM 64                      8 32 64: 11m46
+GPU GASAL STREAM 64 CMAT                 8 32 64: 1m19
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 1m16
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 56.1s
+
+-----------
+TACC 50MB ref vs ref 800 seeds:
+(match=2,mismatch=-1,open=-2,extend=-2)
+CPU                                            8: 
+CPU                                           32: 
+CPU                                           64: 31m15
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 1m16
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 1m3.5
+
+
+TACC 50MB ref vs ref 800 seeds:
+(match=1,mismatch=-3,open=-1,extend=-1)
+CPU                                            8: 
+CPU                                           32: 
+CPU                                           64: 21m28
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 59s3
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 48s5
+
+
+TACC 50MB ref vs ref 800 seeds:
+(match=5,mismatch=-4,open=-10,extend=-1)
+CPU                                            8: 
+CPU                                           32: 
+CPU                                           64: 31m27
+GPU GASAL STREAM 64 CMAT CPBASES         8 32 64: 1m18
+GPU GASAL STREAM 64 CMAT CPBASES NOSCORE 8 32 64: 1m4.5
+
+
+
+
+
 
 
 

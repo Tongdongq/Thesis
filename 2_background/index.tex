@@ -4,7 +4,7 @@
 
 \chapter{Background}
 \ifdefined\main
-\acresetall
+%\acresetall
 \newcommand{\codePath}{../2_background/code/}
 \newcommand{\figPath}{../2_background/figures/}
 \else
@@ -37,7 +37,7 @@ A DNA molecule consists of two long chains of nucleotides (also called strands),
 Each nucleotide is composed of a nucleobase, a sugar called deoxyribose and a phosphate group \cite{dna_structure}.
 The four different nucleobases are: adenine (A), thymine (T), cytosine (C) and guanine (G).
 The bases of one strand bond with bases in the opposite strand, but adenine can only bond with thymine, and cytosine only with guanine.
-Figure \ref{fig:dna_structure} shows a schematic overview of the components of DNA.
+Figure \ref{fig:dna_structure} shows a schematic overview of the components of DNA, Figure \ref{fig:dna_replication_fig} shows the chemical structure of some of the molecules, as well as the incorporation of a new nucleotide.
 
 \figC{width=\textwidth}{dna_structure.jpeg}{Structure of DNA, source: \cite{dna_structure_fig}}{fig:dna_structure}
 
@@ -56,7 +56,7 @@ RNA primers are added to the strands, one for the leading strand, and several fo
 DNA polymerase starts building from those primers.
 The leading strand is built in one go, but since there are several primers in the lagging strand, it consists of multiple pieces, including the primers.
 These pieces are called the Okazaki fragments \cite{Okazaki_fragments}.
-RNase removes the primers, and ligase stitches the DNA fragments together.
+Ribonuclease (RNase) removes the primers, and ligase stitches the DNA fragments together.
 
 \figC{width=\textwidth}{dna_replication.jpg}{Molecules involved in DNA replication, source \cite{dna_replication_fig}}{fig:dna_replication_fig}
 

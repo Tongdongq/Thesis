@@ -443,6 +443,68 @@ runtime
 56.9, k15
 55.2, k16
 
+GPU GASAL STREAM 64 CMAT CPBASES
+6.8MB, TACC, ref vs read, profile.sh nf 2 32 64
+       Metric Name         Min         Max         Avg
+  gld_transactions         128      510441      187249
+  gst_transactions           0     7029517     4352825
+    gld_efficiency      12.36%     100.00%      29.17%
+    gst_efficiency       0.00%      89.46%      29.30%
+    gst_throughput  0.000  B/s  6.91  GB/s  4.33  GB/s
+    gld_throughput  2.84  MB/s  3.24  GB/s   372  MB/s
+     sm_efficiency       6.60%      94.08%      70.71%
+achieved_occupancy    0.015636    0.066620    0.047945
+
+
+GPU GASAL STREAM 64 CMAT CPBASES
+50MB, TACC, ref vs read, profile.sh nf 8 32 64, ~1.5h profiletime
+                        Event Name         Min         Max         Avg
+                 l1_local_load_hit     1191119     1228710     1228099
+                l1_local_load_miss     1193287     1235296     1231826
+                l1_local_store_hit     2381636     2457566     2457019
+               l1_local_store_miss           0         128         117
+       l2_subp0_read_sector_misses     1984743     3066446     2944003
+l2_subp0_total_read_sector_queries     1265913     1438932     1425404
+
+                  gld_transactions      148539      508090      450765
+                  gst_transactions     6439743     7032217     6972615
+                    gld_efficiency      16.44%      52.24%      47.30%
+                    gst_efficiency      10.91%      91.87%      79.69%
+                    gst_throughput  6.4096GB/s  6.9307GB/s  6.8885GB/s
+                    gld_throughput  288.67MB/s  823.55MB/s  772.53MB/s
+                  stall_inst_fetch      10.41%      10.58%      10.47%
+             stall_exec_dependency      59.14%      60.14%      59.38%
+           stall_memory_dependency      14.95%      15.34%      15.20%
+             stall_memory_throttle      12.44%      13.34%      13.11%
+                     sm_efficiency      93.81%      94.34%      94.17%
+                achieved_occupancy    0.064460    0.066630    0.066595
+                alu_fu_utilization     Low (3)     Low (3)     Low (3)
+
+
+GPU GASAL STREAM 64 CMAT CPBASES
+50MB, TACC, ref vs ref, profile.sh nf 1 128 64, 40m profiletime
+                        Event Name         Min         Max         Avg
+                 l1_local_load_hit           0     4448011     3955570
+                l1_local_load_miss           0     5428209     4806750
+                l1_local_store_hit           0     9647501     8579238
+               l1_local_store_miss           0         512         411
+       l2_subp0_read_sector_misses         512    12309134    10602207
+l2_subp0_total_read_sector_queries         587     6218380     5459388
+
+                  gld_transactions         512     1950608     1520291
+                  gst_transactions           0    28028124    24789237
+                    gld_efficiency      12.65%     100.00%      44.85%
+                    gst_efficiency       0.00%      86.85%      68.95%
+                    gst_throughput  0.00000B/s  20.211GB/s  17.504GB/s
+                    gld_throughput  4.7719MB/s  12.017GB/s  1.8413GB/s
+                  stall_inst_fetch       1.77%      14.31%       7.13%
+             stall_exec_dependency      18.43%      68.69%      39.50%
+           stall_memory_dependency       9.93%      34.83%      18.97%
+             stall_memory_throttle       0.00%      15.66%      14.44%
+                     sm_efficiency       6.67%      97.12%      91.43%
+                achieved_occupancy    0.015741    0.262564    0.234640
+                alu_fu_utilization     Low (1)     Mid (6)     Mid (5)
+
 
 
 
