@@ -62,7 +62,7 @@ reverse* & 13530 & 214 \\
 \end{tabular}
 
 \bigskip
-\caption{Number of waves}
+\caption{Number of waves for one extension in one direction}
 \label{tbl:daligner_dist2}
 \centering
 \vspace{-5pt}
@@ -116,7 +116,7 @@ max & median & 90\% & 99\% \\ \hline
 \end{tabular}
 
 \bigskip
-\caption{Length of overlap}
+\caption{Length of found overlap, also includes unreported overlaps.}
 \label{tbl:daligner_dist7}
 \centering
 \vspace{-5pt}
@@ -248,12 +248,13 @@ Pebbles are checkpoints in the alignment to allow for easier recalculation of th
 Shorter alignments do not need these, but long reads create long alignments.
 However, since Falcon does not use them \cite{Falcon}, they could be removed.
 This means some arrays and loops can be removed.
+Each Pebble takes four integers, and Pebbles are created for both reads.
 
 \paragraph{Cache main diagonals in variables (CAWORK)}
 Inside each wave, multiple diagonals have to be explored.
 Some data is propagated between diagonals, since the possible previous diagonals they read from, overlaps.
 This is usually done via the main data arrays in global memory, but since that could be slow, it could be worthwhile to store some data in registers, so that they can be used in the next diagonal.
-This can be combined wih encoding these data arrays (CWORK).
+This can be combined with encoding these data arrays (CWORK).
 
 \paragraph{Cache main diagonals in shared memory (DIAGSX)}
 Since caching in registers is relatively expensive (registers are sparse), caching in shared memory might be a better idea.
@@ -449,7 +450,7 @@ It was also used to find the maximum of four values in the alignment kernel.
 As with Daligner, the optimal registercount was found to be 64.
 
 \paragraph{Streaming CUDA functions (STREAM)}
-Same as for Daligner.
+Same as for Daligner, streaming CUDA functions like kernels or data transfers allow them to be executed in parallel.
 
 
 \end{document}

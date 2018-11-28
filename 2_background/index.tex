@@ -292,7 +292,7 @@ Still, this is much lower than the high throughput offered by Illumina HiSeq 250
 A nanopore is a small opening through which a DNA molecule can move, one base at a time.
 While doing this, these bases can be detected by an electrical or optical signal.
 The nanopore are usually made of biological proteins, or synthetic structures like carbon nanotubes \cite{nanotubes}.
-Oxford Nanopore Technologies (ONT) has build a system for DNA sequencing where three natural biological molecules form a nanopore.
+Oxford Nanopore Technologies (ONT) has built a system for DNA sequencing where three natural biological molecules form a nanopore.
 This system is called MinION and is a tiny portable DNA sequencer, shown in Figure \ref{fig:minION}.
 The nanopore is put in a synthetic lipid bilayer, which consists of two sheets of lipid molecules forming a thin polar membrane.
 A voltage is applied across the bilayer, causing an ionic current through the nanopore.
@@ -812,7 +812,7 @@ Not all of these are accessible from the host or from other components of the me
 \item L1 cache: Cache line size is 128B. Its default behaviour is to only cache local memory, not global memory. However, for certain architectures applications can opt-in to cache both global and local loads in L1 \cite{L1cache}.
 \end{itemize}
 
-\figC{scale=.5}{memory_hierarchy.png}{Memory hierarchy \cite{cuda}}{fig:memory_hierarchy}
+\figC{scale=.8}{memory_hierarchy.png}{Memory hierarchy \cite{cuda}}{fig:memory_hierarchy}
 
 %\includegraphics[scale=.2]{\fig texture_cache.png}
 \figC{scale=.2}{texture_cache.png}{This access pattern has spatial locality, and could be cached in the texture cache \cite{texture_cache}}{fig:texture_cache}
@@ -822,7 +822,7 @@ When copying data to or from the GPU, there are usually no kernels running in a 
 This means that if the copy time is large, the overall efficiency is quite low.
 These operations can be overlapped or pipelined by using streams. Figure \ref{fig:streams} shows how the execution time can decrease by overlapping copying and computing.
 
-\figC{scale=.2}{streams.png}{Different versions of the same computation \cite{streams}}{fig:streams}
+\figC{scale=.3}{streams.png}{Different versions of the same computation \cite{streams}}{fig:streams}
 
 \todo{add section on OpenCL?}
 %\section{OpenCL}
@@ -858,7 +858,7 @@ CUDAlign \cite{CUDAlign} accelerates the exact Smith-Waterman algorithm, and all
 The input sequence length is only restricted by the available global memory.
 CUDAlign 2.0 \cite{CUDAlign2} uses linear space and boasts a 702x and 19.5x speedup compared to 1 core and 64 cores respectively.
 
-SeqNFind \cite{SeqNFind} is a hardware/software solution based on NVIDIA Tesla GPUs.
+SeqNFind \cite{SeqNFind} is a hardware/software solution based on NVIDIA Tesla GPUs, an example is shown in Figure \ref{fig:SeqNFind}.
 It can be used to speed up numerous algorithms.
 
 \figC{scale=.7}{SeqNFind.jpg}{An image of the SeqNFind hardware, source \cite{SeqNFind}}{fig:SeqNFind}
