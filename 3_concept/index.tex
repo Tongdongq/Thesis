@@ -23,7 +23,7 @@ This implies that there exists a coverage c for every target coverage k, such th
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
 This means that if the reads are long enough to handle repetitive regions, in principle a near perfect denovo assembly of the genome is possible, given enough coverage \cite{Daligner}.
 
-Important points for denovo DNA sequencing are: what level of coverage is needed for high quality assembly?
+Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
 And how to build an assembler that is able to deal with high error rates and long reads?
 Most previous assemblers work with NGS reads, which are much shorter and have much lower error rates.
 Some algorithms used in these assemblers, such as De Bruijn Graph (DBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
@@ -265,13 +265,13 @@ Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{
 It consists of a filter called D-SOFT (Diagonal-band Seed Overlapping based Filtration Technique), which finds seeds, and GACT (Genome Alignment using Constant memory Traceback), which performs alignment between reads of arbitrary length, using constant traceback.
 The fact that GACT uses constant traceback makes it very suitable for hardware acceleration.
 Darwin boasts a 39.000x more energy-efficient approach then software, and a 15.000x speedup for reference-guided alignment for third generation reads using an ASIC.
-On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for denovo over state-of-the-art software.
+On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for de novo over state-of-the-art software.
 
 
 \subsection{D-SOFT}
 Like Daligner, D-SOFT filters by counting bases in Kmer matches.
 For each band of diagonals (bin), a particular threshold must be exceeded to constitute a seed hit, thus invoking the GACT algorithm.
-When using D-SOFT to do denovo alignment, each read is padded with unknown nucleotides (N), so that each read starts at the start of a bin.
+When using D-SOFT to do de novo alignment, each read is padded with unknown nucleotides (N), so that each read starts at the start of a bin.
 Figure \ref{fig:D_SOFT} illustrates the working of D-SOFT for k = 4, N = 10, h = 8, N$_{B}$ = 6.
 N is the number of Kmer matches that are considered, h is the minimum number of unique bases that the Kmer matches in a particular bin must have, N$_{B}$ is the number of bins.
 The start positions of the matches are marked by red dots, the rest of the seed is a red line.

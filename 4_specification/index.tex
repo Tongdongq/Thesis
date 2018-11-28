@@ -37,7 +37,7 @@ Their structure is very similar, but combining them into one function would be d
 \subsection{Darwin}
 Darwin uses gettimeofday \cite{gettimeofday} to measure the runtime of various elements of the algorithm.
 Three notable parts are building the seedposition table, finding the seeds, and aligning usign GACT.
-Of those three, aligning takes the most time, namely 99.9\% for a small PacBio human denovo alignment, and 99.4\% for a small simulated PacBio E.coli reference based alignment.
+Of those three, aligning takes the most time, namely 99.9\% for a small PacBio human de novo alignment, and 99.4\% for a small simulated PacBio E.coli reference based alignment.
 GACT is also the part that has been accelerated on FPGA by the original creators because of the constant memory requirement.
 This is why GACT will be implemented on GPU.
 
@@ -146,12 +146,12 @@ Skipping GACTcalls would remove at most 3\%.
 
 The default tilesize is 320.
 If some GPU threads have a smaller tilesize, this will cause divergence, because they will have to wait until the threads with larger tilesizes are finished.
-For denovo alignment, 63\% of the tilesizes where 320x320.
+For de novo alignment, 63\% of the tilesizes where 320x320.
 For reference-based alignment, this percentage is 79\%.
 
 The traceback is done inside the alignment function.
 All used tracebackpointers (max 2*(T-O)) are returned.
-For denovo, 74\% of the traceback results had the maximum of 200 bases in either direction, this is 84\% for reference-based alignment.
+For de novo, 74\% of the traceback results had the maximum of 200 bases in either direction, this is 84\% for reference-based alignment.
 
 
 

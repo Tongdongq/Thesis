@@ -20,6 +20,8 @@
 
 % usage: \fig{options}{fileName}{caption}{fig:label}
 
+% sed '/{/!s/denovo/de novo/g'   to replace 'denovo' with 'de novo', except is there is a { on the line
+
 \newcommand{\fig}[4]{%
 \begin{figure}[h]
 \includegraphics[#1]{\figPath #2}

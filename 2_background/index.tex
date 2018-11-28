@@ -596,7 +596,7 @@ Figure \ref{fig:dna_assembly} shows a simplified assembly process.
 
 \figC{width=.6\textwidth}{DNA_assembly.png}{A DNA strand is cloned and sequenced, the reads are assembled and the original DNA strand is recovered, source: \cite{dna_assembly_fig}}{fig:dna_assembly}
 
-There are two types of assembly: denovo and reference based.
+There are two types of assembly: de novo and reference based.
 Denovo assembly works as described above, but reference based assembly first maps the reads to a reference.
 If multiple reads map to the same place in the reference, they are likely to be overlapping.
 Denovo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
@@ -607,7 +607,7 @@ The drawback of reference based assembly is that a read must first be mapped to 
 Reference based assembly is good at finding small variations between the sampled DNA and the reference \cite{denovo_vs_reference}.
 
 \subsection{Denovo assembly}
-% denovo:
+% de novo:
 % velvet (ngs, dBG)
 % abyss (ngs, k:27-36, dBG)
 % daligner (tgs)
@@ -621,14 +621,14 @@ Reference based assembly is good at finding small variations between the sampled
 % qsra (ngs, hash, prefix, greedy)
 % Newbler (ngs, olc, seed: k:16)
 % sga (ngs, olc, fm, BWT)
-% SOAPdenovo2 (dBG)
+% SOAPde novo2 (dBG)
 
 % HGAP (tgs)
 % Falcon (tgs)
 % Canu (tgs)
 % Hinge (tgs)
 
-There are two types of denovo assemblers: string-based and graph-based.
+There are two types of de novo assemblers: string-based and graph-based.
 String-based assemblers are greedy \cite{denovo1}.
 Examples of string-based assemblers are SSAKE \cite{ssake}, SHARCGS \cite{sharcgs} and QSRA \cite{qsra}.
 The greedy approach works like this: from the set of reads, pick the two strings that have the 'best' overlap and merge them, repeat until there is one string left or there are no suitable overlaps anymore.
