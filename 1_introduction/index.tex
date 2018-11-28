@@ -13,8 +13,8 @@ Pretty much all of these processes are governed by DNA, the building blocks of l
 Our kind has spent ages trying to unravel its secrets.
 Literally, because we found out that DNA consists of a double helix, which must be unwound to be used.
 
-In 2012, we discovered that the human genome consists of about three billion basepairs, wrapped up in 23 chromosomepairs \cite{human_genome_project}.
-And that it shares 60\% with the genome of a banana \cite{banana}.
+In 2003, we sequenced the whole human genome \cite{human_genome_project}.
+It consists of about three billion basepairs, wrapped up in 23 chromosomepairs, and shares 60\% with the genome of a banana \cite{banana}.
 However, DNA still has many unexposed secrets.
 For example, some diseases are partially caused by genes, like breast cancer or sickle cell disease \cite{genomic_diseases}.
 
@@ -32,7 +32,7 @@ These promising regions are called seeds, and are found using Kmers.
 A Kmer is a piece of K consecutive nucleotides.
 Many different techniques exist to split and store the reads into Kmers.
 The reads are compared to eachother, reads that have enough matching Kmers in a small enough region, are extended using various methods.
-Another approach is a deBruijn graph, each Kmer is a vertex, and an edge is created for each next Kmer.
+Another approach is a de Bruijn graph, each Kmer is a vertex, and an edge is created for each next Kmer.
 For example, the read 'ATC' would result in vertices 'AT' and 'TC', with a directed edge with weight one between them.
 This results in a large graph with up to $4^K$ vertices, and even more edges, a normal value for K is 21.
 The resulting assembly is found by calculating the Hamiltonian Path \cite{Euler_Hamil_paths}.
