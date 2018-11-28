@@ -553,7 +553,7 @@ Or to only allow gaps for one sequence.
 % Banded-SW
 % X-drop
 % SAGA genetic algorithm
-% Ant colony optimzation, particle swarm optimization
+% Ant colony optimization, particle swarm optimization
 % BWA
 
 A heuristic algorithm does not guarantee to find an optimal solution, but gives an approximate solution to a particular problem \cite{heuristic}.
@@ -597,16 +597,16 @@ Figure \ref{fig:dna_assembly} shows a simplified assembly process.
 \figC{width=.6\textwidth}{DNA_assembly.png}{A DNA strand is cloned and sequenced, the reads are assembled and the original DNA strand is recovered, source: \cite{dna_assembly_fig}}{fig:dna_assembly}
 
 There are two types of assembly: de novo and reference based.
-Denovo assembly works as described above, but reference based assembly first maps the reads to a reference.
+De novo assembly works as described above, but reference based assembly first maps the reads to a reference.
 If multiple reads map to the same place in the reference, they are likely to be overlapping.
-Denovo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
-Denovo assembly is an NP-hard problem \cite{denovo_NP}.
+De novo assembly compares each read with every other read, resulting in a naive time complexity of $O(N^2)$, where N is the number of reads.
+De novo assembly is an NP-hard problem \cite{denovo_NP}.
 Mapping each read to a reference takes $O(N)$, and then a much smaller number of reads has to be compared with each other.
 
 The drawback of reference based assembly is that a read must first be mapped to a reference, this means that reads that contain new or very different stretches of DNA are filtered away, this results in a biased assembly.
 Reference based assembly is good at finding small variations between the sampled DNA and the reference \cite{denovo_vs_reference}.
 
-\subsection{Denovo assembly}
+\subsection{De novo assembly}
 % de novo:
 % velvet (ngs, dBG)
 % abyss (ngs, k:27-36, dBG)
@@ -621,7 +621,7 @@ Reference based assembly is good at finding small variations between the sampled
 % qsra (ngs, hash, prefix, greedy)
 % Newbler (ngs, olc, seed: k:16)
 % sga (ngs, olc, fm, BWT)
-% SOAPde novo2 (dBG)
+% SOAPdenovo2 (dBG)
 
 % HGAP (tgs)
 % Falcon (tgs)
@@ -709,7 +709,7 @@ Stampy uses a probabilistic aligner to extend their seeds.
 SeqAlto and Aryana use a banded Needleman-Wunsch.
 
 When all the reads are mapped to the reference, they have to be combined.
-This can be done by local denovo assembly, or a consensus algorithm \cite{consensus}.
+This can be done by local de novo assembly, or a consensus algorithm \cite{consensus}.
 
 
 % mappers:
