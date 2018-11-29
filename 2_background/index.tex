@@ -109,7 +109,7 @@ The cells produces more heat shock proteins when it is exposed to heat \cite{cha
 \section{DNA sequencing}
 DNA sequencing is the process of finding out which nucleotides make up a DNA molecule, or all DNA molecules of an organism.
 Separate DNA molecules are called 'chromosomes'.
-Humans have 46 chromosomes, containing about 3.5 billion basepairs \cite{DNA_human_stats} and about 20000 genes \cite{human_genes}.
+Humans have 46 chromosomes, containing about 3.5 billion base pairs \cite{DNA_human_stats} and about 20000 genes \cite{human_genes}.
 
 Knowing the exact DNA sequence is useful for a number of applications: analyzing bacteria/virusses, analyzing genetic diseases, forensic analysis, ethnicity and ancestry analysis.
 
@@ -123,7 +123,7 @@ Sanger sequencing, also called chain-termination sequencing, is the first major 
 It is published in 1977 \cite{Sanger}, and later improvements led to the development of commercial DNA sequencing machines in 1991 \cite{history_sequencing}.
 It is also the technique used by the Human Genome Project \cite{sanger_sequencing2}, a project to sequence the whole genome of a human.
 The project start around 1990, and finished in 2003 \cite{human_genome_project}.
-Since Sanger sequencing has a maximum chain length of about 900 basepairs \cite{sanger_sequencing2}, the resulting pieces of DNA had to be assembled after sequencing.
+Since Sanger sequencing has a maximum chain length of about 900 base pairs \cite{sanger_sequencing2}, the resulting pieces of DNA had to be assembled after sequencing.
 
 To sequence a DNA sample, it is mixed in a tube with: a \textit{primer}, DNA polymerase, normal DNA nucleotides (dATP, dTTP, dGTP and dCTP), and dye-labeled, chain-terminating dideoxynucleotides.
 The primer is a piece of DNA that can fit onto a specific spot of a DNA strand.
@@ -171,7 +171,7 @@ The wells are cleaned by the enzyme apyrase, which degrades ATP and the unused n
 Now, the next type of nucleotide can be added.
 The whole sequencing process is shown in Figure \ref{fig:pyro_sequencing}.
 
-The newest pyrosequencing machines can produce read lengths up to 700 basepairs.
+The newest pyrosequencing machines can produce read lengths up to 700 base pairs.
 
 \figC{scale=.9}{pyro_sequencing_1.jpg}{Workflow of pyrosequencing, adapted from: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
@@ -184,18 +184,19 @@ Bridge PCR is further explained in Figures \ref{fig:bridge_pcr} and \ref{fig:bri
 At the end of the PCR step, the reverse strands are washed away \cite{bridge_pcr_reverse}.
 The reversible terminators are regular nucleotides, but fluorescent dye occupies the 3' end.
 First, the reversible terminators are added, and bound by the DNA polymerase.
-The unused nucleotides are washed away, and the dye of the bound nucleotides is released by an enzyme, allowing the bases to be read, and the chain to be extended during the next cycle.
+The unused nucleotides are washed away, and the dye of the bound nucleotides is released by an enzyme, allowing the bases to be read, and the chain to be extended by one base during the next cycle.
 
-Reads produced by this method are shorter (about 100 basepairs \cite{ngs_history}\cite{pyro_sequencing1}).
+Reads produced by this method are shorter (about 100 base pairs \cite{ngs_history}\cite{pyro_sequencing1}).
 
 \figC{scale=.65}{bridge_pcr.png}{Process of bridge PCR, source: \cite{ngs_sequencing_atdbio}}{fig:bridge_pcr}
 \figC{scale=.75}{bridge_pcr_comp.jpg}{(a) emulsion PCR, (b) bridge PCR, (c) emulsion PCR results in beads with cloned DNA strands, each well can fit one bead, (d) bridge PCR results in clusters of cloned DNA strands, source: \cite{history_sequencing}}{fig:bridge_pcr_comp}
 
 Illumina also developed paired-end (PE) sequencing.
 Both ends of a DNA strand are sequenced, with an unsequenced gap in the middle, this creates more data per DNA strand, but also valuable information, since the length of the strand is known.
+This length is equal to the length of the fragment \cite{paired_end_lengths}.
 These paired-end reads can be used during assembly, namely during the scaffolding (see Section \ref{sec:dna_assembly}).
 Figure \ref{fig:paired_end} shows how they can be used to resolve repetitive regions.
-\todo{find paired-end lengths?}
+
 
 \figC{scale=.6, clip, trim=0 170 0 0}{paired_end.jpg}{Paired-end sequenced reads can be used to resolve repetitive regions due to their length.
   Source: \cite{paired_end_fig}}{fig:paired_end}
@@ -218,7 +219,7 @@ After the rounds, the colors can be decoded to get the actual bases, like in Fig
 The total workflow in shown in Figure \ref{fig:solid_workflow}.
 
 Because each base is measured twice, the accuracy can go up to 99.999\% with six primers, which is the highest of the NGS methods \cite{ngs_sequencing_atdbio}.
-A downside is that the read lengths are usually short, 50 to 75 basepairs \cite{ngs_history}.
+A downside is that the read lengths are usually short, 50 to 75 base pairs \cite{ngs_history}.
 
 \figC{scale=.5}{solid_color_coding.jpg}{Color coding of SOLiD sequencing results, source: \cite{solid_color_coding}}{fig:solid_color_coding}
 \figC{scale=.3}{solid_color_decoding.png}{Color decoding of SOLiD sequencing results, source: \cite{solid_color_decoding}}{fig:solid_color_decoding}
@@ -229,15 +230,15 @@ DNBS relies on Rolling Circle Amplification to clone the DNA strands that need t
 The cloned strands are sequenced like in SOLiD sequencing \cite{ngs_history}.
 Ion Torrent is very similar to pyrosequencing, but uses hydrogen ions instead of fluorescent dye to detect bases \cite{ngs_sequencing_atdbio}.
 The number of ions is proportional to the number bases that was attached, however, at large repeating sections the accuracy decreases.
-Ion Torrent produces reads of up to 400 basepairs, but the error rate is relatively high at 1.5\%.
+Ion Torrent produces reads of up to 400 base pairs, but the error rate is relatively high at 1.5\%.
 
 
 \subsection{Third Generation Sequencing}
 There is no clear division between Next Generation Sequencing and Third Generation Sequencing (TGS).
-The technological improvements follow eachother quickly, and do not usually fit into welldefined timescales \cite{window_tgs}.
+The technological improvements follow eachother quickly, and do not usually fit into well-defined timescales \cite{window_tgs}.
 However, an often used definition is that TGS approaches are able to sequence a single DNA molecule, thus eliminating the need for amplification \cite{history_sequencing}\cite{ngs_sequencing_atdbio}.
 
-The first TGS method is created by Helicos Biosciences, a company that went backrupt in 2012 \cite{history_sequencing}.
+The first TGS method is created by Helicos Biosciences, a company that went bankrupt in 2012 \cite{history_sequencing}.
 DNA template strings are attached to a surface.
 Fluorescent nucleotides called Virtual Terminators are added, the dye is then cleaved off and detected.
 The samples are washed, and a new type of nucleotide can be added.
@@ -246,18 +247,18 @@ The read lengths are also quite short: about 32 nucleotides \cite{window_tgs}.
 
 The other TGS are roughly placed into three categories: (a) sequencing by synthesis, (b) sequencing by nanopore, (c) direct imaging \cite{window_tgs}.
 
-One of the most used TGS platforms is the Single Molecule RealTime (SMRT) sequencing platform from Pacific Biosciences.
+One of the most used TGS platforms is the Single Molecule RealTime (SMRT) sequencing platform from Pacific Biosciences (PacBio).
 It is based on sequencing by synthesis.
 A very important part of SMRT sequencing is the Zero-Mode Waveguide (ZMW) technology.
 A ZMW is a very tiny hole, with a diameter of 60-100 nm, and a height of 100 nm \cite{zmw}.
 The metal that the holes are created in is placed on a glass substrate, giving the holes a glass bottom.
 At the bottom of each well is a DNA polymerase molecule attached.
 The wells are illuminated from beneath, by a laser with a wavelength of approximately 600 nm \cite{history_sequencing}.
-The diameter of the well is important, because it is smaller than the wavelength of the used light, the light penetrating the bottom of the well decays exponentionally, such that only the bottom of the well is illuminated.
+The diameter of the well is important, because it is smaller than the wavelength of the used light, the light penetrating the bottom of the well decays exponentially, such that only the bottom of the well is illuminated.
 The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
 There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer, this creates a high signal-to-noise ratio \cite{window_tgs}.
 As the polymerase does not have to wait for the nucleotides to be washed away, the process is realtime, which greatly increases the sequencing speed.
-Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}, Figure \ref{fig:pacbio_readlength} shows a distribution of the read lengths.
+Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 base pairs, and longest reads of 60000 base pairs \cite{pacbio_readlength}, Figure \ref{fig:pacbio_readlength} shows a distribution of the read lengths.
 The fluorescent dyes are attached to the phosphate chain, which is cleaved off naturally when incorporated into the DNA strand, as shown in Figures \ref{fig:dna_replication_fig}, \ref{fig:pacbio_dye} and \ref{fig:pacbio}.
 
 \figC{scale=.4}{pacbio_dye.jpeg}{(a) A zero-mode waveguide with a DNA polymerase molecule at the bottom (b) a dyed base is incorporated into the strand, and the phosphate groups with tye dye are cleaved off, source: \cite{pacbio_dye}}{fig:pacbio_dye}
@@ -272,7 +273,7 @@ The insert can be of any length, where lengths from 40 bp to 25000 bp have been 
 The hairpins contain a sequence to which a primer can bind to.
 When the whole SMRTbell is sequenced, the DNA polymerase arrives at the 5' end of the primer.
 The primer is separated from the SMRTbell, and the sequencing can continue.
-This means that length of the sequence can become much larger than the length of the insert, depending on the lifetime of the polymerase \cite{pacbio}.
+This means that the length of the sequence can become much larger than the length of the insert, depending on the lifetime of the polymerase \cite{pacbio}.
 After sequencing, the reads can be split up by removing the hairpin regions, to obtain subreads.
 Since each base can be sequenced multiple times, a consensus sequence can be constructed from all subreads, with a quality score for each base.
 This process is shown in Figure \ref{fig:SMRTbell2}.
@@ -291,7 +292,7 @@ Still, this is much lower than the high throughput offered by Illumina HiSeq 250
 
 A nanopore is a small opening through which a DNA molecule can move, one base at a time.
 While doing this, these bases can be detected by an electrical or optical signal.
-The nanopore are usually made of biological proteins, or synthetic structures like carbon nanotubes \cite{nanotubes}.
+The nanopore is usually made of biological proteins, or synthetic structures like carbon nanotubes \cite{nanotubes}.
 Oxford Nanopore Technologies (ONT) has built a system for DNA sequencing where three natural biological molecules form a nanopore.
 This system is called MinION and is a tiny portable DNA sequencer, shown in Figure \ref{fig:minION}.
 The nanopore is put in a synthetic lipid bilayer, which consists of two sheets of lipid molecules forming a thin polar membrane.
@@ -309,7 +310,8 @@ Figures \ref{fig:nanopore} and \ref{fig:nanopore2} show the working of the nanop
 \figC{width=.3\textwidth}{minION.jpg}{A MinION device connected to a USB 3.0 cable, source: \cite{minION_fig}}{fig:minION}
 
 \figC{scale=.8}{nanopore.jpg}{Double-stranded DNA gets denatured by an enzyme (1), one of the strands moves through the nanopore (2), adapted from: \cite{history_sequencing}}{fig:nanopore}
-\figC{width=\textwidth}{nanopore2.png}{(i) nanopore is empty, (ii) dsDNA with lead adaptor (blue), molecular motor (orange) and hairpin adaptor (red), (iii) lead adaptor, (iv) template strand (gold), (v) hairpin adaptor, (vi) complement strand (dark blue), (vii) trailing adaptor (brown), (viii) nanopore is empty again, adapted from: \cite{minION}}{fig:nanopore2}
+\figC{width=\textwidth}{nanopore2.png}{(i) nanopore is empty, (ii) dsDNA is caught by a molecular motor (orange), (iii) the lead adaptor (blue) is pulled through, (iv) template strand (yellow), (v) hairpin adaptor (red), (vi) complement strand (dark blue), (vii) trailing adaptor (brown), (viii) nanopore is empty again, adapted from: \cite{minION}}{fig:nanopore2}
+
 
 Oxford Nanopore boasts very long reads, over 200 kilobases, but a disadvantage of using this system is the error rate is very high: 12-38\% \cite{minION_error1}\cite{minION_error2}.
 
@@ -318,7 +320,7 @@ Oxford Nanopore boasts very long reads, over 200 kilobases, but a disadvantage o
 The third category is direct imaging, usually with some sort of microscope.
 
 A Transmission Electron Microscope (TEM) can be used to detect atoms attached to nucleotides.
-The atoms that normally make up nucleotides are too small and light to be detected, so heavy elements elements are added, like Mercury \cite{tem}.
+The atoms that normally make up nucleotides are too small and light to be detected, so heavy elements are added, like Mercury \cite{tem}.
 Figures \ref{fig:tem_label} and \ref{fig:flatDNA2} show a DNA strand with labelled nucleotides, and a resulting image.
 To be able to read the bases, the DNA's natural state, a double helix, must be flattened and placed on a substrate.
 Figure \ref{fig:flatDNA1} shows the different forms of DNA.
@@ -372,7 +374,6 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 
 \figC{width=.5\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunnelling nanopore measuring the tunnelling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
-\todo{mention protein alignment?}
 \section{DNA Alignment}
 DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
 This information can be used to reconstruct the whole genome, during the assembly phase, which is discussed in Section \ref{sec:dna_assembly}
@@ -384,7 +385,6 @@ Alignment algorithms are also useful in applications like text comparison \cite{
 If the two reads originate from the same part of the genome, the mismatches can be explained by sequencing errors.
 But copying the genome during cell division can also cause errors \cite{dna_replication_errors}.
 Since DNA sequencing is usually performed on more than one cell, the variations in these cells are all sequenced.
-\todo{citation needed?}
 
 The mismatches between reads can be distinguished between substitutions, insertions and deletions.
 A substitution is shown between the fifth bases in the figure.
@@ -398,10 +398,8 @@ Exact or heuristic algorithms can be used to determine the best alignment betwee
 Exact algorithms are guaranteed to find the best alignment, heuristic algorithms reduce the search space, which (dramatically) improves runtime, but the results might be worse than exact algorithms.
 
 A simple scoring scheme has a static score/penalty for an indel or mismatch, but biologically speaking, one larger gap is more likely to happen than two smaller gaps, since it is more likely to add arbitrary bases to an existing gap than to create such a gap.
-\todo{citation needed?}
 This is why an affine gap penalty in the form of $y = a*N+b$ is often used, where $b$ is the gap open penalty, $a$ the gap extend penalty, and $N$ the number of bases in the gap - 1.
-Other variations in gap penalty include constant ($y = a$), double affine (), convex ($y = a+b\cdot ln(N)$).
-\todo{double affine description?}
+Other variations in gap penalty include constant ($y = a$), double affine ($y = a + min(n,k)b_0 + max(0,n-k)b_1$) or convex ($y = a+b\cdot ln(N)$).
 
 Global alignment aligns the full length of both sequences.
 Every base will either have a match/mismatch with a base from the other read, or a gap.
@@ -414,7 +412,6 @@ Figure \ref{fig:global_vs_local_alignment_fig} shows another example of a case w
 
 \figC{width=.6\textwidth}{global_vs_local.png}{Local alignment can find small, overlapping regions very well, source: \cite{global_vs_local_alignment_fig}}{fig:global_vs_local_alignment_fig}
 
-\todo{should dynamic programming be a separate subsection? Could be an appendix as well}
 \subsection{Dynamic programming}
 Dynamic programming is a programming technique that solves problems by dividing them recursively into smaller, simpler problems \cite{Dynamic_programming1}.
 An important aspect is that the subproblems overlap, saving the results of one subproblem to use in another subproblem.
@@ -431,7 +428,6 @@ Bottom-up firsts solves the subproblems, and uses these results to build the sol
 For global alignment, the Needleman-Wunsch (NW) algorithm \cite{NeedlemanWunsch} is widely used.
 It was published in 1970, and designed to compare sequences of amino acids, but as both are represented by letters, comparing nucleotides works in the same way.
 Needleman-Wunsch is an exact algorithm, producing the optimal global alignment.
-\todo{cite/prove that NW is proven optimal?}
 
 In Needleman-Wunsch, the smallest subproblems are trivial alignments, such as aligning two bases, or aligning zero bases in one read with N bases in the other.
 The first can result in two cases: a match or a mismatch, the latter results in N gaps.
@@ -462,9 +458,9 @@ The algorithm consists of three steps: initialization, filling the matrix, and p
 The initialization writes scores to the first row and column, as these alignments are trivial.
 Figure \ref{fig:NW1} shows an initialized matrix.
 
-\figC{width=.6\textwidth}{NW1.png}{The NW matrix, initialised, source: \cite{NW_online}}{fig:NW1}
+\figC{width=.6\textwidth}{NW1.png}{The NW matrix, initialized, source: \cite{NW_online}}{fig:NW1}
 
-The matrix is filled according to the recurrence relation, where the elements have to be calculating in a particular order, because certain previous values need to be known.
+The matrix is filled according to the recurrence relation, where the elements have to be calculated in a particular order, because certain previous values need to be known.
 A filled matrix is shown in Figure \ref{fig:NW2}.
 
 \figC{width=.6\textwidth}{NW2.png}{The NW matrix, filled, source: \cite{NW_online}}{fig:NW2}
@@ -475,7 +471,6 @@ The traceback path either follows the traceback pointers, denoted by arrows in F
 The traceback path always ends at element $S(0,0)$.
 
 \figC{width=.6\textwidth}{NW3.png}{The NW matrix, with the traceback path highlighted, source: \cite{NW_online}}{fig:NW3}
-
 
 The affine gap penalty is implemented via 3 matrices, one for a match/mismatch, one for a gap in read A, one for a read in B.
 %X[] = max(gap_open + M[], gap_extend + X[])
@@ -508,7 +503,7 @@ Or it could be an extension of an existing gap, in which case the score if based
 
 
 \subsection{Local alignment}
-Smith-Waterman (SW)\cite{SW} is a variation on Needleman-Wunsch, it finds local alignments instead of global alignments.
+Smith-Waterman (SW) \cite{SW} is a variation on Needleman-Wunsch, it finds local alignments instead of global alignments.
 It is also based on dynamic programming, but has small changes which allow the algorithm to start and stop an alignment at any point in the matrix.
 Cells with a negative score are set to zero.
 Traceback starts at the highest scoring cell, instead of in the bottom-right corner.
@@ -562,31 +557,27 @@ Heuristics are often used to reduce the runtime, and a well designed heuristic w
 In DNA alignment, a heuristic will often reduce the number of elements in a NW or SW matrix that are calculated.
 
 Many heuristic aligners implement a seed-and-extend technique \cite{seed_extend}.
-A seed is a small piece that contains k consecutive nucleotides, also known as Kmer, where k is usually 3-25.
-Exact Kmer matches are found, and the overlap is extended from there.
+A seed describes two regions in two different reads that have enough similarity to be investigated further.
+A seed could have consecutive matching nucleotides, or multiple matching Kmers.
+A Kmer is a piece of K consecutive nucleotides, where K is usually 12-36.
+One way of seeding is finding Kmer matches, and counting them to find out if the regions have enough similarity.
+If a seed is found, it can be 'extended' using various techniques.
 
-A small k will result in lots of hits, many of which will not result in a convincing overlap.
-A large k will limit the number of hits, but also reduces the sensitivity, since actual overlaps could have zero large consecutive matching nucleotides.
-To increase the sensitivity when using a large k, one could allow one or more mismatches in the seed, to create so-called spaced seeds \cite{spaced_seeds}.
+A small K will result in lots of hits, many of which will not result in a convincing overlap.
+A large K will limit the number of hits, but also reduces the sensitivity, since actual overlaps could have zero large consecutive matching nucleotides.
+To increase the sensitivity when using a large K, one could allow one or more mismatches in the seed, to create so-called spaced seeds \cite{spaced_seeds}.
 To reduce the number of hits, multiple nearby Kmer matches can be required to start extension, since an actual overlap is likely to have lots of matching nucleotides.
 
 For the extension phase, a variant of dynamic programming can be used, which forces the traceback to start at the end of the seed.
 The dynamic programming can include an area that is smaller than the matrix that would be calculated by regular Smith-Waterman.
 Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
-
-\subsection{Multiple Sequence Alignment}
-Multiple Sequence Alignment algorithms \cite{MSA_survey} try to align three or more sequences, usually of similar length.
-The results can be used to create phylogenetic trees or to study evolutionary relationships \cite{MSA}.
-\todo{expand this section?}
-
-
 \section{DNA Assembly}\label{sec:dna_assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
-These length and error rate of these reads depend of the sequencing technique used, but they all have one thing in common: they have to be assembled to be useful.
+The length and error rate of these reads depend of the sequencing technique used, but they all have one thing in common: they have to be assembled to be useful.
 DNA assembly tries to combine the reads into large, high quality parts.
 
-The process of DNA assembly is often compared to taking a copy of a book, shredding it, and trying to piece is back together.
+The process of DNA assembly is often compared to taking a copy of a book, shredding it, and trying to piece it back together.
 However, when taking a read and splitting it into two parts, there is no information indicating that the two parts were originally together, as it would with shredded paper.
 This is why DNA is always oversampled, this means that each base is sequenced multiple times.
 %If a short sequence of bases is found in multiple reads, overlaps can be found, and the reads are combined into a bigger read.
@@ -633,7 +624,7 @@ String-based assemblers are greedy \cite{denovo1}.
 Examples of string-based assemblers are SSAKE \cite{ssake}, SHARCGS \cite{sharcgs} and QSRA \cite{qsra}.
 The greedy approach works like this: from the set of reads, pick the two strings that have the 'best' overlap and merge them, repeat until there is one string left or there are no suitable overlaps anymore.
 The 'best' overlap can differ: a perfect overlap between two strings s and t is a string y, such that s = xy and t = yz for some non-empty strings x and z \cite{denovo2}, but different scoring schemes allowing a few mismatches here and there are possible.
-A suitable overlap will have a minimum length: since there are only four different bases, a set will likely have two reads with an overlap of one base, one can imagine merging these is not likely to be correct.
+A suitable overlap will have a minimum length: since there are only four different bases, a set will likely have two reads with an overlap of one base; one can imagine merging these is not likely to be correct.
 The greedy approach requires all reads to be compared with all reads, which is not suited for the high throughput of NGS systems.
 Another problem are repeat regions, which are very common in eukaryotic genomes, the human genome can contain more than 50\% repeats or repetitive areas \cite{repeats1}\cite{repeats2}.
 
@@ -641,11 +632,11 @@ Figure \ref{fig:repeat_greedy} shows how a greedy algorithm can misassemble read
 
 \figC{width=.6\textwidth}{repeat_greedy.jpg}{Pieces of a repeat region (green) occur in multiple reads, fragments 2 and 6 have a bigger overlap than 2 and 3 or 5 and 6, causing a misassembly, adapted from: \cite{repeat_greedy_fig}}{fig:repeat_greedy}
 
-For NGS reads, graph-based assemblers are used, which come in two flavours: overlap-layout-consensus (OLC) and de Bruijn Graph (dBG) \cite{OLC_DBG}.
+For NGS reads, graph-based assemblers are used, which come in two flavours: Overlap-Layout-Consensus (OLC) and de Bruijn Graph (dBG) \cite{OLC_DBG}.
 
 The OLC assemblers first find overlaps and build an overlap graph.
 Each node represents a read, and each edge represents an overlap between two reads.
-During the layout phase, the graph is analysed to find paths, corresponding to segments of the original genome.
+During the layout phase, the graph is analyzed to find paths, corresponding to segments of the original genome.
 The perfect graph contains one path that visits each node exactly once.
 This problem can be described as finding a Hamiltonian Path \cite{Euler_Hamil_paths}, which is also an NP-hard problem \cite{ngs_difficulties}.
 A Hamiltonian Path includes all vertices of a graph exactly once.
@@ -680,8 +671,6 @@ The gaps contain unknown bases, denoted by 'N', but their lengths is roughly kno
 To create scaffolds, paired-end reads can be used.
 When two ends of the paired-end read are found in different contigs, these contigs are likely to belong next to each other, with a gap between them.
 
-\todo{consider talking about Optical Mapping to aid scaffolding}
-\todo{talk about error correction before/after assembly?}
 
 \subsection{Reference based assembly}
 The biggest part in reference based assembly is finding the location in the reference that the read came from, this process is called 'mapping'.
@@ -689,14 +678,14 @@ Mapping is usually done by a 'seed-and-extend' method.
 This means that first a position is found that is promising (seed), and then the algorithm looks at both ends of the seed to see if those parts also match with the reference.
 
 The most used method of finding seeds is to divide the reads into Kmers.
-A Kmer is a piece of DNA with exactly k bases \cite{Kmer}.
+A Kmer is a piece of DNA with exactly K bases \cite{Kmer}.
 The reference is also divided into Kmers, and exact Kmer matches are found using various methods.
 A popular and basic method is hashing, used by MAQ \cite{maq}, Seqmap \cite{seqmap}, Mosaik \cite{mosaik}, Snap \cite{snap}, Shrimp2 \cite{shrimp2}, Stampy \cite{stampy} and SeqAlto \cite{seqalto}.
 A different approach uses BWT \cite{BWT} or suffix arrays \cite{SA} to find matches, used by BWA \cite{bwa}, Soap2 \cite{soap2}, Bowtie2 \cite{bowtie2}, BWA-SW \cite{bwa-sw}, Aryana \cite{aryana} and BFAST \cite{bfast}.
-An uncommon approach is to use sorting to find matching Kers, like in merge-sort \cite{mergesort}\cite{sorting}.
+An uncommon approach is to use sorting to find matching Kmers, like in merge-sort \cite{mergesort}\cite{sorting}.
 This technique is used by Slider \cite{slider} and Syzygy \cite{syzygy}.
 
-The value of k is very important: too low and there will be too many hits, too high and there will not be enough hits.
+The value of K is very important: too low and there will be too many hits, too high and there will not be enough hits.
 The value is also dependent on the length of the reads, and the type of reference (a different k might be used for humans or bacteria).
 Values between 12 and 32 are common.
 
@@ -760,9 +749,7 @@ A general workflow using a GPU is shown in Figure \ref{fig:gpu_workflow}.
 %\end{itemize}
 
 
-
-\todo{maybe divide into subsections}
-\section{CUDA}
+\subsection{CUDA}
 CUDA is a parallel computing platform that allows people to use Nvidia GPUs for their own applications.
 Developers can write functions that will execute on the GPU called \textit{kernels}, these are launched from a CPU function.
 The GPU is referred to as \textit{device} and the CPU as \textit{host}.
@@ -824,16 +811,6 @@ These operations can be overlapped or pipelined by using streams. Figure \ref{fi
 
 \figC{scale=.3}{streams.png}{Different versions of the same computation \cite{streams}}{fig:streams}
 
-\todo{add section on OpenCL?}
-%\section{OpenCL}
-
-
-
-
-%\todo{include this section? this work mainly focuses on GPU computation, instead of heterogeneous computation}
-%\section{Heterogeneous computing}
-%\cite{hetero_survey}
-
 
 \subsection{Bioinformatics on GPU}
 
@@ -867,7 +844,9 @@ CUSHAW \cite{cushaw} is an accelerated short read aligner that uses BWT.
 It uses CUDA and is optimized for the Fermi architecture.
 Each GPU thread is assigned a short read and its complement to align to the reference.
 
-\todo{mention other/more GPU algorithms?}
+
+
+
 
 
 

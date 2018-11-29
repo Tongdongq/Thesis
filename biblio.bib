@@ -18,15 +18,6 @@
 	publisher = "Springer, Berlin, Heidelberg",
 }
 
-@misc{Longreads,
-    author    = "Pacific Biosciences",
-    title     = "Pacific Biosciences Releases New DNA Sequencing Chemistry to Enhance Read Length and Accuracy for the Study of Human and Other Complex Genomes",
-    howpublished = "http://investor.pacificbiosciences.com/releasedetail.cfm?releaseid=876252",
-    year     = "2014",
-    month    = "October",
-    note     = "Press release",
-}
-
 @article{Poisson,
 	author = "Eric S. Lander, Michael S. Waterman",
 	title = "Genomic mapping by fingerprinting random clones: A mathematical analysis",
@@ -2206,9 +2197,225 @@ eprint = {/oup/backfile/content_public/journal/bioinformatics/26/5/10.1093_bioin
  source = {https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-product-literature/TeslaK80-datasheet.pdf},
 } 
 
-%https://devblogs.nvidia.com/parallelforall/how-overlap-data-transfers-cuda-cc/
+% 29-11-2018
+@misc{paired_end_lengths,
+    author    = "Unknown",
+    title     = "Paired end and Mate pair Sequencing: What is it and How is it done?",
+    howpublished = "https://era7bioinformatics.com/en/page.cfm?id=1626",
+    year     = "2014",
+    month    = "December",
+}
 
-%https://en.wikipedia.org/wiki/Stream_processing
+%%%%%%%%%%%%% TU Delft references
+% de Bruijn Graph
+@inproceedings{TUD_dBG,
+    author = "S. Ren and N. Ahmed and K.L.M. Bertels and Z. Al-Ars",
+    title = "An Efficient GPU-based de Bruijn Graph Construction Algorithm for Micro-Assembly",
+    booktitle = "Proc. 18th IEEE International Conference on BioInformatics and BioEngineering",
+    address = "Taichung, Taiwan",
+    month = "October",
+    year = "2018",
+    pages = ""
+}
+
+% BWA-MEM
+
+@inproceedings{TUD_BWA_MEM1,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "Comparative Analysis of System-Level Acceleration Techniques in Bioinformatics: A Case Study of Accelerating the Smith-Waterman Algorithm for BWA-MEM",
+    booktitle = "Proc. 18th IEEE International Conference on BioInformatics and BioEngineering",
+    address = "Taichung, Taiwan",
+    month = "October",
+    year = "2018",
+    pages = ""
+}
+@article{TUD_BWA_MEM2,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "Hardware Acceleration of BWA-MEM Genomic Short Read Mapping for Longer Read Lengths",
+    journal = "Computational Biology and Chemistry",
+    volume = "75",
+    issue = "",
+    month = "August",
+    year = "2018",
+    pages = "54-64"
+}
+@inproceedings{TUD_BWA_MEM3,
+    author = "E.J. Houtgast and V.M. Sima and G. Marchiori and K.L.M. Bertels and Z. Al-Ars",
+    title = "Power-Efficiency Analysis of Accelerated BWA-MEM Implementations on Heterogeneous Computing Platforms",
+    booktitle = "Proc. International Conference on Reconfigurable Computing and FPGAs",
+    address = "Cancun, Mexico",
+    month = "December",
+    year = "2016",
+    pages = ""
+}
+@inproceedings{TUD_BWA_MEM4,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "An Efficient GPU-Accelerated Implementation of Genomic Short Read Mapping with BWA-MEM",
+    booktitle = "Proc. International Symposium on Highly-Efficient Accelerators and Reconfigurable Technologies",
+    address = "Hong Kong, China",
+    month = "July",
+    year = "2016",
+    pages = ""
+}
+@inproceedings{TUD_BWA_MEM5,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "GPU-Accelerated BWA-MEM Genomic Mapping Algorithm Using Adaptive Load Balancing",
+    booktitle = "Proc. 29th International Conference on Architecture of Computing Systems",
+    address = "Nuremberg, Germany",
+    month = "April",
+    year = "2016",
+    pages = "130-142"
+}
+@inproceedings{TUD_BWA_MEM6,
+    author = "N. Ahmed and V.M. Sima and E.J. Houtgast and K.L.M. Bertels and Z. Al-Ars",
+    title = "Heterogeneous Hardware/Software Acceleration of the BWA-MEM DNA Alignment Algorithm",
+    booktitle = "Proc. International Conference On Computer Aided Design",
+    address = "Austin, USA",
+    month = "November",
+    year = "2015",
+    pages = "240-246"
+}
+@inproceedings{TUD_BWA_MEM7,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "An FPGA-Based Systolic Array to Accelerate the BWA-MEM Genomic Mapping Algorithm",
+    booktitle = "Proc. International Conference On Embedded Computer Systems: Architectures, Modeling, And Simulation",
+    address = "Samos, Greece",
+    month = "September",
+    year = "2015",
+    pages = ""
+}
+
+% Pair-HMM
+@article{TUD_HMM1,
+    author = "S. Ren and K.L.M. Bertels and Z. Al-Ars",
+    title = "Efficient Acceleration of the Pair-HMMs Forward Algorithm for GATK HaplotypeCaller on GPUs",
+    journal = "Evolutionary Bioinformatics",
+    volume = "14",
+    issue = "",
+    month = "March",
+    year = "2018",
+    pages = ""
+}
+@inproceedings{TUD_HMM2,
+    author = "J.W. Peltenburg and S. Ren and Z. Al-Ars",
+    title = "Maximizing Systolic Array Efficiency to Accelerate the PairHMM Forward Algorithm",
+    booktitle = "Proc. IEEE International Conference on Bioinformatics and Biomedicine",
+    address = "Shenzhen, China",
+    month = "December",
+    year = "2016",
+    pages = "758-762"
+}
+@inproceedings{TUD_HMM3,
+    author = "S. Ren and K.L.M. Bertels and Z. Al-Ars",
+    title = "Exploration of Alternative GPU Implementations of the Pair-HMMs Forward Algorithm",
+    booktitle = "Proc. 3rd International Workshop on High Performance Computing on Bioinformatics",
+    address = "Shenzhen, China",
+    month = "December",
+    year = "2016",
+    pages = ""
+}
+@inproceedings{TUD_HMM4,
+    author = "S. Ren and V.M. Sima and Z. Al-Ars",
+    title = "FPGA Acceleration of the Pair-HMMs Forward Algorithm for DNA Sequence Analysis ",
+    booktitle = "Proc. International Workshop on High Performance Computing on Bioinformatics",
+    address = "Washington DC, USA",
+    month = "November",
+    year = "2015",
+    pages = ""
+}
+
+% Haplotypecaller
+@inproceedings{TUD_Haplo,
+    author = "S. Ren and K.L.M. Bertels and Z. Al-Ars",
+    title = "GPU-Accelerated GATK HaplotypeCaller with Load-Balanced Multi-Process Optimization",
+    booktitle = "Proc. 17th annual IEEE International Conference on BioInformatics and BioEngineering",
+    address = "Washington DC, USA",
+    month = "October",
+    year = "2017",
+    pages = ""
+}
+
+
+% FPGA
+@inproceedings{TUD_FPGA,
+    author = "E.J. Houtgast and V.M. Sima and Z. Al-Ars",
+    title = "High Performance Streaming Smith-Waterman Implementation with Implicit Synchronization on Intel FPGA using OpenCL",
+    booktitle = "Proc. 17th annual IEEE International Conference on BioInformatics and BioEngineering",
+    address = "Washington DC, USA",
+    month = "October",
+    year = "2017",
+    pages = "492-496"
+}
+
+
+% NGS
+@proceedings{TUD_NGS1,
+    author = "E.J. Houtgast and V.M. Sima and K.L.M. Bertels and Z. Al-Ars",
+    title = "Computational Challenges of Next Generation Sequencing Pipelines Using Heterogeneous Systems",
+    conference = "12th International Summer School on Advanced Computer Architecture and Compilation for High-Performance and Embedded Systems",
+    address = "Fiuggi, Italy",
+    month = "July",
+    year = "2016",
+    editors = ""
+}
+@inproceedings{TUD_NGS2,
+    author = "E.J. Houtgast and V.M. Sima and G. Marchiori and K.L.M. Bertels and Z. Al-Ars",
+    title = "Power-Efficient Accelerated Genomic Short Read Mapping on Heterogeneous Computing Platforms",
+    booktitle = "Proc. 24th IEEE International Symposium on Field-Programmable Custom Computing Machines",
+    address = "Washington DC, USA",
+    month = "May",
+    year = "2016",
+    pages = ""
+}
+
+% Alignment
+@inbook{TUD_Alignment1,
+    author = "L. Hasan and Z. Al-Ars",
+    title = "Computational Biology and Applied Bioinformatics",
+    publisher = "InTech",
+    month = "September",
+    year = "2011",
+    chapter = "9",
+    pages = "187-202"
+}
+@inproceedings{TUD_Alignment2,
+    author = "L. Hasan and M.A. Kentie and Z. Al-Ars",
+    title = "GPU-Accelerated Protein Sequence Alignment",
+    booktitle = "Proc. 33rd Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    address = "Boston, USA",
+    month = "August",
+    year = "2011",
+    pages = "2442-2446"
+}
+ @article{TUD_Alignment3,
+    author = "L. Hasan and M.A. Kentie and Z. Al-Ars",
+    title = "DOPA: GPU-based Protein Alignment Using Database and Memory Access Optimizations",
+    journal = "BMC Research Notes",
+    volume = "4",
+    issue = "261",
+    month = "July",
+    year = "2011",
+    pages = "1-11"
+}
+@inproceedings{TUD_Alignment4,
+    author = "L. Hasan and Z. Al-Ars and M. Taouil and K.L.M. Bertels",
+    title = "Performance and Bandwidth Optimization for Biological Sequence Alignment",
+    booktitle = "Proc. 5th IEEE International Design and Test Workshop",
+    address = "Abu Dhabi, UAE",
+    month = "December",
+    year = "2010",
+    pages = "155-160"
+}
+@inproceedings{TUD_Alignment5,
+    author = "L. Hasan and Z. Al-Ars and M. Taouil",
+    title = "High Performance and Resource Efficient Biological Sequence Alignment",
+    booktitle = "Proc. 32nd Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    address = "Buenos Aires, Argentina",
+    month = "September",
+    year = "2010",
+    pages = "1767-1770"
+}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%

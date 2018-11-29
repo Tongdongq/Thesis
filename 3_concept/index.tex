@@ -15,7 +15,7 @@
 Pacific Biosciences (PacBio) has commercially launched its first sequencer in 2011.
 It is able to output reads with an average of 1000 bases, which is significantly longer than Next-Generation Sequencing (NGS) reads \cite{PBlaunch1}.
 In 2014, a new polymerase-chemistry combination was released, called P6-C4.
-This version can output average read lengths of 10000-15000 bases, and its longest reads can exceed 40000 bases \cite{Longreads}.
+This version can output average read lengths of 10000-20000 bases, and its longest reads can exceed 60000 bases \cite{pacbio_readlength}.
 While the drawback is that these reads have an error rate of 12-15\%, this can be compensated by the distribution of these errors \cite{Daligner}.
 First, the set of reads is a nearly Poisson sampling of the sampled genome.
 This implies that there exists a coverage c for every target coverage k, such that every region of the genome is covered k times \cite{Poisson}.
@@ -33,10 +33,10 @@ The first step in an Overlap-Layout-Consensus (OLC) assembler is usually finding
 BLASR \cite{BLASR} was the only long read aligner at the time, and inspired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
 The most time-consuming step is extending the seed hit to find an alignment.
-To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(ND) algorithm \cite{O_ND}, combined with heuristic trimming and a data structure that describes a sparse path from the seed hit to the furthest reaching point.
+To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of an older O(ND) algorithm \cite{O_ND}, combined with heuristic trimming and a data structure that describes a sparse path from the seed hit to the furthest reaching point.
 
 Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
-It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
+It reports alignments $P = (a,i,g)\times(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
 Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
 The correlation, or percent identity of the alignment is defined as $1-2\epsilon$.
 
@@ -73,7 +73,7 @@ To find suitable alignments, we have to find a read subset pairs P such that $le
 
 The O(ND) algorithm tries to find progressive waves of furthest reaching (f.r.) points until the endpoint is reached.
 The goal is to find longest possible paths starting at a starting point $\rho = (i,j)$ with 0 differences, then 1 difference, then 2 and so on.
-After d differences, the possible paths can end in diagonals $\kappa \pm d$, where $\kappa = i-j$ is the diagonal of the starting point.
+After $d$ differences, the possible paths can end in diagonals $\kappa \pm d$, where $\kappa = i-j$ is the diagonal of the starting point.
 The furthest reaching point on diagonal $k$ that can be reached from $\rho$ with $d$ differences is called $F_\rho(d,k)$.
 A collection of these points for a particular value of $d$ is called the $d$-wave emanating from $\rho$, and defined as $W_\rho(d) = \{F_\rho(d,\kappa-d),...,F_\rho(d,\kappa+d)\}$.
 $F_\rho(d,k)$ will be referred to as $F(d,k)$, where $\rho$ is implicitly understood from the context.
@@ -97,7 +97,7 @@ A point $(i,j)$ is furthest when its anti-diagonal $i+j$ is greatest.
 The best alignment between reads A and B is the smallest $d$ such that $(m,n)\in W_{(0,0)}(d)$, where $m$ and $n$ are the length of reads A and B.
 The O(ND) algorithm computes $d$-waves from starting point $(0,0)$ until the end point $(m,n)$ is reached.
 The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive sequences \cite{Daligner}.
-Because seeds are not always at the beginning, so waves are computed in both forward and reverse direction.
+Because seeds are not always at the beginning of the reads, waves are computed in both forward and reverse direction.
 The latter is easily done by reversing the direction of edges in the edit graph.
 
 \subsection{Seeding: concept}
@@ -107,7 +107,7 @@ Finding a seed includes finding matching Kmers for every read pair $(a,b)$ with 
 Previous methods to match Kmers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
 
 Assuming that the Kmer matches are independent, the probability that a Kmer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
-The number of conserved Kmers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ Kmers are expected in this alignment.
+The number of conserved Kmers in an alignment of $\tau$ base pairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ Kmers are expected in this alignment.
 An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved Kmers is 10.
 Only $.046\%$ of the expected read pairs have 1 or fewer Kmers, and only $0.26\%$ have 2 of fewer.
 To filter with $99.74\%$ sensitivity, only read pairs with 3 or more Kmer matches need to be examined.
@@ -119,10 +119,10 @@ The specificity of the filter is increased in two ways:
 \end{itemize}
 
 The first way decreases the false positive rate because it only allows read pairs that have their Kmer matches relatively close, indicating a smaller region with higher similarity.
-The second way relies on the fact that 3 overlapping Kmers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint Kmers with $3k$ basepairs ($\pi^3$).
+The second way relies on the fact that 3 overlapping Kmers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint Kmers with $3k$ base pairs ($\pi^3$).
 
 
-The actually find the Kmer matches, Daligner uses a sort-merge procedure:
+To actually find the Kmer matches, Daligner uses a sort-merge procedure:
 \begin{itemize}
 \item Build a list $List_X = \{(kmer(X_x,i),x,i)\}_{x,i}$ of all Kmers for database $X \in \{\mathcal{A},\mathcal{B}\}$, where $kmer(R,i)$ is the Kmer $R[i-k+1,i]$.
 \item Sort both lists in order of their Kmers.
@@ -145,7 +145,7 @@ In that case the seed is called 'skippable', Figure \ref{fig:skippable} illustra
 
 The best values for $h$ and $s$ depend on things like $\epsilon$ and the read lengths.
 
-For Daligner, the default $k$ is 14, and assumed error rate is $0.85$.
+For Daligner, the default $k$ is 14, and assumed error rate is $0.15$.
 
 
 \subsection{Seeding: implementation}
@@ -185,7 +185,7 @@ On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite
 The optimal number of threads is more complex, because they usually do not have their own caches.
 
 
-\subsection{Local Alignment}
+\subsection{Local alignment}
 Assuming the filter finds a seed-hit $\rho = (i,j)$, the basic idea is compute furthest reaching waves in forward and reverse direction to find the alignment.
 The problem is that as the wave propagates further from $\rho$, it spans wider and wider since it occupies $2d+1$ diagonals.
 The final alignment will have only one point from each wave so most of the points are wasted, but we only which ones until the whole alignment is done.
@@ -196,14 +196,14 @@ This referred to as the \textit{regional alignment quality}.
 F.r. points with less than $\mathcal{M}$ matches in the last $C$ columns are removed.
 For example, when $\epsilon = .15$ then a segment with $M[k] < .55C = 33$ if $C = 60$ is probably not desirable.
 
-To keep track of the matching/mismatching bases, we keep a bitvector $B(d,k)$ that represents the last $C = 60$ columns of the best path from $\rho$ to a given f.r. point $F(d,k)$.
+To keep track of the matching/mismatching bases, we keep a bit vector $B(d,k)$ that represents the last $C = 60$ columns of the best path from $\rho$ to a given f.r. point $F(d,k)$.
 A 0 will denote a mismatch and a 1 a match.
 This is easily updated by left-shifting a 0 or 1.
 The number of matches $M(d,k)$ can be tracked by observing the bit that is shifted out.
 Listing \ref{code:LA} shows pseudo-code that computes $W_\rho(d+1)[low-1,hgh+1]$ from $W_\rho(d)[low,hgh]$ assuming $[low,hgh] \subseteq [\kappa-d,\kappa+d]$ is the trimmed result of the wave $W_\rho(d)$.
 Note that the array $W$ only holds the $B$-coordinate $j$ of each f.r. point $(i,j)$, since $i = j + k$.
 
-\lstinputlisting[caption=Local Alignment, label=code:LA]{\codePath la.c}
+\lstinputlisting[caption=Local alignment, label=code:LA]{\codePath la.c}
 
 The second trimming principle involves only keeping f.r. points which are within $\mathcal{L}$ anti-diagonals of the maximal anti-diagonal reached by its wave.
 It makes sense that the f.r. point on diagonal $k^*$ that will be in the final alignment is on a greater anti-diagonal $i+k$ than points that are not.
@@ -260,11 +260,11 @@ true &\text{ if } x = 0
 
 \section{Darwin}
 Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{Darwin1}\cite{Darwin2}.
-It consists of a filter called D-SOFT (Diagonal-band Seed Overlapping based Filtration Technique), which finds seeds, and GACT (Genome Alignment using Constant memory Traceback), which performs alignment between reads of arbitrary length, using constant traceback.
+It consists of a filter called D-SOFT (Diagonal-band Seed Overlapping based Filtration Technique), which finds seeds, and GACT (Genome Alignment using Constant memory Traceback), which performs alignment between reads of arbitrary length, using constant traceback memory.
 The fact that GACT uses constant traceback makes it very suitable for hardware acceleration.
 Darwin boasts a 39.000x more energy-efficient approach then software, and a 15.000x speedup for reference-guided alignment for third generation reads using an ASIC.
 On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for de novo over state-of-the-art software.
-
+\todo{19.9x based on first paper}
 
 \subsection{D-SOFT}
 Like Daligner, D-SOFT filters by counting bases in Kmer matches.
@@ -279,7 +279,7 @@ As oppose to Daligner, D-SOFT only considers the Kmer matches from one bin, not 
 
 \figC{width=.7\textwidth}{D_SOFT.png}{Illustration of D-SOFT algorithm, source: \cite{Darwin2}}{fig:D_SOFT}
 
-First, a lookup table for the Kmer all Kmers and their positions is made.
+First, a lookup table for all Kmers and their positions is made.
 This can be done with any implementation, like seed position tables, suffix arrays \cite{SA} or BWT \cite{BWT} based indices.
 
 D-SOFT uses two arrays, \textit{bp\_count} and \textit{last\_hit\_pos}.
@@ -293,18 +293,17 @@ Whenever this window size is not mentioned, it is equal to one.
 \subsection{GACT}
 Normal Smith-Waterman will take too much memory and time for long reads, because the complexity is quadratic for the length of the reads.
 Numerous efforts to accelerate Smith-Waterman have been made, both by using hardware and by using heuristics.
-\todo{name accelerated variants here, or in Chapter 2 Background?}
 Even when using heuristics, the memory requirements are still linear.
 GACT finds the alignment between reads of arbitrary length using constant traceback memory.
 It performs normal Smith-Waterman on a submatrix called a tile of size T, and then moves to the next tile, which overlaps with the previous tile with O bases.
-For reasonable values for T and O, GACT produces an optimal result.
+For reasonable values for T and O, GACT has shown to produce the same result as Smith-Waterman.
 
 The algorithm for left extension is shown in Listing \ref{code:GACT}.
 Positions $i\_curr$ and $j\_curr$ are produced by D-SOFT.
 The start and end position of the current tile are stored in $i,j\_start$ and $i,j\_curr$ respectively.
-The traceback path of the whole left extension is kept in $tb_left$.
+The traceback path of the whole left extension is kept in $tb\_left$.
 The function $Align()$ uses modified Smith-Waterman to compute the optimal alignment between subsequences $R\_tile$ and $Q\_tile$, with traceback starting from the bottom-right cell, except for the first tile, where traceback starts from the highest-scoring cell.
-$Align()$ returns the tile's alignment score, the number of bases in R and Q aligned by this tile ($i,j\_off$), the traceback pointers $tb$ and the position of the highest-scoring cell (ignored except for the first cell).
+$Align()$ returns the tile's alignment score, the number of bases in R and Q aligned by this tile $i,j\_off$, the traceback pointers $tb$ and the position of the highest-scoring cell (ignored except for the first cell).
 $Align()$ also limits $i,j\_off$ to at most T - O bases, to ensure the next tile overlaps by at least O bases.
 The left extension finishes when it hits the end of $R$ or $Q$, or when traceback cannot add any bases to the existing alignment.
 The memory needed for the traceback is $O(T^2)$, which is constant since T is chosen up front.
@@ -325,7 +324,7 @@ The traceback is ended earlier for higher overlaps, so that the tiles will overl
 The performance of GACT is linear ($O(max(m,n)\cdot T)$) with respect to the length of the reads.
 It is more suited to long reads than banded alignment, because banded alignment uses a static band around the main diagonal.
 GACT allows for flexible bands, since the position of the new tile depends on the traceback path, this is useful for long reads that have high indel rates.
-\todo{flexible bands are better when indels are present, prove/cite that it does not matter when only having substitutions?}
+
 
 
 

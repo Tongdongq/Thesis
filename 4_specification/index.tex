@@ -13,16 +13,6 @@
 
 \section{Profiling}
 
-%MCprof \cite{mcprof1}\cite{mcprof2} was used to profile Daligner, the results are shown in Figures \ref{prof1} and \ref{prof2}.
-%The algorithm consists of three main phases: seeding, filtering and aligning.
-%The seeding phase takes part in the lex\_sort(), count\_thread() and merge\_thread() functions.
-%The filter implementation is not very complex, and is combined with the alignment part in report\_thread(), this function starts the actual alignment in the form of Local\_Alignment() when a suitable seed is found.
-%Each seed is aligned in forward and reverse direction.
-
-
-%\todo{insert pictures of profiling, or maybe switch to gprof, because mcprof pictures were off}
-% \label{prof1}, \label{prof2}
-
 \subsection{Daligner}
 Gprof \cite{gprof} was used to profile Daligner, the function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio \cite{54x} has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
@@ -146,6 +136,7 @@ The default tile size is 320.
 If some GPU threads have a smaller tile size, this will cause divergence, because they will have to wait until the threads with larger tile sizes are finished.
 For de novo alignment, 63\% of the tile sizes where 320x320.
 For reference-based alignment, this percentage is 79\%.
+The reference is much longer than a read, so the probability that a tile is located at the end of the reference, is much lower than the probability it is at the end of a read.
 
 The traceback is done inside the alignment function.
 All used traceback pointers (max 2*(T-O)) are returned.
@@ -211,9 +202,9 @@ Storing N in the LS part would mean reading and writing a negative value that is
 It it easier to give H an offset of 1, so that the stored value is always non-negative.
 Since N can still be negative, it is put in the MS part, where shifting right is possible for both positive and negative values.
 M is always non-negative, but V can contain -1, therefore V is put in the MS part, and M in the LS part.
-T contains a bitvector that represents the history of the last C (default = 60) bases, based on this, the number of matches is updated.
+T contains a bit vector that represents the history of the last C (default = 60) bases, based on this, the number of matches is updated.
 T cannot be easily reduced in size without reducing C, although M can be removed by calculating the popcount of T when it is needed.
-CWORK reduces the memory per diagonal per thread from 8 ints to 5 ints.
+CWORK reduces the memory per diagonal per thread from 8 integers to 5 integers (ints).
 
 \begin{table}
 \caption{The minimum and maximum values for different variables.}
@@ -258,7 +249,7 @@ This can be combined with encoding these data arrays (CWORK).
 Since caching in registers is relatively expensive (registers are sparse), caching in shared memory might be a better idea.
 An SMX of compute capability 3.x has 64KB of on-chip memory that can be divided among L1 cache and shared memory.
 There are three settings: 48KB shared memory / 16KB L1 cache, 32KB shared memory / 32KB L1 cache, 16KB shared memory / 48KB L1 cache \cite{shared_mem}.
-Shared memory is designed to be shared among all threads in a threadblock, but can be used as local memory, when carefully calculating the addresses.
+Shared memory is designed to be shared among all threads in a thread block, but can be used as local memory, when carefully calculating the addresses.
 To avoid bank conflicts, the data can be stored as shown in Figure \ref{fig:DIAGS}.
 
 \figC{width=\textwidth , clip, trim=60 170 130 120}{DIAGS.pdf}{Encoding of data in shared memory, NA and NB are not shown. A name $X_{n}[m]$ indicates thread n, array X, index m.}{fig:DIAGS}
@@ -270,13 +261,15 @@ The diagonals are recached every $2^n$ diagonals.
 Possible values include 5, 9 and 17.
 An example for 5 cached diagonals is listed below:
 
+\begin{samepage}
 \begin{itemize}
 \item wave spans diagonals 20-29
 \item cache diagonals 20-24 in shared memory
 \item compute diagonals 20-23
-\item when current diagonal is 24, writeback cached diagonals to global memory, move diagonal 24 to position 0 in the cache, and cache diagonals 25-28
+\item when current diagonal is 24, write back cached diagonals to global memory, move diagonal 24 to position 0 in the cache, and cache diagonals 25-28
 \item compute diagonals 24-27
 \end{itemize}
+\end{samepage}
 
 A diagonal normally takes 8 ints.
 CWORK reduces that to 5 ints.
@@ -327,7 +320,7 @@ There are multiple places where this technique was used:
 The number of register assigned to a thread can be limited.
 This can increase the number of active threads on an SMX, since the number of registers on an SMX is also limited.
 The tradeoff lies with the reduced capabilities of the thread, the data that was stored in those registers now spills to local memory.
-The optimal registercount was found to be 64.
+The optimal register count was found to be 64.
 
 \paragraph{Streaming CUDA functions (STREAM)}
 Certain CUDA functions, like copying data from or to the device, and kernels, can be executed at the same time if different streams are used.
@@ -335,12 +328,12 @@ This function only matters if multiple CPU threads are used.
 
 \subsubsection{Splitting the alignment between GPU and CPU}
 There are other ways of using the GPU, the implementations GPU\_SINGLE, GPU\_SNAKE and COMPRESS\_ABSEQ try to do that.
-GPU\_SINGLE lets the GPU compute a large bitmatrix, where 0 means a mismatch, and 1 means a match.
+GPU\_SINGLE lets the GPU compute a large bit matrix, where 0 means a mismatch, and 1 means a match.
 These bits will be read by the CPU, instead of having the CPU do the comparisons itself.
 GPU\_SNAKE computes the whole snake on the GPU, and stores it at some index that is based on the positions in reads a and b.
 When the CPU wants to know the length of a snake during alignment, it only has to look up the length in the array.
-COMPRESS\_ABSEQ calculates the XORred bitvector between integers with compressed bases like described above, but the results returned to the CPU.
-During alignment on the CPU, it only has to read the correct bitvector, and count the leading zeros.
+COMPRESS\_ABSEQ calculates the XORred bit vector between integers with compressed bases like described above, but the results returned to the CPU.
+During alignment on the CPU, it only has to read the correct bit vector, and count the leading zeros.
 
 \subsubsection{CPU acceleration}
 Using the XOR operation on compressed bases (CABSEQ) can also be implemented on the CPU.
@@ -419,7 +412,7 @@ Since the order of accesses is slightly different between the CPU version and GA
 \paragraph{Coalescing the returned, used traceback pointers}
 The CPU needs to know what path the traceback took to compute the full aligned strings.
 While following the trace, the GPU writes the used pointers to an output buffer uncoalesced.
-This buffer could be coalesced, but the tracebackprocedure takes only a fraction of the GPU time, so this is not implemented.
+This buffer could be coalesced, but the traceback procedure takes only a fraction of the GPU time, so this is not implemented.
 
 \paragraph{No score (NOSCORE)}
 If the score of the alignment is not needed, the used traceback pointers do not have to returned to the CPU.
@@ -428,7 +421,7 @@ It also saves the time spend on building the aligned strings on the CPU.
 
 \paragraph{Coalesce global matrix (GLOBAL)}
 The score matrices in GASAL are small enough to fit in the registers, and cannot be coalesced.
-There are two main matrices left: the global array that stores the scores of one column, and the tracebackpointer matrix.
+There are two main matrices left: the global array that stores the scores of one column, and the traceback pointer matrix.
 The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be separated.
 The scores are stored via 16-bit shorts, but since the smallest memory transaction is 32 bytes (Compute Capability 3.5) \cite{cuda}, and the uninterleaved elements are far enough, it causes unnecessary transactions too.
 % According to nvprof, this is not true. There is uncoalesced access reported due to accesses in the global array. Perhaps, because of the known index (ridx), the compiler optimizes these values. It could be placed in L1 cache as local memory.
@@ -445,7 +438,7 @@ This technique was used to keep track of the maximum score of the tile, and the 
 It was also used to find the maximum of four values in the alignment kernel.
 
 \paragraph{Maxrregcount = 64}
-As with Daligner, the optimal registercount was found to be 64.
+As with Daligner, the optimal register count was found to be 64.
 
 \paragraph{Streaming CUDA functions (STREAM)}
 Same as for Daligner, streaming CUDA functions like kernels or data transfers allow them to be executed in parallel.

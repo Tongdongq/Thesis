@@ -59,8 +59,8 @@ CABSEQ & 1 & 132 & 89.1 \\
 
 Table \ref{tbl:daligner2} shows runtimes for GPU implementations, which have the same output as the original.
 All listed GPU configurations use STREAM.
-Running the fastest configuration (CWORK CABSEQ) with 1 256 64 results in a runtime of 82.9, which is faster than the singlethreaded CPU implementation.
-However, running singlethreaded is not a realistic scenario on this hardware.
+Running the fastest configuration (CWORK CABSEQ) with 1 256 64 results in a runtime of 82.9, which is faster than the single-threaded CPU implementation.
+However, running single-threaded is not a realistic scenario on this hardware.
 
 \begin{table}
 \centering
@@ -136,9 +136,9 @@ Other inline PTX implementations did not give a consistent speedup.
 \todo{combine this table with Darwin?}
 \begin{table}
 \centering
-\caption{Runtimes for different Daligner parameters, one CPU thread, run on ce-cuda, 10x E.coli, denovo. Sensitivity and specificity are measured for A vs A, using a score threshold of 200.}
+\caption{Runtimes for different Daligner parameters, one CPU thread, run on ce-cuda, 10x E.coli, de novo. Sensitivity and specificity are measured for A vs A, using a score threshold of 200.}
 \label{tbl:daligner5}
-\begin{tabular}{c|cccc}
+\begin{tabular}{c|c c c c}
 parameters & runtime A vs A (s) & runtime A vs B (s) & sensitivity & specificity \\ \hline
 default & 32.5 & 61.0 & 99.78 & 86.7 \\
 h45  & 31.5 & 57.6 & 99.58 & 86.8 \\
@@ -150,7 +150,7 @@ k16  & 29.4 & 55.2 & 96.9 & 87.5 \\
 \newpage
 
 \subsection{Profiling}
-Nvprof \cite{nvprof} was used to profile the experiments.
+nvprof \cite{nvprof} was used to profile the experiments.
 
 % cat 4 reads
 For 3000 bp reads from a custom PacBio generator:
@@ -273,9 +273,9 @@ speedup vs CPU 64 & 29.5 & 26.6 & 29.3 \\
 
 \begin{table}
 \centering
-\caption{Runtimes for different Darwin parameters, 1 64 64, 10x E.coli, denovo, A vs A. Sensitivity and specificity are measured using thresholds of 600 and 990 for score and length respectively.}
+\caption{Runtimes for different Darwin parameters, 1 64 64, 10x E.coli, de novo, A vs A. Sensitivity and specificity are measured using thresholds of 600 and 990 for score and length respectively.}
 \label{tbl:darwin4}
-\begin{tabular}{c|cccc}
+\begin{tabular}{c|c c c c}
 number of seeds (N) & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & specificity \\ \hline
 1400 & 105.6 & 62.8 & 99.33 & 85.0 \\
 1100 & 94.2 & 56.1 & 98.9 & 85.4 \\
@@ -287,7 +287,7 @@ number of seeds (N) & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & spe
 
 \begin{table}
 \centering
-\caption{Runtimes for different Darwin run configurations, 50MB dataset, denovo, A vs A.}
+\caption{Runtimes for different Darwin run configurations, 50MB dataset, de novo, A vs A.}
 \label{tbl:darwin6}
 \begin{tabular}{c|cc}
 Run configuration & runtime TACC (s) \\ \hline
@@ -320,7 +320,7 @@ Run configuration & runtime TACC (s) \\ \hline
 \caption{Profile data for different optimizations, run on the 50MB dataset, with 1 64 64 threads.}
 \label{tbl:darwin_prof}
 \begin{tabular}{c c c}
-optimizations & global ld efficiency \\ \hline
+optimizations & global load efficiency \\ \hline
 baseline & 12\% \\
 GLOBAL & 49\% \\
 GLOBAL CPBASES & 73\% \\
@@ -336,7 +336,7 @@ This makes optimizing the traceback part not efficient.
 
 \begin{table}
 \centering
-\caption{CPBASES saves some time in alignment, but adds preperation time.}
+\caption{CPBASES saves some time in alignment, but adds preparation time.}
 \label{tbl:CPBASES}
 \begin{tabular}{c c c c}
 & preparation (s) & packing (ms) & aligning (s) \\ \hline
@@ -394,7 +394,7 @@ For reference-based alignment (mapping), a read that is aligned to the reference
 For de novo based alignment, a true positive must have an overlap of 1000 bases according to PBSIM, and be found by the aligner.
 The run configuration of Darwin consists of three numbers, the first denotes the number of CPU threads, the second the number of GPU blocks that each CPU thread launches, the third the number of GPU threads in each of those GPU blocks.
 Since Daligner is faster of CPU than on GPU, the CPU version is used, and the number indicates the number of CPU threads.
-For Darwin, h (default:21) indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n (1400) is the number of seeds that are considered for that readpair, and w (4) is the size of the window for the minimizers.
+For Darwin, h (default:21) indicates the number of non-overlapping bases that the Kmers must have to constitute a seed, n (1400) is the number of seeds that are considered for that read pair, and w (4) is the size of the window for the minimizers.
 The overlap length threshold is set to 990 during de novo alignment.
 For Daligner, h (35) means the same, l (1000) is the minimum length that an overlap must have to be reported.
 Both aligners can use a minimum score threshold to further filter the found overlaps.
@@ -439,7 +439,7 @@ The exact sensitivities for l200 and l100 are 99.97\% and 100.00\% respectively.
 PBSIM generates reads with a minimum size of 100, this is why lowering the default minimum overlap length of 1000bp increases the sensitivity in reference-based alignment.
 If the input data is longer than that, or not aligning those shorter reads is acceptable, the setting for l can be higher.
 Figures \ref{fig:darwin2} and \ref{fig:darwin3} show a similar tradeoff between sensitivity and specificity for Darwin.
-While the default value for the number of seeds is 1400, this number can be lowered to 400 without noticable impact on the sensitivity.
+While the default value for the number of seeds is 1400, this number can be lowered to 400 without noticeable impact on the sensitivity.
 When going lower than 400, the sensitivity is reduced, but the runtime is also lower.
 The runtime and number of seeds have an affine relation, so trading runtime for sensitivity is easy.
 The specificity is higher when the number of seeds is low, it makes sense that producing less GACTcalls by reducing the number of seeds in the seedposition table reduces the number of false positives.

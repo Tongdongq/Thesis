@@ -41,14 +41,18 @@ However, this should only result in marginal improvements of the sensitivity, si
 
 
 The CPU version could be optimized as well.
-The current multithreaded version has no load balancing.
+The current multi-threaded version has no load balancing.
 All CPU threads can a roughly equal amount of reads that must be test by D-SOFT.
-The number of seeds that emerge can vary (observed values are 17000 and 30655), this is partially caused by the different readlengths.
+The number of seeds that emerge can vary (observed values are 17000 and 30655), this is partially caused by the different read lengths.
 Another reason for the imbalance is that the extension phase for each seed can have a different duration.
-One way to solve this is to create a large list with all the seeds, possibly partioned so that the threads can write to this list in parallel.
+One way to solve this is to create a large list with all the seeds, possibly partitioned so that the threads can write to this list in parallel.
 When starting the GACT phase, each thread gets a batch of reads to extend.
 When a thread is done with its batch, or has less seeds than GPU threads, it gets another batch from the large list.
 
+Since GASAL is designed to work with affine gap penalties, it uses four arrays to keep track of the score.
+If a linear gap penalty is used, it can be reduced to two.
+The calculation of the maximum score can also be simplified.
+Since this the main part of the algorithm, this could reduce the runtime significantly.
 
 
 
