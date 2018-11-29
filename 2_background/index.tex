@@ -5,8 +5,8 @@
 \chapter{Background}
 \ifdefined\main
 %\acresetall
-\newcommand{\codePath}{../2_background/code/}
-\newcommand{\figPath}{../2_background/figures/}
+\newcommand{\codePath}{2_background/code/}
+\newcommand{\figPath}{2_background/figures/}
 \else
 \input{../notmain.tex}
 \fi
@@ -171,7 +171,7 @@ The wells are cleaned by the enzyme apyrase, which degrades ATP and the unused n
 Now, the next type of nucleotide can be added.
 The whole sequencing process is shown in Figure \ref{fig:pyro_sequencing}.
 
-The newest pyrosequencing machines can produce readlengths up to 700 basepairs.
+The newest pyrosequencing machines can produce read lengths up to 700 basepairs.
 
 \figC{scale=.9}{pyro_sequencing_1.jpg}{Workflow of pyrosequencing, adapted from: \cite{pyro_sequencing_fig}}{fig:pyro_sequencing}
 
@@ -257,7 +257,7 @@ The diameter of the well is important, because it is smaller than the wavelength
 The well is filled with fluorescent nucleotides, and as one of these is held by the polymerase, a light pulse is produced and recorded.
 There are other nucleotides floating in the well, but the nucleotides held by the polymerase is illuminated approximately three orders of magnitude longer, this creates a high signal-to-noise ratio \cite{window_tgs}.
 As the polymerase does not have to wait for the nucleotides to be washed away, the process is realtime, which greatly increases the sequencing speed.
-Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}, Figure \ref{fig:pacbio_readlength} shows a distribution of the readlengths.
+Another advantage is that it produces some of the longest read lengths in the industry, with an average of 10000 basepairs, and longest reads of 60000 basepairs \cite{pacbio_readlength}, Figure \ref{fig:pacbio_readlength} shows a distribution of the read lengths.
 The fluorescent dyes are attached to the phosphate chain, which is cleaved off naturally when incorporated into the DNA strand, as shown in Figures \ref{fig:dna_replication_fig}, \ref{fig:pacbio_dye} and \ref{fig:pacbio}.
 
 \figC{scale=.4}{pacbio_dye.jpeg}{(a) A zero-mode waveguide with a DNA polymerase molecule at the bottom (b) a dyed base is incorporated into the strand, and the phosphate groups with tye dye are cleaved off, source: \cite{pacbio_dye}}{fig:pacbio_dye}

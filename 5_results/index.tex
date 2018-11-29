@@ -5,8 +5,8 @@
 \chapter{Results}
 \ifdefined\main
 %\acresetall
-\newcommand{\codePath}{../5_results/code/}
-\newcommand{\figPath}{../5_results/figures/}
+\newcommand{\codePath}{5_results/code/}
+\newcommand{\figPath}{5_results/figures/}
 \else
 \input{../notmain.tex}
 \fi
@@ -350,15 +350,17 @@ This requires a more complex preparation on the GPU size, which interleaves the 
 For the 50MB dataset, ran with 1 256 64, the timing results are listed in Table \ref{tbl:CPBASES}.
 The preparation and packing take more time, but this is compensated by a faster alignment phase.
 
-
-
 Using inline PTX did not give consistent speedup for either implementation.
 This should not be a large surprise, modern compilers are quite good at creating efficient low-level code.
 
+As shown in Table \ref{tbl:darwin7}, during runs on the 130MB dataset, the majority of the time was spent on GACT.
+This shows that despite large speedups, the bottleneck is still extending the seeds using GACT.
+For the 1 128 64 run, 55\% of the GACT time is spent on the CPU, preparing the new GPU arguments, and handling finished alignments.
+In the 8 32 64 run, this percentage drops to 15\%.
 \begin{table}
 \centering
-\label{tbl:darwin7}
 \caption{Percentage spent in GACT, 130MB, A vs A, N = 800, w = 4.}
+\label{tbl:darwin7}
 \begin{tabular}{c|c c c}
 run configuration & total runtime (s) & GACT time (s) & percentage GACT \\ \hline
 8 32 64 & 157 & 136 & 87 \\
@@ -366,11 +368,7 @@ run configuration & total runtime (s) & GACT time (s) & percentage GACT \\ \hlin
 \end{tabular}
 \end{table}
 
-%For a 10x de novo 15\% error dataset that took 62.8 seconds, xx\% was taken by GACT.
-As shown in Table \ref{tbl:darwin7}, during runs on the 130MB dataset, the majority of the time was spent on GACT.
-This shows that despite large speedups, the bottleneck is still extending the seeds using GACT.
-For the 1 128 64 run, 55\% of the GACT time is spent on the CPU, preparing the new GPU arguments, and handling finished alignments.
-In the 8 32 64 run, this percentage drops to 15\%.
+
 
 A common performance metric for Smith-Waterman based solutions is CUPS, which stands for Cell Updates Per Second, where a cell is a score element in the matrix.
 For 10x de novo A vs A, the Darwin GPU implementation peaked at 11.1 GCUPS.

@@ -1,1 +1,0 @@
-$ENV{'BIBINPUTS'}='./..//:' . $ENV{'BIBINPUTS'};

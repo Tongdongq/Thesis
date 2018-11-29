@@ -5,15 +5,14 @@
 \chapter{Concept}
 \ifdefined\main
 %\acresetall
-\newcommand{\codePath}{../3_concept/code/}
-\newcommand{\figPath}{../3_concept/figures/}
+\newcommand{\codePath}{3_concept/code/}
+\newcommand{\figPath}{3_concept/figures/}
 \else
 \input{../notmain.tex}
 \fi
 
-\section{Pacbio reads}
-Daligner finds alignments between long, noisy reads.
-Pacific Biosciences has commercially launched its first sequencer in 2011.
+\section{Pacific Biosciences}
+Pacific Biosciences (PacBio) has commercially launched its first sequencer in 2011.
 It is able to output reads with an average of 1000 bases, which is significantly longer than Next-Generation Sequencing (NGS) reads \cite{PBlaunch1}.
 In 2014, a new polymerase-chemistry combination was released, called P6-C4.
 This version can output average read lengths of 10000-15000 bases, and its longest reads can exceed 40000 bases \cite{Longreads}.
@@ -21,22 +20,21 @@ While the drawback is that these reads have an error rate of 12-15\%, this can b
 First, the set of reads is a nearly Poisson sampling of the sampled genome.
 This implies that there exists a coverage c for every target coverage k, such that every region of the genome is covered k times \cite{Poisson}.
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
-This means that if the reads are long enough to handle repetitive regions, in principle a near perfect denovo assembly of the genome is possible, given enough coverage \cite{Daligner}.
+This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage \cite{Daligner}.
 
 Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
 And how to build an assembler that is able to deal with high error rates and long reads?
 Most previous assemblers work with NGS reads, which are much shorter and have much lower error rates.
-Some algorithms used in these assemblers, such as De Bruijn Graph (DBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
-Since Daligner was built, new methods of using DBG with long reads have been developed, but they rely on a short read based DBG to correct errors in long reads \cite{DBG1}\cite{DBG2}.
+Some algorithms used in these assemblers, such as de Bruijn Graph (dBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
+Since Daligner was built, new methods of using dBG with long reads have been developed, but they rely on a short read based dBG to correct errors in long reads \cite{DBG1}\cite{DBG2}.
 
 \section{Daligner}
 The first step in an Overlap-Layout-Consensus (OLC) assembler is usually finding overlaps between reads \cite{OLC}.
 BLASR \cite{BLASR} was the only long read aligner at the time, and inspired Daligner.
 It uses the same filtering concept, but with a cache-coherent threaded radix sort to find seeds, instead of a BWT index \cite{BWT}.
 The most time-consuming step is extending the seed hit to find an alignment.
-To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(nd) algorithm \cite{O_ND}, combined with heuristic trimming and a data structure that describes a sparse path from the seed hit to the furthest reaching point.
+To do this, Daligner uses a novel method which adaptively computes furthest reaching waves of the older O(ND) algorithm \cite{O_ND}, combined with heuristic trimming and a data structure that describes a sparse path from the seed hit to the furthest reaching point.
 
-\todo{next part is copied straight from daligner paper}
 Daligner performs all-to-all comparison on two input databases $\mathcal{A}$, with $M$ long reads $A_1, A_2,...A_M$ and $\mathcal{B}$, with $N$ long reads $B_1, B_2,...B_N$ over alphabet $\Sigma = 4$
 It reports alignments $P = (a,i,g)x(b,j,h)$ such that $len(P) = ((g-i)+(h-j))/2 \ge \tau$ and the optimal alignment between $A_a[i+1,g]$ and $B_b[j+1,h]$ has no more than 2$\epsilon \cdot len(P)$ differences, where a difference can be either an insertion, a deletion or a substitution.
 Both $\tau$ and $\epsilon$ are user settable parameters, where $\tau$ is the minimum alignment length and $\epsilon$ the average error rate.
@@ -59,7 +57,7 @@ a_i \\ b_j
 \end{bmatrix}$} if $i,j > 0$.
 \end{itemize}
 
-Figures \ref{fig:edit_graph1} and \ref{fig:edit_graph2} show images from a tool, created by Nicholas Butler \cite{diff_tutorial}, that shows how the edit graph is traversed by the O(nd) algorithm.
+Figures \ref{fig:edit_graph1} and \ref{fig:edit_graph2} show images from a tool, created by Nicholas Butler \cite{diff_tutorial}, that shows how the edit graph is traversed by the O(ND) algorithm.
 
 \figC{width=.7\textwidth}{edit_graph.png}{An empty edit graph, source: \cite{diff_tutorial}}{fig:edit_graph1}
 \figC{width=.7\textwidth}{edit_graph2.png}{A filled edit graph, the dark blue lines represent mismatches and their subsequent snakes, the light blue lines are the d-waves, the brown lines are odd diagonals, yellow lines are even diagonals, the red path is the shortest path, source: \cite{diff_tutorial}}{fig:edit_graph2}
@@ -105,14 +103,14 @@ The latter is easily done by reversing the direction of edges in the edit graph.
 \subsection{Seeding: concept}
 To find suitable starting points for the edit graphs, seeding is done.
 A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
-Finding a seed includes finding matching Kmers for every readpair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
+Finding a seed includes finding matching Kmers for every read pair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
 Previous methods to match Kmers include Suffix Arrays \cite{SA} and BWT indices \cite{BWT}.
 
 Assuming that the Kmer matches are independent, the probability that a Kmer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
 The number of conserved Kmers in an alignment of $\tau$ basepairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ Kmers are expected in this alignment.
 An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved Kmers is 10.
-Only $.046\%$ of the expected readpairs have 1 or fewer Kmers, and only $0.26\%$ have 2 of fewer.
-To filter with $99.74\%$ sensitivity, only readpairs with 3 or more Kmer matches need to be examined.
+Only $.046\%$ of the expected read pairs have 1 or fewer Kmers, and only $0.26\%$ have 2 of fewer.
+To filter with $99.74\%$ sensitivity, only read pairs with 3 or more Kmer matches need to be examined.
 
 The specificity of the filter is increased in two ways:
 \begin{itemize}
@@ -120,7 +118,7 @@ The specificity of the filter is increased in two ways:
 \item thresholding on the number of bases in Kmer matches, instead of the number of Kmers themselves
 \end{itemize}
 
-The first way decreases the false positive rate because it only allows readpairs that have their Kmer matches relatively close, indicating a smaller region with higher similarity.
+The first way decreases the false positive rate because it only allows read pairs that have their Kmer matches relatively close, indicating a smaller region with higher similarity.
 The second way relies on the fact that 3 overlapping Kmers have a higher probability ($\pi^{1+2/k}$) than 3 disjoint Kmers with $3k$ basepairs ($\pi^3$).
 
 

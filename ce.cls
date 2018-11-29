@@ -1153,8 +1153,8 @@ born in \@CITY{\city}, \@COUNTRY{\country}
 %-----------------------------------------------------------------------%
 %       Comment out the footer (copyright)                              %     
 %-----------------------------------------------------------------------%
-    \def\@oddfoot{\hfill \footnotesize  \input{../version.txt}}
-    \def\@evenfoot{\hfill \footnotesize  \input{../version.txt}}
+    \def\@oddfoot{\hfill \footnotesize }
+    \def\@evenfoot{\hfill \footnotesize }
 %   \def\@oddfoot{\hfill \footnotesize \@docopyright}
 %   \def\@evenfoot{\footnotesize \@docopyright \hfill}
 %   \def\@oddfoot{\hfill \footnotesize \copyright \the\year\ \INSTITUTE}

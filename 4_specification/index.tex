@@ -5,8 +5,8 @@
 \chapter{Specification}
 \ifdefined\main
 %\acresetall
-\newcommand{\codePath}{../4_specification/code/}
-\newcommand{\figPath}{../4_specification/figures/}
+\newcommand{\codePath}{4_specification/code/}
+\newcommand{\figPath}{4_specification/figures/}
 \else
 \input{../notmain.tex}
 \fi
@@ -27,14 +27,14 @@
 Gprof \cite{gprof} was used to profile Daligner, the function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio \cite{54x} has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
 Since Local\_Alignment() is the most time-consuming function, that will be the first one the be considered for acceleration.
-Each Local\_Alignment() call originates from a particular readpair $A, B$, so executing multiple Local\_Alignment() instances from different readpairs causes no datahazards.
-This is why Daligner is able to use multiple threads, each one running the filter-align function report\_thread() on its own list of readpairs.
+Each Local\_Alignment() call originates from a particular read pair $A, B$, so executing multiple Local\_Alignment() instances from different read pairs causes no data hazards.
+This is why Daligner is able to use multiple threads, each one running the filter-align function report\_thread() on its own list of read pairs.
 The Local\_Alignment() function consists mainly of forward\_wave() and reverse\_wave(), which implement the snakefinding algorithm in both directions respectively.
 Their structure is very similar, but combining them into one function would be difficult.
 
 \subsection{Darwin}
 Darwin uses gettimeofday \cite{gettimeofday} to measure the runtime of various elements of the algorithm.
-Three notable parts are building the seedposition table, finding the seeds, and aligning usign GACT.
+Three notable parts are building the seedposition table, finding the seeds, and aligning using GACT.
 Of those three, aligning takes the most time, namely 99.9\% for a small PacBio human de novo alignment, and 99.4\% for a small simulated PacBio E.coli reference based alignment.
 GACT is also the part that has been accelerated on FPGA by the original creators because of the constant memory requirement.
 This is why GACT will be implemented on GPU.
@@ -82,7 +82,7 @@ reverse & 78 & 0 & 0 & 1 & 5 & 9 \\
 \end{tabular}
 
 \bigskip
-\caption{Number of Kmer matches per readpair}
+\caption{Number of Kmer matches per read pair}
 \label{tbl:daligner_dist4}
 \centering
 \vspace{-5pt}
@@ -92,7 +92,7 @@ max & median & 75\% & 99\% \\ \hline
 \end{tabular}
 
 \bigskip
-\caption{Max drift ($\mid$initial diag - observed diag$\mid$)}
+\caption{Max drift ($\mid$initial diagonal - observed diagonal$\mid$)}
 \label{tbl:daligner_dist5}
 \centering
 \vspace{-5pt}
@@ -138,17 +138,17 @@ When compressed, this would take three integers per thread, for both reads.
 
 \subsection{Darwin}
 Darwin has a different filtering algorithm, which results in less skippable LAcalls/GACTcalls.
-The 130MB dataset generates 820499 calls, of which 97\% belong to a unique readpair.
+The 130MB dataset generates 820499 calls, of which 97\% belong to a unique read pair.
 Skipping GACTcalls would remove at most 3\%.
 
 
-The default tilesize is 320.
-If some GPU threads have a smaller tilesize, this will cause divergence, because they will have to wait until the threads with larger tilesizes are finished.
-For de novo alignment, 63\% of the tilesizes where 320x320.
+The default tile size is 320.
+If some GPU threads have a smaller tile size, this will cause divergence, because they will have to wait until the threads with larger tile sizes are finished.
+For de novo alignment, 63\% of the tile sizes where 320x320.
 For reference-based alignment, this percentage is 79\%.
 
 The traceback is done inside the alignment function.
-All used tracebackpointers (max 2*(T-O)) are returned.
+All used traceback pointers (max 2*(T-O)) are returned.
 For de novo, 74\% of the traceback results had the maximum of 200 bases in either direction, this is 84\% for reference-based alignment.
 
 
@@ -156,19 +156,19 @@ For de novo, 74\% of the traceback results had the maximum of 200 bases in eithe
 \section{Acceleration}
 \subsection{Daligner}
 The individual snakes from a d-wave are independent, they can be calculated in parallel.
-However, the width of a trimmed d-wave is usually lower than 32, this means a warp cannot be fully utilised if it is assigned a single readpair.
-An option is to assign two readpairs to a block, each readpair would then have 16 threads.
-This means that the half-warp is fully utilised more often, but when the width of the d-wave is larger than 16, there well be idle threads.
+However, the width of a trimmed d-wave is usually lower than 32, this means a warp cannot be fully utilized if it is assigned a single read pair.
+An option is to assign two read pairs to a block, each read pair would then have 16 threads.
+This means that the half-warp is fully utilized more often, but when the width of the d-wave is larger than 16, there well be idle threads.
 
 For this reason, coarse-grained parallelism is chosen to be implemented.
 The alignment and filter functions are separated, instead, filter() produces a large list of seed hits (LAcalls), which should be send to the local alignment function.
-An advantage of having alignment and filtering intertwined is that Kmer matches that are included in previous alignments can be skipped, Figure \ref{fig:skip} illustrates this.
-This advantage is lost when generated the large list, but can be reimplemented using a scheduler that keeps track of the furthest position that was reached in an alignment for each readpair.
+An advantage of having alignment and filtering intertwined is that Kmer matches that are included in previous alignments can be skipped, Figure \ref{fig:skippable} illustrates this.
+This advantage is lost when generated the large list, but can be reimplemented using a scheduler that keeps track of the furthest position that was reached in an alignment for each read pair.
 Each Kmer match that has enough neighbouring Kmer matches constitutes its own LAcall in the large list, but these are filtered out later.
-Each GPU thread is assigned a readpair, and each readpair can have multiple LAcalls.
-The host side will assign an LAcall to each GPU thread (unless there are not enough readpairs).
+Each GPU thread is assigned a read pair, and each read pair can have multiple LAcalls.
+The host side will assign an LAcall to each GPU thread (unless there are not enough read pairs).
 The GPU performs the local alignment, and returns the results.
-If a readpair has no unskippable LAcalls left, its GPU thread is assigned a new readpair.
+If a read pair has no unskippable LAcalls left, its GPU thread is assigned a new read pair.
 
 
 % multiple implementations:
@@ -362,7 +362,7 @@ It is not necessary to implement skipping seeds/Kmer matches for Darwin, since i
 
 
 It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism \todo{cite wavefront parallelism?}
-The tilesize of 320 should be enough to allow for enough utilization.
+The tile size of 320 should be enough to allow for enough utilization.
 This method uses less memory, since the Smith-Waterman matrices and the sequences are shared.
 However, this complicates the implementation, since the number of elements on an anti-diagonal is often not equal to 32.
 Inter-thread communication or scheduling is needed to efficiently use the hardware.
@@ -373,7 +373,7 @@ Besides, the memory used by a single thread is not very large, since the tiles t
 
 GACT is designed to allow for an affine gap penalty, so it uses three matrices to keep track of the scores.
 The whole tile is calculated per column, so only two columns need to be kept from the matrices: the current and the previous.
-This means the implementation uses $O(T)$ memory for the score, where T is the tilesize.
+This means the implementation uses $O(T)$ memory for the score, where T is the tile size.
 The traceback pointers need to be kept for the whole tile, this takes $O(T^2)$.
 
 \paragraph{Coalesce matrices (CMAT)}
@@ -416,7 +416,7 @@ Since the order of accesses is slightly different between the CPU version and GA
 % CPBASES (for GASAL)
 
 
-\paragraph{Coalescing the returned, used tracebackpointers}
+\paragraph{Coalescing the returned, used traceback pointers}
 The CPU needs to know what path the traceback took to compute the full aligned strings.
 While following the trace, the GPU writes the used pointers to an output buffer uncoalesced.
 This buffer could be coalesced, but the tracebackprocedure takes only a fraction of the GPU time, so this is not implemented.
