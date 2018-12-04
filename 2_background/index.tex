@@ -1,4 +1,4 @@
-\documentclass[../main/thesis.tex]{subfiles}
+\documentclass[../thesis.tex]{subfiles}
 
 \begin{document}
 
@@ -27,7 +27,7 @@ When these polypeptides are folded by the forces between the atoms, it is called
 The exact form of the protein is crucial to its function \cite{protein_misfolding}.
 Examples of protein functions are breaking down molecules like other proteins, fat or carbohydrates, fighting off foreign particles like viruses or bacteria, and assisting in a chemical reaction, in which case the protein is called an \textit{enzyme} \cite{protein_function}.
 Enzymes bind to the reagents of the reaction to lower the activation energy and increase the speed of the reaction, but they are not consumed during the reaction and can be reused.
-Enzymes are usually highly specific, meaning that they will only catalyse certain reactions \cite{enzyme_specificity1}\cite{enzyme_specificity2}.
+Enzymes are usually highly specific, meaning that they will only catalyze certain reactions \cite{enzyme_specificity1}\cite{enzyme_specificity2}.
 
 It is clear that proteins play a huge role in sustaining a cell.
 The information needed to create proteins is stored in \textit{DNA} or deoxyribonucleic acid.
@@ -88,13 +88,13 @@ Most amino acids are nonpolar, this means their electrical charge is zero and ba
 Others have positive or negative charges, or have no charge, but do have a dipole, these are called polar.
 Polar amino acids can form hydrogen bonds \cite{hydrogen_bond}, charged amino acids can form ionic bonds \cite{ionic_bond}.
 Hydrophobic amino acids can form weaker van der Waals bonds.
-Most of these bonds noncovalent, which means they do not share electrons \cite{ionic_bond}.
+Most of these bonds non-covalent, which means they do not share electrons \cite{ionic_bond}.
 Cysteine is the only amino acid that can form covalent bonds \cite{protein_structures}.
 
 Bonds between parts of the protein can cause folding patterns to appear.
 The most occurring types are \textit{alpha helices} and \textit{beta sheets}, shown in Figure \ref{fig:alpha_helix_beta_sheet}.
 These patterns form the \textit{secondary structure} of a protein.
-When these patterns interact with eachother, for example due to van der Waals bonds, the \textit{tertiary structure} forms.
+When these patterns interact with each other, for example due to van der Waals bonds, the \textit{tertiary structure} forms.
 Finally, a protein consisting of multiple chains, or subunits, is called the \textit{quaternary structure} \cite{protein_structures}.
 
 \figC{scale=.3}{alpha_helix_beta_sheet.jpg}{Alpha helix and beta sheet visualized, source: \cite{alpha_helix_beta_sheet}}{fig:alpha_helix_beta_sheet}
@@ -111,7 +111,7 @@ DNA sequencing is the process of finding out which nucleotides make up a DNA mol
 Separate DNA molecules are called 'chromosomes'.
 Humans have 46 chromosomes, containing about 3.5 billion base pairs \cite{DNA_human_stats} and about 20000 genes \cite{human_genes}.
 
-Knowing the exact DNA sequence is useful for a number of applications: analyzing bacteria/virusses, analyzing genetic diseases, forensic analysis, ethnicity and ancestry analysis.
+Knowing the exact DNA sequence is useful for a number of applications: analyzing bacteria/viruses, analyzing genetic diseases, forensic analysis, ethnicity and ancestry analysis.
 
 Another application is genetic modification of bacteria or plants.
 If their DNA can be altered, they could produce useful substances at a very low marginal cost.
@@ -137,7 +137,7 @@ At one point, a dideoxynucleotide is added, and the chain cannot grow anymore.
 The distribution of chain lengths is determined by the ratio of normal and dideoxynucleotides \cite{sanger_ratio}.
 
 After a certain period, most of the dideoxynucleotides have terminated a chain, and the next phase can begin.
-The chains are sorted by length by means of \textit{cappilary electrophoresis} (CE).
+The chains are sorted by length by means of \textit{capillary electrophoresis} (CE).
 During CE, the chains are run through a long glass capillary filled with a gel polymer.
 An electrical field is applied and the DNA fragments move through the capillary.
 The speed of the fragment is inversely proportional to its weight, so the shortest chains arrive earliest at the end.
@@ -235,7 +235,7 @@ Ion Torrent produces reads of up to 400 base pairs, but the error rate is relati
 
 \subsection{Third Generation Sequencing}
 There is no clear division between Next Generation Sequencing and Third Generation Sequencing (TGS).
-The technological improvements follow eachother quickly, and do not usually fit into well-defined timescales \cite{window_tgs}.
+The technological improvements follow each other quickly, and do not usually fit into well-defined timescales \cite{window_tgs}.
 However, an often used definition is that TGS approaches are able to sequence a single DNA molecule, thus eliminating the need for amplification \cite{history_sequencing}\cite{ngs_sequencing_atdbio}.
 
 The first TGS method is created by Helicos Biosciences, a company that went bankrupt in 2012 \cite{history_sequencing}.
@@ -374,7 +374,7 @@ They have two generations of devices, and use nanopores with a diameter of 0.8 n
 
 \figC{width=.5\textwidth}{nanopore_tunnel.jpg}{(a) a traditional nanopore measuring the ionic current in the direction of the ssDNA strand, (b) a tunnelling nanopore measuring the tunnelling current perpendicular to the ssDNA strand, source: \cite{nanopore_tunnel1}}{fig:nanopore_tunnel}
 
-\section{DNA Alignment}
+\section{DNA alignment}
 DNA alignment involves determining the similarity between two DNA reads, a high similarity indicates the two reads originated from the same part of the genome.
 This information can be used to reconstruct the whole genome, during the assembly phase, which is discussed in Section \ref{sec:dna_assembly}
 An example of an alignment is shown in Figure \ref{fig:alignment}.
@@ -572,7 +572,7 @@ For the extension phase, a variant of dynamic programming can be used, which for
 The dynamic programming can include an area that is smaller than the matrix that would be calculated by regular Smith-Waterman.
 Variants include Banded Smith-Waterman \cite{banded_SW} and Xdrop \cite{Xdrop}.
 
-\section{DNA Assembly}\label{sec:dna_assembly}
+\section{DNA assembly}\label{sec:dna_assembly}
 Every DNA sequencing technique produces reads, which are pieces of data that represent a part of the sampled DNA, possibly containing some errors.
 The length and error rate of these reads depend of the sequencing technique used, but they all have one thing in common: they have to be assembled to be useful.
 DNA assembly tries to combine the reads into large, high quality parts.
@@ -844,7 +844,7 @@ CUSHAW \cite{cushaw} is an accelerated short read aligner that uses BWT.
 It uses CUDA and is optimized for the Fermi architecture.
 Each GPU thread is assigned a short read and its complement to align to the reference.
 
-
+Other work has been done on de Bruijn graphs \cite{TUD_dBG}, BWA-MEM \cite{TUD_BWA_MEM1}\cite{TUD_BWA_MEM2}\cite{TUD_BWA_MEM3}\cite{TUD_BWA_MEM4}\cite{TUD_BWA_MEM5}\cite{TUD_BWA_MEM6}\cite{TUD_BWA_MEM7}, Pair-HMM/HaplotypeCaller \cite{TUD_HMM1}\cite{TUD_HMM2}\cite{TUD_HMM3}\cite{TUD_HMM4}\cite{TUD_Haplo}, NGS reads \cite{TUD_NGS1}\cite{TUD_NGS2}, accelerating with FPGA \cite{TUD_FPGA}, and generic sequence alignment \cite{TUD_Alignment1}\cite{TUD_Alignment2}\cite{TUD_Alignment3}\cite{TUD_Alignment4}\cite{TUD_Alignment5}.
 
 
 

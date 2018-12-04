@@ -1,4 +1,4 @@
-\documentclass[../main/thesis.tex]{subfiles}
+\documentclass[../thesis.tex]{subfiles}
 
 \begin{document}
 
@@ -14,10 +14,11 @@ Our kind has spent ages trying to unravel its secrets.
 Literally, because we found out that DNA consists of a double helix, which must be unwound to be used.
 
 In 2003, we sequenced the whole human genome {\cite{human_genome_project}}.
-It consists of about three billion basepairs, wrapped up in 23 chromosomepairs, and shares 60\% with the genome of a banana \cite{banana}.
+It consists of about three billion base pairs (bp), wrapped up in 23 chromosome pairs, and shares 60\% with the genome of a banana \cite{banana}.
 However, DNA still has many unexposed secrets.
 For example, some diseases are partially caused by genes, like breast cancer or sickle cell disease \cite{genomic_diseases}.
 
+\section{Motivation}
 To gain more knowledge about the influence of DNA and genes in general, they must be identified.
 This is where DNA sequencing comes in.
 With a blood sample, or some saliva, the DNA of an individual can be mapped.
@@ -25,9 +26,11 @@ Combining the DNA of many people can teach us what the effect is of some genes.
 However, DNA sequencing machines are not perfect, they only provide small parts of the DNA, and they contain errors too.
 These small parts must be assembled into a whole genome.
 One phase of this assembly is the alignment part, where overlaps between those small parts are found.
-Performing the normal, exact way of alignment using Smith-Waterman is not feasible, so many algorithms have been developed to perform this alignment, for different lengths and error rates.
+A straightforward way of finding all overlaps is performing an alignment algorithm, such as Smith-Waterman, on every pair of reads.
+The number of alignments is quadratic with the number of reads, and the runtime of one alignment is quadratic with the lengths of the involved reads, so this method is not feasible
+Many heuristic algorithms have been developed to perform this alignment, for different lengths and error rates.
 Seed-and-extend is one heuristic, which dramatically reduces the amount of computation needed.
-Instead of performing Smith-Waterman on each readpair, only readpairs with promising regions are considered.
+Instead of performing Smith-Waterman on each read pair, only read pairs with promising regions are considered.
 These promising regions are called seeds, and are found using Kmers.
 A Kmer is a piece of K consecutive nucleotides.
 Many different techniques exist to split and store the reads into Kmers.
@@ -42,7 +45,7 @@ They can be produced very quickly, but a drawback is their length.
 DNA can contain repeat regions, where a certain piece of DNA is repeated many times back-to-back, or a repeat could appear in many different places in the genome.
 These repeats can be longer than the produced reads, which means the reads cannot be used to resolve these repeats.
 
-Third generation sequencing produce much longer reads, of up to 60000 basepairs.
+Third generation sequencing produce much longer reads, of up to 60000 base pairs.
 Due to their length, they are more likely to contain a whole repeat section, which means it can be used to connect the pieces before and after the repeat.
 A major drawback is that they also contain more errors, 15-30\%, depending on the exact technology.
 
@@ -55,18 +58,40 @@ GPUs are built for graphics applications, but modern, programmable GPUs allow fo
 This means that any algorithm can be run on a GPU, but implementing them is not a trivial task.
 The GPU must be explicitly told what to do, and using the GPU also introduces communication overhead.
 Moreover, GPU cores use a simpler instruction set than CPU cores, and run on lower clocks.
-To gain speedup with a GPU, the workload must be divided well, to ensure the available hardware is sufficiently utilised.
+To gain speedup with a GPU, the workload must be divided well, to ensure the available hardware is sufficiently utilized.
 
 In this work, Daligner and Darwin are implemented to run on a GPU, in particular a Tesla K40 \cite{K40}, which features 2880 CUDA cores, 12 GB of VRAM, and the Kepler architecture.
 
+\section{Thesis goal}
+The main goal of the thesis is formulated as follows: \\\\
+\indent Perform a study that compares the acceleration potential on GPU for Daligner and Darwin.
+\\\\
+Daligner is written in C, and Darwin in C++.
+This should allow for a relatively easy implementation on the GPU.
+To fulfill the stated goal, a few research questions must be answered:
 
-\paragraph{Outline}
+\begin{itemize}
+\item Is it possible to accelerate Daligner and Darwin using a GPU?
+\item Can we tweak Daligner and Darwin to trade performance, sensitivity and specificity?
+\item How do Daligner and Darwin relate to each other with respect to runtime, sensitivity and specificity?
+\end{itemize}
+
+\section{Outline}
 Chapter 2 Background contains details about the working of DNA in biology, as well as DNA sequencing and assembly techniques.
 Chapter 3 Concept further explains the algorithms of Daligner and Darwin.
 Chapter 4 Specification contains measured statistics that help understand the working of the algorithm, as well as all the implementations/optimizations done on both algorithms.
 The evaluation of these implementations is presented in Chapter 5 Results.
 In Chapter 6 Conclusion, conclusions and recommendations for future work are presented.
 
+
+% section 1.1 Context
+% section 1.2 research questions
+% section 1.3 outline
+
+% questions: 
+% - is it possible to accelerate Daligner and Darwin in GPU?
+% - can we trade speedup for higher sensitivity/specificity or the other way around?
+% - 
 
 \end{document}
 

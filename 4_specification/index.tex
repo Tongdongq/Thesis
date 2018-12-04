@@ -1,4 +1,4 @@
-\documentclass[../main/thesis.tex]{subfiles}
+\documentclass[../thesis.tex]{subfiles}
 
 \begin{document}
 
@@ -14,10 +14,11 @@
 \section{Profiling}
 
 \subsection{Daligner}
-Gprof \cite{gprof} was used to profile Daligner, the function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
+Gprof \cite{gprof} was used to profile Daligner.
+The function Local\_Alignment() was found to take between 90\% and 95\% of the runtime.
 An arbitrary 130MB dataset from the Human 54x dataset from PacBio \cite{54x} has been used, the first 50MB of those files are used as a smaller dataset, this will be referred to as 'the 50MB dataset'.
 Since Local\_Alignment() is the most time-consuming function, that will be the first one the be considered for acceleration.
-Each Local\_Alignment() call originates from a particular read pair $A, B$, so executing multiple Local\_Alignment() instances from different read pairs causes no data hazards.
+Each Local\_Alignment() call (LAcall) originates from a particular read pair $A, B$, so executing multiple Local\_Alignment() instances from different read pairs causes no data hazards.
 This is why Daligner is able to use multiple threads, each one running the filter-align function report\_thread() on its own list of read pairs.
 The Local\_Alignment() function consists mainly of forward\_wave() and reverse\_wave(), which implement the snakefinding algorithm in both directions respectively.
 Their structure is very similar, but combining them into one function would be difficult.
@@ -26,6 +27,7 @@ Their structure is very similar, but combining them into one function would be d
 Darwin uses gettimeofday \cite{gettimeofday} to measure the runtime of various elements of the algorithm.
 Three notable parts are building the seedposition table, finding the seeds, and aligning using GACT.
 Of those three, aligning takes the most time, namely 99.9\% for a small PacBio human de novo alignment, and 99.4\% for a small simulated PacBio E.coli reference based alignment.
+When a seed is found, and needs to be extended, it is called a GACTcall.
 GACT is also the part that has been accelerated on FPGA by the original creators because of the constant memory requirement.
 This is why GACT will be implemented on GPU.
 
@@ -98,7 +100,7 @@ reverse & 1323 & 37 \\
 \label{tbl:daligner_dist6}
 \centering
 \vspace{-5pt}
-\begin{tabular}{c|c c c c}
+\begin{tabular}{c c c c c}
 max & median & 90\% & 99\% \\ \hline
 18384 & 2 & 15 & 70 \\
 \end{tabular}
@@ -123,8 +125,8 @@ This means the average number of skippable LAcalls per performed LAcalls is abou
 
 The number of times each base is read is relatively low, between one and five.
 This means caching the bases somewhere might not give a whole lot of speedup, but it could help nonetheless.
-To cache 95\% of the accesses, about 40 bases must be cached for both a- and bread.
-When compressed, this would take three integers per thread, for both reads.
+To cache 95\% of the accesses, about 40 bases must be cached for both reads of the read pair.
+When each base is compressed to two bits, this would take three integers per thread, for both reads.
 
 \subsection{Darwin}
 Darwin has a different filtering algorithm, which results in less skippable LAcalls/GACTcalls.
@@ -148,11 +150,11 @@ For de novo, 74\% of the traceback results had the maximum of 200 bases in eithe
 \subsection{Daligner}
 The individual snakes from a d-wave are independent, they can be calculated in parallel.
 However, the width of a trimmed d-wave is usually lower than 32, this means a warp cannot be fully utilized if it is assigned a single read pair.
-An option is to assign two read pairs to a block, each read pair would then have 16 threads.
-This means that the half-warp is fully utilized more often, but when the width of the d-wave is larger than 16, there well be idle threads.
+An option is to assign two read pairs to a warp, each read pair would then have 16 threads.
+This means that the half-warp is fully utilized more often, but when the width of the d-wave is larger than 16, there will be idle threads.
 
 For this reason, coarse-grained parallelism is chosen to be implemented.
-The alignment and filter functions are separated, instead, filter() produces a large list of seed hits (LAcalls), which should be send to the local alignment function.
+The alignment and filter functions are separated, instead, filter() produces a large list of seed hits (LAcalls), which should be sent to the local alignment function.
 An advantage of having alignment and filtering intertwined is that Kmer matches that are included in previous alignments can be skipped, Figure \ref{fig:skippable} illustrates this.
 This advantage is lost when generated the large list, but can be reimplemented using a scheduler that keeps track of the furthest position that was reached in an alignment for each read pair.
 Each Kmer match that has enough neighbouring Kmer matches constitutes its own LAcall in the large list, but these are filtered out later.
@@ -174,15 +176,12 @@ If a read pair has no unskippable LAcalls left, its GPU thread is assigned a new
 % - compress_abseq
 % - coalesce_abseq
 
+Below, a number of different implemented optimizations for Daligner are listed.
+
 \paragraph{Coalesce main data arrays (WORK)}
 The main data of a wave is stored in a few arrays.
 These arrays are not interleaved when used by the CPU, since each thread has its own cache.
 On the GPU, they need to be interleaved to allow for coalesced reads.
-
-\paragraph{Cache variables (CVARS)}
-The alignment kernel of Daligner is quite complex and contains many variables.
-This results in a large register usage per thread.
-To try and combat this, a few often used variables can be placed in the unused shared memory.
 
 % V: furthest reaching anti-diagonal in current wave, higher is better
 % M: number of matches in current 60 bit history
@@ -252,13 +251,14 @@ There are three settings: 48KB shared memory / 16KB L1 cache, 32KB shared memory
 Shared memory is designed to be shared among all threads in a thread block, but can be used as local memory, when carefully calculating the addresses.
 To avoid bank conflicts, the data can be stored as shown in Figure \ref{fig:DIAGS}.
 
-\figC{width=\textwidth , clip, trim=60 170 130 120}{DIAGS.pdf}{Encoding of data in shared memory, NA and NB are not shown. A name $X_{n}[m]$ indicates thread n, array X, index m.}{fig:DIAGS}
+\figC{width=\textwidth , clip, trim=60 170 130 120}{DIAGS.pdf}{Encoding of data in shared memory, NA and NB are not shown. The banks are indicated by b0, b1, etc. A name $X_{n}[m]$ indicates thread n, array X, index m.}{fig:DIAGS}
 
 Since shared memory is expensive, this technique can be combined with RM and NP to reduce the memory requirements per diagonal.
 
 Diagonals are cached per $2^n+1$, because the diagonal in the last cached position must be moved to the first one, and detecting if the current diagonal is a factor $2^n$ away from the first one in the wave is easy.
 The diagonals are recached every $2^n$ diagonals.
-Possible values include 5, 9 and 17.
+The number of cached diagonals can be 5, 9 or 17 (DIAGS5, DIAGS7 and DIAGS17).
+A value of 33 will be use too much shared memory.
 An example for 5 cached diagonals is listed below:
 
 \begin{samepage}
@@ -304,23 +304,24 @@ This is similar to writing inline assembly.
 An example of where this could be useful is for conditions.
 Instructions like 'if' or 'for' can cause divergence, making part of the warp wait for the other, increasing execution time.
 Sometimes, a loop can be unrolled.
-According to section 5.4.2 Control Flow Instruction in the programming guide\cite{cuda}, an 'if' can be translated to predicated instructions instead.
-These are instructions whose execution depends on the value of the predicate, which is either true o false.
+According to section 5.4.2 Control Flow Instruction in the programming guide \cite{cuda}, an 'if' can be translated to predicated instructions instead.
+These are instructions whose execution depends on the value of the predicate, which is either true or false.
 The compiler decides if the number of instructions controlled by the condition is small enough.
 In an earlier version, that number used to be 7, if the compiler determines that the condition is likely to produce many divergent warps, and 4 when otherwise \cite{PTX3}.
 The current programming guide does not state a number.
 
-There are multiple places where this technique was used:
-- replacing 'if(\_\_clz(a1) == 32){abpos -= max;}' in combination with CABSEQ
-- finding which of three values is the max
-- loading data based on the max of three values
-- keeping track of furthest reaching point in the current wave
+There are multiple places where this technique was used: \\
+- replacing 'if(\_\_clz(a1) == 32){abpos -= max;}' in combination with CABSEQ \\
+- finding which of three values is the max \\
+- loading data based on the max of three values \\
+- keeping track of furthest reaching point in the current wave.
 
-\paragraph{Maxrregcount = 64}
+\paragraph{Maxrregcount = 128}
 The number of register assigned to a thread can be limited.
 This can increase the number of active threads on an SMX, since the number of registers on an SMX is also limited.
 The tradeoff lies with the reduced capabilities of the thread, the data that was stored in those registers now spills to local memory.
-The optimal register count was found to be 64.
+The optimal register count limit was found to be 128.
+Actual register counts vary from 70 to 100.
 
 \paragraph{Streaming CUDA functions (STREAM)}
 Certain CUDA functions, like copying data from or to the device, and kernels, can be executed at the same time if different streams are used.
@@ -334,6 +335,7 @@ GPU\_SNAKE computes the whole snake on the GPU, and stores it at some index that
 When the CPU wants to know the length of a snake during alignment, it only has to look up the length in the array.
 COMPRESS\_ABSEQ calculates the XORred bit vector between integers with compressed bases like described above, but the results returned to the CPU.
 During alignment on the CPU, it only has to read the correct bit vector, and count the leading zeros.
+
 
 \subsubsection{CPU acceleration}
 Using the XOR operation on compressed bases (CABSEQ) can also be implemented on the CPU.
@@ -354,7 +356,7 @@ It is not necessary to implement skipping seeds/Kmer matches for Darwin, since i
 
 
 
-It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism \todo{cite wavefront parallelism?}
+It is also possible to implement a more fine-grained parallelism, and assign multiple threads to the same tile using wavefront parallelism.
 The tile size of 320 should be enough to allow for enough utilization.
 This method uses less memory, since the Smith-Waterman matrices and the sequences are shared.
 However, this complicates the implementation, since the number of elements on an anti-diagonal is often not equal to 32.
@@ -364,19 +366,26 @@ Since the tiles are almost always the same size (it only differs when aligning t
 This requires enough seed hits to keep every processing element busy, but the 130MB dataset produces two lists of 400k seeds using default settings. 
 Besides, the memory used by a single thread is not very large, since the tiles that need to be aligned are usually at most 320 bases.
 
-GACT is designed to allow for an affine gap penalty, so it uses three matrices to keep track of the scores.
+GACT is designed to allow for an affine gap penalty, so it uses four matrices to keep track of the scores.
 The whole tile is calculated per column, so only two columns need to be kept from the matrices: the current and the previous.
 This means the implementation uses $O(T)$ memory for the score, where T is the tile size.
-The traceback pointers need to be kept for the whole tile, this takes $O(T^2)$.
+The traceback pointers need to be kept for the whole tile, this takes $O(T^2)$ memory.
+
+The implemented optimizations for Darwin are listed below.
+
+\paragraph{Align GACTcalls in batches (BATCH)}
+Not necessarily an optimization, but the baseline aligns each GACTcall as soon as they are found.
+When using the GPU, many GACTcalls need to be available to be aligned.
+BATCH stores all GACTcalls in a large list, and sends batches of predetermined size to the batched align function.
+If GPU is active, this batched align function sends it to the GPU, otherwise, the CPU will align the batch serially.
 
 \paragraph{Coalesce matrices (CMAT)}
 Since the matrices and traceback pointers are read/written for every score element, it makes sense to coalesce these, to optimize the memory bandwidth and reduce the number of memory transactions.
 There are four matrices with score data, which cause 14*T*T transactions per thread.
-Swapping the current and previous column takes 8*T*T transactions per thread. 
+Swapping the current and previous column takes 8*T transactions per thread. 
 Initialization takes 8*T transactions per thread.
 The traceback pointers need T*T transactions for filling and 2*T-1 for initialization per thread.
 Computing the traceback path takes at most 2*T transactions, but these cannot be coalesced, because each thread can have a different path.
-After coalescing, a warp of 32 threads will have reduced the needed transactions by 32.
 Each value in these matrices is an integer.
 
 \paragraph{GASAL (GASAL)}
@@ -387,7 +396,7 @@ The integers are padded with 'N' nucleotides, these do not affect the score when
 The packed bases do not have to be copied back to the CPU, because they are used during alignment.
 The second phase is the actual alignment, since there are 8 bases in one integer, the matrix is divided into 8x8 tiles.
 Figures \ref{fig:GASAL1} and \ref{fig:GASAL2} show the order of the tiles and elements in which they are calculated.
-
+The actual arrays that represent the score data have 9 elements, this is done so each element can read the previous element.
 
 \figC{width=.7\textwidth , clip, trim=70 490 260 120}{GASAL.pdf}{Illustration of GASAL algorithm, high level.}{fig:GASAL1}
 \figC{width=.4\textwidth , clip, trim=70 240 400 400}{GASAL.pdf}{Illustration of GASAL algorithm, within an 8-by-8 tile.}{fig:GASAL2}
@@ -401,7 +410,9 @@ GASAL needs to be adapted to perform actual traceback, to guarantee that the til
 It is chosen to perform the actual traceback on the GPU, instead of copying all the pointers to the CPU, and doing the traceback there.
 \todo{this choice might seem odd, since traceback on GPU is usually very divergent, might need more explanation}
 
-Since the order of accesses is slightly different between the CPU version and GASAL, the reported coordinates of the element with the maximum score could differ.
+%Since the order of accesses is slightly different between the CPU version and GASAL, the reported coordinates of the element with the maximum score could differ.
+
+When CMAT is used with GASAL, the matrix containing all traceback pointers is coalesced, as well as the array with the used traceback pointers.
 
 % CUDA streams
 % CMAT
@@ -409,26 +420,22 @@ Since the order of accesses is slightly different between the CPU version and GA
 % CPBASES (for GASAL)
 
 
-\paragraph{Coalescing the returned, used traceback pointers}
-The CPU needs to know what path the traceback took to compute the full aligned strings.
-While following the trace, the GPU writes the used pointers to an output buffer uncoalesced.
-This buffer could be coalesced, but the traceback procedure takes only a fraction of the GPU time, so this is not implemented.
-
 \paragraph{No score (NOSCORE)}
 If the score of the alignment is not needed, the used traceback pointers do not have to returned to the CPU.
-It also saves the time spend on building the aligned strings on the CPU.
+It also saves the time spent on building the aligned strings on the CPU.
 
 
 \paragraph{Coalesce global matrix (GLOBAL)}
 The score matrices in GASAL are small enough to fit in the registers, and cannot be coalesced.
 There are two main matrices left: the global array that stores the scores of one column, and the traceback pointer matrix.
 The global array actually stores the scores of the three matrices needed to allow for an affine gap penalty, coalescing them means that they have to be separated.
+The current implementation uses an array of 'short3' structures to store the matrices.
 The scores are stored via 16-bit shorts, but since the smallest memory transaction is 32 bytes (Compute Capability 3.5) \cite{cuda}, and the uninterleaved elements are far enough, it causes unnecessary transactions too.
 % According to nvprof, this is not true. There is uncoalesced access reported due to accesses in the global array. Perhaps, because of the known index (ridx), the compiler optimizes these values. It could be placed in L1 cache as local memory.
 
 
 \paragraph{Coalesce packed bases (CPBASES)}
-The bases are uninterleaved when they are send to the GPU, and after packing.
+The bases are uninterleaved when they are sent to the GPU, and after packing.
 This means that during alignment, they cause uncoalesced reads.
 To prevent this, the writing of the packed bases can interleave them, but this means the packing kernel has write in an uncoalesced manner.
 When preparing the bases on the CPU, they are interleaved, so that the packing kernel can read and write coalesced, and the alignment kernel can read coalesced too.
@@ -438,7 +445,8 @@ This technique was used to keep track of the maximum score of the tile, and the 
 It was also used to find the maximum of four values in the alignment kernel.
 
 \paragraph{Maxrregcount = 64}
-As with Daligner, the optimal register count was found to be 64.
+The optimal register count was found to be 64.
+The kernel is less complex than Daligner, so this is not surprising.
 
 \paragraph{Streaming CUDA functions (STREAM)}
 Same as for Daligner, streaming CUDA functions like kernels or data transfers allow them to be executed in parallel.

@@ -1,4 +1,4 @@
-\documentclass[../main/thesis.tex]{subfiles}
+\documentclass[../thesis.tex]{subfiles}
 
 \begin{document}
 
@@ -147,7 +147,7 @@ The best values for $h$ and $s$ depend on things like $\epsilon$ and the read le
 
 For Daligner, the default $k$ is 14, and assumed error rate is $0.15$.
 
-
+\todo{remove this section}
 \subsection{Seeding: implementation}
 Daligner is designed to use multiple threads and use the cache efficiently.
 Building and merge the lists in steps 1 and 3 is easy, since only one pass is needed for both actions.
@@ -227,7 +227,7 @@ When $\epsilon$ goes to 0, there is a very long slide from the starting point $\
 Each f.r. point not on the path should lag a lot behind the best f.r. point.
 As $\alpha$ increases as $\epsilon$ goes to 0, this explains further why the wave becomes very pointy and narrow.
 
-\todo{which last step of the argument is wrong exactly? Probably the formula of $\beta$}
+\todo{remove argument that width of wave is constant}
 
 The alignment finding algorithm ends because either the boundary of the edit graph is reached, or because all f.r. points have failed the regional alignment criterion, this means that the reads are probably not correlated anymore.
 In the second case, the best point in the last wave should not be reported as endpoint of the alignment, because the last columns could all be mismatches.

@@ -1,4 +1,4 @@
-\documentclass[../main/thesis.tex]{subfiles}
+\documentclass[../thesis.tex]{subfiles}
 
 
 \begin{document}
@@ -22,8 +22,9 @@ This means Darwin can be configured to prefer substitutions or gaps, and customi
 A clear tradeoff between sensitivity and specificity can be observed from the experiments.
 This shows that both algorithms can be configured to suit the input requirements of later stages in the assembly pipeline.
 
+\todo{answer research questions}
 
-\section{Future Work}
+\section{Future work}
 
 %TODO future work
 % - Yatish told me about transitive overlaps:
@@ -54,6 +55,10 @@ If a linear gap penalty is used, it can be reduced to two.
 The calculation of the maximum score can also be simplified.
 Since this the main part of the algorithm, this could reduce the runtime significantly.
 
+GASAL uses four bits to represent a base, which allows one integer to hold eight bases, which explains the 8x8 access pattern.
+The matrices that hold the scores are reduced to 9-element arrays, which are put in the registers.
+If the GASAL tiles are made smaller, for example 4x4, these arrays should only be 5 elements wide.
+This reduces the amount of registers per thread, and could allow for more active threads, which could reduce the runtime.
 
 
 \end{document}
