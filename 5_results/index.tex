@@ -14,13 +14,14 @@
 \section{Hardware}
 Tests on two systems were done: TACC \cite{TACC} and ce-cuda.
 
-A TACC node (S824L) has two 10-core 3.42 GHz POWER8 CPUs, 256 GB RAM and a Tesla K40m.
+A TACC node (S824L) has two 10-core 3.42 GHz POWER8 CPUs \cite{datasheet_TACC}, 256 GB RAM and a Tesla K40m.
 The CUDA version for TACC is 7.5, and the operating system is Ubuntu 3.19.0-28-generic.
+The GCC version is 4.9.2.
 
-ce-cuda has 2 Intel Xeon E5-2620 @ 2.4 GHz CPUs, 32 GB RAM and a Tesla K40c.
-\todo{get OS of ce-cuda}
+ce-cuda has 2 Intel Xeon E5-2620 @ 2.4 GHz CPUs \cite{datasheet_ce_cuda}, 32 GB RAM and a Tesla K40c.
 The clocks on the K40 were 745 MHz and 3004 MHz for core and memory respectively.
-The CUDA version for ce-cuda is 9.2.
+The CUDA version for ce-cuda is 9.2, and the operating system is CentOS 7.5.
+The GCC version is 4.8.5.
 
 The K40c and K40m have the same performance, the only difference lies in their cooling method \cite{K40m}.
 
@@ -317,7 +318,7 @@ Run configuration & runtime TACC (s) \\ \hline
 
 \begin{table}
 \centering
-\caption{Profile data and runtimes for different optimizations, run on the 50MB dataset.}
+\caption{Profile data by nvprof and runtimes for different optimizations, run on the 50MB dataset.}
 \label{tbl:darwin_prof}
 \begin{tabular}{c c c}
 optimizations & avg global load efficiency & runtime (s) \\ \hline
@@ -373,10 +374,19 @@ run configuration & total runtime (s) & GACT time (s) & percentage GACT \\ \hlin
 \end{table}
 
 
-
 A common performance metric for Smith-Waterman based solutions is CUPS, which stands for Cell Updates Per Second, where a cell is a score element in the matrix.
 For 10x de novo A vs A, the Darwin GPU implementation peaked at 11.1 GCUPS.
 It did up to 13.3 GCUPS during the 130MB dataset, A vs A, and 13.5 for A vs B.
+
+According to nvprof, the achieved occupancy for a 1 128 64 run of the 50MB dataset is 0.23, this is the ratio of active warps per cycle to the maximum number of warps per SMX, note that the maximum occupancy is 0.50, due to the amount of registers.
+A higher occupancy does not automatically a lower runtime \cite{low_occupancy}.
+The stall reasons include execution dependencies (40\%), memory dependencies (19\%) and memory throttle (14\%).
+The utilization of the arithmetic functional units was 5, on a scale of 1 to 10.
+These numbers show there is still potential for speedup on this GPU.
+Execution dependencies cause stalls because an input for the instruction is not yet available, this effect can be reduced by utilizing more instruction level parallelism (ILP).
+This means the code to calculate one Smith-Waterman element must be rewritten, since that is the computational bottleneck.
+However, modern day compilers are quite good at detecting and using ILP, so performance gains might be small.
+
 
 
 \section{Sensitivity and specificity}
@@ -463,10 +473,27 @@ For Figures \ref{fig:darwin5} and \ref{fig:darwin6}, the sensitivity remains con
 The exact threshold where the sensitivity starts dropping will depend on the scoring scheme.
 It makes sense that there is such a threshold, since the theoretical overlaps have a minimum length of 1000 bp, which should produce a certain score given the scoring scheme and the distribution of errors.
 
+Tables \ref{tbl:daligner5} and \ref{tbl:darwin4} show the runtime, sensitivity and specificity for different parameters.
+For both Daligner and Darwin holds: a faster run on TACC is also a faster run on ce-cuda.
+However, Daligner runs faster on TACC, while Darwin is faster on ce-cuda.
+The Xeon E5-2620 v3 has a maximum of 59 GB/s memory bandwidth, 256 KB L2 cache per core, and 15 MB L3 cache.
+The S824L has a maximum of 192 GB/s memory bandwidth per socket, 512 KB L2 cache per core, 8 MB L3-cache per core, and 16 MB L4 cache per DIMM.
+Darwin used 18 GB of RAM for a 10x E.coli dataset, run with 8 32 64, Daligner uses only 3 GB of RAM.
+One of the differences for Daligner between TACC and ce-cuda is the time to sort the lists.
+Sorting on TACC is about 7x faster than on ce-cuda, the alignment phase is also slightly faster.
+Since Daligner is designed with caching behaviour in mind, it is possible that the larger caches of S824L benefit Daligner greatly.
+From these tables, it is clear that Daligner on CPU is more sensitive, more specific and faster on both platforms than the GPU accelerated Darwin.
+The only drawback of Daligner is that is does not actually calculate the optimal overlap, whereas Darwin is empirically shown to be optimal (equal to Smith-Waterman) for certain values of T and O \cite{Darwin2}.
+Darwin also uses the traceback pointers to calculate the fully aligned strings, like in Figure \ref{fig:global_vs_local_alignment_fig}.
+The output can be changed easily to produce MAF files \cite{MAF}, this is not possible for Daligner.
+An explanation for the difference in runtime is the number of cells the algorithms have to process.
+Darwin creates 320x320 tiles, which contain 102400 elements, and have an overlap of at least 120 bp with the previous tile.
+Daligner follows snakes, and only stops to store values at the end of a snake.
+The median wave width is 26, if every snake in the wave had a length of 0, it would mean Daligner does about 8\% of the equivalent cell updates.
 
-
-
-
+Daligner and Darwin also differ in output quality, while Daligner is more sensitive and specific, Darwin has a better resistance against large length thresholds.
+This means that Darwin generally outputs longer overlaps.
+The sensitivity for various length thresholds are shown in Table \ref{tbl:length_thresholds}.
 
 \begin{table}
 \centering
@@ -481,9 +508,6 @@ k16     & 16.9 & 29.4 & 96.9 & 87.5 \\
 \end{tabular}
 \end{table}
 
-
-
-
 \begin{table}
 \centering
 \caption{Runtimes for different Darwin parameters, 1 64 64, 10x E.coli, de novo, A vs A. Sensitivity and specificity are measured using thresholds of 600 and 990 for score and length respectively.}
@@ -495,7 +519,24 @@ number of seeds (N) & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & spe
 800 & 89.4 & 48.5 & 97.8 & 86.2 \\
 \end{tabular}
 \end{table}
-\todo{update this table}
+
+\begin{table}
+\centering
+\caption{Sensitivity for Daligner and Darwin for different length thresholds, the score thresholds are set to 200 and 600 for Daligner and Darwin respectively, Darwin uses N = 800, 10x E.coli, de novo, A vs A.}
+\label{tbl:length_thresholds}
+\begin{tabular}{c|c c}
+ & \multicolumn{2}{c}{sensitivity} \\
+length threshold & Daligner & Darwin \\ \hline
+990 & 99.78 & 97.8 \\
+1100 & 95.4 & 95.0 \\
+1200 & 87.9 & 90.2 \\
+1500 & 68.3 & 76.1 \\
+\end{tabular}
+\end{table}
+
+
+
+
 
 
 \end{document}

@@ -1167,7 +1167,7 @@ born in \@CITY{\city}, \@COUNTRY{\country}
 \newcommand{\ADDR}{P.O. Box 5031, NL-2600 GA Delft,\\ The Netherlands}
 \newcommand{\DEP}{Department of Electrical Engineering}
 \newcommand{\INSTITUTE}{Delft University of Technology}
-\newcommand{\LAB}{Computer Engineering}
+\newcommand{\LAB}{Quantum \& Computer Engineering}
 \newcommand{\FAC}{Faculty of Electrical Engineering, Mathematics and Computer Science}
 \newcommand{\PLACE}{Delft, The Netherlands}
 \newcommand{\LABADD}{Mekelweg 4,\\2628 CD Delft\\ The Netherlands}
