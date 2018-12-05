@@ -22,8 +22,8 @@ This implies that there exists a coverage c for every target coverage k, such th
 Secondly, the work of Churchill and Waterman \cite{quality} implies that the accuracy of the consensus sequence of k sequences is O($\epsilon^k$), which goes to 0 as k increases.
 This means that if the reads are long enough to handle repetitive regions, in principle a near perfect de novo assembly of the genome is possible, given enough coverage \cite{Daligner}.
 
-Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
-And how to build an assembler that is able to deal with high error rates and long reads?
+%Important points for de novo DNA sequencing are: what level of coverage is needed for high quality assembly?
+%And how to build an assembler that is able to deal with high error rates and long reads?
 Most previous assemblers work with NGS reads, which are much shorter and have much lower error rates.
 Some algorithms used in these assemblers, such as de Bruijn Graph (dBG) \cite{DeBruijn} would grow too large for high error rates and long reads.
 Since Daligner was built, new methods of using dBG with long reads have been developed, but they rely on a short read based dBG to correct errors in long reads \cite{DBG1}\cite{DBG2}.
@@ -100,7 +100,7 @@ The complexity of this algorithm is $O(n+d^2)$ when A and B are non-repetitive s
 Because seeds are not always at the beginning of the reads, waves are computed in both forward and reverse direction.
 The latter is easily done by reversing the direction of edges in the edit graph.
 
-\subsection{Seeding: concept}
+\subsection{Seeding}
 To find suitable starting points for the edit graphs, seeding is done.
 A seed is a section where $A[i,g]$ and $B[j,h]$ have a certain high similarity that indicates that these reads probably originate from the same part of the genome.
 Finding a seed includes finding matching Kmers for every read pair $(a,b)$ with $a\in \mathcal{A}$ and $b\in \mathcal{B}$.
@@ -142,48 +142,12 @@ In that case the seed is called 'skippable', Figure \ref{fig:skippable} illustra
 
 \figC{width=.7\textwidth ,clip, trim = 50 570 100 100 }{skippable_LAcalls.pdf}{s1 (red) and s2 are seeds, s1 is extended first, and its extension (blue) includes s2. If s2 were to be extended, its extension would be the same as that of s1, therefore s2 does not need to be extended}{fig:skippable}
 
-
 The best values for $h$ and $s$ depend on things like $\epsilon$ and the read lengths.
 
 For Daligner, the default $k$ is 14, and assumed error rate is $0.15$.
 
-\todo{remove this section}
-\subsection{Seeding: implementation}
-Daligner is designed to use multiple threads and use the cache efficiently.
-Building and merge the lists in steps 1 and 3 is easy, since only one pass is needed for both actions.
-The elements of the lists are compressed into 64-bit integers.
-Daligner uses a radix sort \cite{sorting}\cite{radix} to sort the lists in steps 2 and 4.
-Each 64-bit integer is a vector of $P=\lceil hbits/B\rceil$, $B$-bit digits ($x_P,x_{P-1},x,...,x_1$) where $B$ is a parameter.
-The sort needs $P$ passes, where each pass sorts the elements on a $B$-bit digit $x_i$.
-Each pass is done with a bucket sort \cite{sorting} with $2^B$ buckets.
-Instead of a linked list, the integers in the list $src$ are moved in precomputed segments $trg[bucket[b]...bucket[b+1]-1]$ of an array $trg[0...N-1]$ with the same size as $src$.
-For the $p^{th}$ pass, $bucket[b] = \{i: src[i]_p < b\}$ for each $b \in [0,2^B-1]$.
-The pseudocode is shown is Listing \ref{code:radix1}.
-
-\lstinputlisting[caption=Basic radix sort, label=code:radix1]{\codePath radix1.c}
-
-The algorithm takes $O(P(N+2^B))$ time, but $B$ and $P$ are small fixed numbers so it is effectively $O(N)$.
-There are a lot of parallel sorting algorithms \cite{parRadix1}\cite{parRadix2}, but Daligner uses a new method that needs half the number of passes that traditional methods use.
-Each thread sorts a contiguous segment of size $part = \lceil N/T\rceil$ of $src$ into $trg$, where $T$ is the number of threads.
-This means each thread $t \in [0,T-1]$ has a bucket array $bucket[t]$ where $bucket[t][b] = \{i: src[i] < b$ or $src[i] = b$ and $i/part < t\}$.
-To reduce the number of passes, a bucket array for the next pass is filled during the current pass.
-Each thread counts the number of $B$-bit digits that will be handled in the next pass by itself and every other thread separately.
-If the number at index $i$ will be at index $j$ and in bucket $b$ next pass, then the count in the current pass must not be recorded for the thread $i/part$ that currently sorts the number, but for thread $j/part$ that will sort it in the next pass.
-To do this we need to count the number of these events in $next[j/part][i/part][b]$ where $next$ is a $T\times T\times 2^B$ matrix.
-If $src[i]$ is about to be moved in the $p^{th}$ pass, then $j = bucket[src[i]_p]$ and $b = src[i]_{p+1}$.
-This algorithm takes $O(N/T+T^2)$ time, assuming $B$ and $P$ are fixed.
-The new algorithm is shown in Listing \ref{code:radix2}.
-
-\lstinputlisting[caption=Radix sort in Daligner, label=code:radix2]{\codePath radix2.c}
-
-This algorithm is particularly cache efficient because each bucket sort uses two small arrays $bucket$ and $next$ that will usually fit in the L1 cache.
-Each bucket sort makes one sweep through $src$ and $2^B$ sweeps through the bucket segments of $trg$.
-This totals $2^B+1$ sweeps during each pass.
-Each sweep can be prefetched if it is small enough.
-This means a smaller $B$ is better for caching behaviour, but this increases the number of passes $hbit/B$ that are needed.
-On most processors, e.g. an Intel i7, $B = 8$ gives the fastest radix sort \cite{Daligner}.
-The optimal number of threads is more complex, because they usually do not have their own caches.
-
+Daligner uses a radix-sort based sorting algorithm, that halves the number of passes needed by producing the buckets for the next pass as well.
+Each bucket sort uses two arrays that will generally fit into L1 cache.
 
 \subsection{Local alignment}
 Assuming the filter finds a seed-hit $\rho = (i,j)$, the basic idea is compute furthest reaching waves in forward and reverse direction to find the alignment.
@@ -213,21 +177,6 @@ This means that points far enough behind the tip can be almost certainly removed
 A value of $\mathcal{L} = 30$ is a universally good value for trimming \cite{Daligner}.
 Formally, for each wave computed from the previous trimmed wave, each f.r. point from $[low-1,hgh+1]$ that has either $M[j]<\mathcal{M}$ or $(2W[k^*]+k^*) - (2W[j]+j) > \mathcal{L}$ is removed.
 Note that $W[k]$ contains the $B$-coordinate $j$, and $k=i-j$, so $(2W[k]+k) = i+j$.
-
-The Daligner paper does not give a formal proof, but an argument why the average width of the wave $hgh-low$ is constant for any fixed value of $\epsilon$.
-This means that the alignment finding algorithm has linear expected time as a function of alignment length.
-Consider two f.r. points $A$ and $B$, where $A$ lies on an alignment path with correlation $1-2\epsilon$ or higher, and $B$ does not.
-For the next wave, point $A$ moves forward with one difference and then slides on average $\alpha = (1-\epsilon)^2/(1-(1-\epsilon)^2)$ bases.
-Point $B$ has no such correlation, so it jumps one difference and then only slides $\beta = 1/(\Sigma-1)$ bases, assuming each base is equally likely.
-So an f.r. point $d$ diagonals away from the final path has involved $d$ jumps off the path, and is on average $d(\alpha-\beta)$ anti-diagonals behind the best f.r. point in the wave.
-The average width of a wave with an $\mathcal{L}$ lag cutoff is less than $2\mathcal{L}/(\alpha-\beta)$.
-This last step is incorrect because the statistics of average random path length under this difference model is complexer than assuming all random steps are the same.
-However, there is a definite expected value of path length with $d$ differences, so the basis of the argument holds, although with a different value for $\beta$.
-When $\epsilon$ goes to 0, there is a very long slide from the starting point $\rho$.
-Each f.r. point not on the path should lag a lot behind the best f.r. point.
-As $\alpha$ increases as $\epsilon$ goes to 0, this explains further why the wave becomes very pointy and narrow.
-
-\todo{remove argument that width of wave is constant}
 
 The alignment finding algorithm ends because either the boundary of the edit graph is reached, or because all f.r. points have failed the regional alignment criterion, this means that the reads are probably not correlated anymore.
 In the second case, the best point in the last wave should not be reported as endpoint of the alignment, because the last columns could all be mismatches.

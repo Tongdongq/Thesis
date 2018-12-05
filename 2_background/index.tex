@@ -530,6 +530,14 @@ Note that the scores are still based on previous scores, one cannot take a fille
 Figure \ref{fig:SW1} shows the filled SW matrix, some positive values are different from the NW matrix.
 Figure \ref{fig:SW2} shows the traceback path, note that it does not span the whole sequences.
 
+There are three possible alignments with the highest score (4), small letters denote bases that do not appear in the overlap:
+
+\begin{verbatim}
+                    cATCGa       cATCG-A      cATC-GA
+                     ||||    or   |||| |  or   ||| ||
+                     ATCGga       ATCGGA       ATCGGA
+\end{verbatim}
+
 \figC{width=.6\textwidth}{SW1.png}{The SW matrix, filled, source: \cite{SW_online}}{fig:SW1}
 \figC{width=.6\textwidth}{SW2.png}{The SW matrix, with the traceback path highlighted, source: \cite{SW_online}}{fig:SW2}
 
