@@ -474,7 +474,7 @@ The exact threshold where the sensitivity starts dropping will depend on the sco
 It makes sense that there is such a threshold, since the theoretical overlaps have a minimum length of 1000 bp, which should produce a certain score given the scoring scheme and the distribution of errors.
 
 Tables \ref{tbl:daligner5} and \ref{tbl:darwin4} show the runtime, sensitivity and specificity for different parameters.
-For both Daligner and Darwin holds: a faster run on TACC is also a faster run on ce-cuda.
+For both Daligner and Darwin holds: if a parameter setting runs faster on TACC, it is also faster on ce-cuda.
 However, Daligner runs faster on TACC, while Darwin is faster on ce-cuda.
 The Xeon E5-2620 v3 has a maximum of 59 GB/s memory bandwidth, 256 KB L2 cache per core, and 15 MB L3 cache.
 The S824L has a maximum of 192 GB/s memory bandwidth per socket, 512 KB L2 cache per core, 8 MB L3-cache per core, and 16 MB L4 cache per DIMM.
@@ -491,6 +491,10 @@ Darwin creates 320x320 tiles, which contain 102400 elements, and have an overlap
 Daligner follows snakes, and only stops to store values at the end of a snake.
 The median wave width is 26, if every snake in the wave had a length of 0, it would mean Daligner does about 8\% of the equivalent cell updates.
 
+Darwins sensitivity can be boosted by calculating transitive alignments, if A and B overlap, and A and C too, then B and C probably overlap as well.
+The authors of Darwin added 0.79\%-point to the sensitivity by using this method on a 30x C. elegans dataset \cite{Darwin1}.
+With this addition, it is possible that Darwin becomes more sensitive than Daligner, although it can probably be added to Daligner as well.
+
 Daligner and Darwin also differ in output quality, while Daligner is more sensitive and specific, Darwin has a better resistance against large length thresholds.
 This means that Darwin generally outputs longer overlaps.
 The sensitivity for various length thresholds are shown in Table \ref{tbl:length_thresholds}.
@@ -501,10 +505,10 @@ The sensitivity for various length thresholds are shown in Table \ref{tbl:length
 \label{tbl:daligner5}
 \begin{tabular}{c|c c c c}
 parameters & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & specificity \\ \hline
-default & 19.2 & 32.5 & 99.78 & 86.7 \\
-h45     & 18.5 & 31.5 & 99.58 & 86.8 \\
-k15     & 17.8 & 31.6 & 98.9 & 87.1 \\
-k16     & 16.9 & 29.4 & 96.9 & 87.5 \\
+default & 19.0 & 32.5 & 99.78 & 86.7 \\
+h45     & 18.4 & 31.5 & 99.58 & 86.8 \\
+k15     & 17.6 & 31.6 & 98.9 & 87.1 \\
+k16     & 16.7 & 29.4 & 96.9 & 87.5 \\
 \end{tabular}
 \end{table}
 
@@ -514,9 +518,10 @@ k16     & 16.9 & 29.4 & 96.9 & 87.5 \\
 \label{tbl:darwin4}
 \begin{tabular}{c|c c c c}
 number of seeds (N) & runtime TACC (s) & runtime ce-cuda (s) & sensitivity & specificity \\ \hline
-1400 & 105.6 & 62.8 & 99.33 & 85.0 \\
-1100 & 94.2 & 56.1 & 98.9 & 85.4 \\
-800 & 89.4 & 48.5 & 97.8 & 86.2 \\
+1400 & 105.6 & 93.9 & 99.33 & 85.0 \\
+1100 & 94.2 & 88.4 & 98.9 & 85.4 \\
+800 & 89.4 & 78.3 & 97.8 & 86.2 \\
+600 & 78.2 & 70.2 & 96.3 & 86.9 \\
 \end{tabular}
 \end{table}
 

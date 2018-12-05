@@ -263,8 +263,8 @@ Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{
 It consists of a filter called D-SOFT (Diagonal-band Seed Overlapping based Filtration Technique), which finds seeds, and GACT (Genome Alignment using Constant memory Traceback), which performs alignment between reads of arbitrary length, using constant traceback memory.
 The fact that GACT uses constant traceback makes it very suitable for hardware acceleration.
 Darwin boasts a 39.000x more energy-efficient approach then software, and a 15.000x speedup for reference-guided alignment for third generation reads using an ASIC.
-On an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for de novo over state-of-the-art software.
-\todo{19.9x based on first paper}
+When GACT is accelerated on an FPGA, Darwin has a 183.0x speedup for reference-guided and 19.9x speedup for de novo over state-of-the-art software.
+When D-SOFT is also accelerated on FPGA, Darwin has a 123x speedup over Daligner for de novo alignment for a 30x C. elegans dataset.
 
 \subsection{D-SOFT}
 Like Daligner, D-SOFT filters by counting bases in Kmer matches.
