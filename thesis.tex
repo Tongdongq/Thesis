@@ -8,19 +8,31 @@
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{mciteplus}     % TD needed for bibliography
-\usepackage[pagebackref=true,linktocpage=true]{hyperref}
+%\usepackage{mciteplus}     % TD needed for bibliography
+\usepackage[hyphens]{url}
+%\def\UrlBreaks{\do\/\do-}
+\usepackage[pagebackref=true,breaklinks]{hyperref}  % TD pagebackref creates links at the end of references in the bib, so that a reader can quickly go back to the page the reference was referenced
 \usepackage{listings}      % TD for code listings
 \usepackage{amsmath}       % TD column vectors
 \usepackage{subfiles}      % TD subfiles
 \usepackage{eso-pic}       % TD custom cover
 \usepackage{epstopdf}      % TD custom cover
 \usepackage{todonotes}     % TD todo notes
+\usepackage{ragged2e}      % TD format long url in references
 \definecolor{gray}{rgb}{0.1,0.1,0.1}  % TD custom cover
 
 % usage: \fig{options}{fileName}{caption}{fig:label}
 
 % sed '/{/!s/denovo/de novo/g'   to replace 'denovo' with 'de novo', except is there is a { on the line
+
+\makeatletter
+\def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
+\def\@bstctlcite[#1]#2{\@bsphack
+  \@for\@citeb:=#2\do{%
+    \edef\@citeb{\expandafter\@firstofone\@citeb}%
+    \if@filesw\immediate\write\csname #1\endcsname{\string\citation{\@citeb}}\fi}%
+  \@esphack}
+\makeatother
 
 \newcommand{\fig}[4]{%
 \begin{figure}[h]
@@ -89,6 +101,7 @@
 %-----------------------------------------------------------------------%
 
 \begin{document}
+\bstctlcite{IEEEexample:BSTcontrol}
 \newcommand{\main}{1}         % TD detect main or subfile
 
 \pagenumbering{roman}
@@ -193,7 +206,8 @@
 %\bibliographystyle{amsplain}
 %\bibliographystyle{plain}
 \markboth{BIBLIOGRAPHY}{BIBLIOGRAPHY}
-%\bibliography{biblio,thispaper,tecs-nopreamble}                                  
+%\bibliography{biblio,thispaper,tecs-nopreamble}       
+\RaggedRight
 \bibliography{biblio}          % fill in your thesis bib file here
 \addcontentsline{toc}{chapter}{Bibliography}
 
@@ -209,7 +223,7 @@
 
 \cleardoublepage
 
-\appendix
-\include{appendix/appendixA}                                       % fill in the tex file for thesis Appendixes
+%\appendix
+%\include{appendix/appendixA}                                       % fill in the tex file for thesis Appendixes
 
 \end{document}

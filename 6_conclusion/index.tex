@@ -9,7 +9,12 @@
 \input{../notmain.tex}
 \fi
 
+% two sequences used to make a picture of the Diff_tutorial tool for the defense presentation:
+% TCACTTTCGTACGCTACAGCGACAATGATAGTTCCCCAAAACGATAAGAAAAAGTTTCCCTCCGTCTTGCTAGCCCCTTCAACCGAGAGGGCTTTTTCAATTCGCCATTTCTCCTGACAAATCATGCGGATATAAAATTT
+%TCGCTACAAGCTGATTAAATGAACTTCACTTCGTAGCGCTACAGCGAAAATGAAGTATCCCGCAGAACGATAACGAAATAAGTTACCTCCCTTCTCTTTGCTAAAGCCCTTCTCAACCGAGAGGGCTTTTTTTCAAATTC
 
+% fix references, especially e.a.
+% 
 
 \section{Research questions}
 To fulfill the main goal of this thesis, several research questions must be answered:
@@ -20,13 +25,15 @@ To fulfill the main goal of this thesis, several research questions must be answ
 GPU implementations for both Daligner and Darwin were made.
 Many different implementations for Daligner showed improvement, but the fastest implementation is still the CPU version.
 Considering the nature of this algorithm, this is not very surprising.
-Fine-grained parallelism is not implemented, it increases the complexity of the implementation, since the median width of the wave is 26, a warp is not fully utilized half of the time, and the overhead of launching a kernel for each wave would become very large.
+Fine-grained parallelism is not implemented.
+It increases the complexity of the implementation, since the median width of the wave is 26, as a result, a warp is not fully utilized half of the time.
+Additionally, the overhead of launching a kernel for each wave would become very large.
 A substantial speedup can be gained when not calculating Pebbles, this is an actual use case, since FALCON does not use those Pebbles.
 
 Darwin showed better results on GPU.
-A naive GPU implementation showed 12x speedup on ce-cuda, with the addition of GASAL, this increased to 109x.
+A naive GPU implementation showed 12x speedup on ce-cuda, with the addition of GASAL, which increased the speedup to 109x.
 If scores are not needed, the speedup increases to 148x.
-Since Darwin is designed to be hardware-friendly, and has already been successfully implemented on an FPGA, this is not surprising.
+Since Darwin is designed to be hardware-friendly, and has already been successfully implemented on an FPGA, this result is not surprising.
 
 To summarize: for Daligner: no, for Darwin: yes.
 
@@ -47,11 +54,15 @@ A clear tradeoff between sensitivity and specificity can be observed from the ex
 This shows that both algorithms can be configured to suit the input requirements of later stages in the assembly pipeline.
 
 
+\todo{be more precise with numbers}
+\todo{fix references}
 
 \begin{itemize}
 \item How do Daligner and Darwin relate to each other with respect to runtime, sensitivity and specificity?
 \end{itemize}
 Daligner can produce more sensitive alignments in a shorter time on both tested systems, while using less memory.
+For high sensitivity (99+\%), Daligner is almost 3x faster on ce-cuda, and 5x on TACC.
+\todo{include lower sensitivity (95\%)}
 
 The main advantage of Darwin is that is calculates an actual Smith-Waterman score.
 This means Darwin can be configured to prefer substitutions or gaps, and customize it to suit a particular sequencing technology.
@@ -61,7 +72,7 @@ Daligner is probably more useful in any kind of DNA assembler, unless alignments
 Daligner also scales better on CPU threads.
 An environment in which Darwin could be better is when there is lots of GPU computing power, and little CPU power.
 However, many systems nowadays have multiple CPU cores, so Daligner remains the better choice in general.
-
+\todo{depending on the application}
 \section{Future work}
 
 %TODO future work
@@ -75,13 +86,11 @@ However, many systems nowadays have multiple CPU cores, so Daligner remains the 
 A way to interpret the produced overlaps more efficiently is to use transitive overlaps.
 If reads A and B overlap, and B and C too, then A and C could also overlap.
 However, this should only result in marginal improvements of the sensitivity, since the overlap between A and C should already be found.
-\todo{Yatish told me this, how to cite?}
-
-
+The authors of Darwin got 0.79\%-point extra sensitivity using this method \cite{Darwin1}.
 
 The CPU version could be optimized as well.
 The current multi-threaded version has no load balancing.
-All CPU threads can a roughly equal amount of reads that must be test by D-SOFT.
+All CPU threads get a roughly equal amount of reads that must be tested by D-SOFT.
 The number of seeds that emerge can vary (observed values are 17000 and 30655), this is partially caused by the different read lengths.
 Another reason for the imbalance is that the extension phase for each seed can have a different duration.
 One way to solve this is to create a large list with all the seeds, possibly partitioned so that the threads can write to this list in parallel.
