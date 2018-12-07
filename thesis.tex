@@ -25,11 +25,19 @@
 
 % sed '/{/!s/denovo/de novo/g'   to replace 'denovo' with 'de novo', except is there is a { on the line
 
-% for every line with 'url', replace the first " with $\url{, then replace the first " with }", and then replace the first $ with "
-% sed '/url/ { s|"|$\\url{| }' 
-% sed '/url/ { s|"|}"| }' 
-% sed '/url/ { s|\$|"| }'
+% for every line with 'doi', replace the first " with $\url{, then replace the first " with }", and then replace the first $ with "
+% do not use these for url fields, they get a url automatically
+% sed '/doi/ { s|"|$\\url{| }' 
+% sed '/doi/ { s|"|}"| }' 
+% sed '/doi/ { s|\$|"| }'
  
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{[{%
+    \ifcase #1 Not cited.%
+          \or Page~#2.%
+          \else Pages #2.%
+    \fi%
+    }]}
 
 \makeatletter
 \def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
