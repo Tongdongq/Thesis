@@ -44,6 +44,9 @@ To summarize: for Daligner: no, for Darwin: yes.
 Both Daligner and Darwin allow the user to tweak the algorithm using parameters.
 Darwin shows a very clear relation between the number of seeds and the runtime.
 The number of seeds also impacts the sensitivity, and to a lesser extend, the specificity.
+Allowing the sensitivity to drop from 99.3\% to 96.3\% reduces the runtime with 25\% for both tested systems.
+
+A similar drop for Daligner results in a 10\% reduction in runtime.
 For Daligner, both k and h can be used to affect the runtime and sensitivity, they seem to have a similar impact.
 
 The CPU scaling for Daligner is much better than for Darwin.
@@ -54,15 +57,12 @@ A clear tradeoff between sensitivity and specificity can be observed from the ex
 This shows that both algorithms can be configured to suit the input requirements of later stages in the assembly pipeline.
 
 
-\todo{be more precise with numbers}
-\todo{fix references}
-
 \begin{itemize}
 \item How do Daligner and Darwin relate to each other with respect to runtime, sensitivity and specificity?
 \end{itemize}
 Daligner can produce more sensitive alignments in a shorter time on both tested systems, while using less memory.
-For high sensitivity (99+\%), Daligner is almost 3x faster on ce-cuda, and 5x on TACC.
-\todo{include lower sensitivity (95\%)}
+For high sensitivity (99+\%), Daligner is 2.9x faster on ce-cuda, and 5.6x on TACC.
+For a lower sensitivity (96+\%), Daligner is 2.4x faster on ce-cuda, and 4.4x on TACC.
 
 The main advantage of Darwin is that is calculates an actual Smith-Waterman score.
 This means Darwin can be configured to prefer substitutions or gaps, and customize it to suit a particular sequencing technology.
@@ -71,17 +71,10 @@ GACT is also empirically shown to produce the same output as Smith-Waterman and 
 Daligner is probably more useful in any kind of DNA assembler, unless alignments need to have specific traits.
 Daligner also scales better on CPU threads.
 An environment in which Darwin could be better is when there is lots of GPU computing power, and little CPU power.
-However, many systems nowadays have multiple CPU cores, so Daligner remains the better choice in general.
-\todo{depending on the application}
+However, many systems nowadays have multiple CPU cores, so depending on the rest of the process, Daligner is likely to be the better candidate.
+
+
 \section{Future work}
-
-%TODO future work
-% - Yatish told me about transitive overlaps:
-% - - if A and B overlap, and B and C too, then A and C probably also overlap
-
-% stuff here depends on the profile results to identify bottlenecks
-
-
 
 A way to interpret the produced overlaps more efficiently is to use transitive overlaps.
 If reads A and B overlap, and B and C too, then A and C could also overlap.
@@ -96,6 +89,10 @@ Another reason for the imbalance is that the extension phase for each seed can h
 One way to solve this is to create a large list with all the seeds, possibly partitioned so that the threads can write to this list in parallel.
 When starting the GACT phase, each thread gets a batch of reads to extend.
 When a thread is done with its batch, or has less seeds than GPU threads, it gets another batch from the large list.
+
+A large percentage of the stalls are caused by execution dependencies.
+These could be reduced by increasing the amount of instruction level parallelism.
+However, compilers are quite good at producing fast code, so speedups might be marginal.
 
 Since GASAL is designed to work with affine gap penalties, it uses four arrays to keep track of the score.
 If a linear gap penalty is used, it can be reduced to two.

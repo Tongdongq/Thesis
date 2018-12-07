@@ -109,7 +109,7 @@ Previous methods to match Kmers include Suffix Arrays \cite{SA} and BWT indices 
 
 Assuming that the Kmer matches are independent, the probability that a Kmer is conserved while sequencing is $\pi = (1-2\epsilon)^k$.
 The number of conserved Kmers in an alignment of $\tau$ base pairs is a Bernouilli distribution with rate $\pi$, so an average of $\tau\cdot\pi$ Kmers are expected in this alignment.
-An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0067$ and the average number of conserved Kmers is 10.
+An example: $k=14$, $\epsilon=15\%$ and $\tau = 1500$, then $\pi = .7^{14} = 0.0068$ and the average number of conserved Kmers is 10.
 Only $.046\%$ of the expected read pairs have 1 or fewer Kmers, and only $0.26\%$ have 2 of fewer.
 To filter with $99.74\%$ sensitivity, only read pairs with 3 or more Kmer matches need to be examined.
 

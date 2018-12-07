@@ -1,1 +1,23 @@
-\todo{include numbers in abstract}
+
+Third generation sequencing machines produce reads with tens of thousands of base pairs.
+%These can be used to resolve repetitive regions in DNA, which cannot be done by the shorter reads that are produced by second generation methods.
+To perform de novo assembly, all reads must be compared with every other read to find overlaps.
+Finding overlaps with the optimal Smith-Waterman is not feasible, since the complexity of Smith-Waterman is quadratic with the length of the reads.
+Heuristics are designed be faster, but are not guaranteed to give the optimal solution.
+Two heuristic DNA aligners are Daligner and Darwin.
+Daligner uses an edit graph based algorithm that has an O(ND) complexity, where N is the read length, and D the number of differences between the two aligned reads.
+Darwin creates overlapping tiles to search promising areas of the Smith-Waterman matrix, and is empirically shown to be optimal.
+This work implements these algorithms on a GPU, and compares the two with respect to sensitivity and specificity.
+Daligner is not suitable for GPU acceleration, but Darwin has shown speedup of 109x vs 8 CPU threads, using a Tesla K40.
+The speedup increases to 148x when the Smith-Waterman scores are not calculated.
+Despite large speedups for Darwin, Daligner is 2-6x faster than Darwin, and slightly more sensitive and specific.
+An advantage of Darwin is that is produces generally longer overlaps, calculates the Smith-Waterman score, and is able to produce a MAF file.
+
+
+%However, long reads can contain 15-30\% errors, depending on the technology.
+%Tools for second generation sequencing cannot be used easily, since the read characteristics are very different.
+
+
+%This means that tools for NGS, such as de Bruijn graphs, cannot be used.
+
+

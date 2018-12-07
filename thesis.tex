@@ -25,6 +25,12 @@
 
 % sed '/{/!s/denovo/de novo/g'   to replace 'denovo' with 'de novo', except is there is a { on the line
 
+% for every line with 'url', replace the first " with $\url{, then replace the first " with }", and then replace the first $ with "
+% sed '/url/ { s|"|$\\url{| }' 
+% sed '/url/ { s|"|}"| }' 
+% sed '/url/ { s|\$|"| }'
+ 
+
 \makeatletter
 \def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
 \def\@bstctlcite[#1]#2{\@bsphack
@@ -107,7 +113,7 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
-\include{acronyms.tex}
+%\include{acronyms.tex}
 
 %-----------------------------------------------------------------------%
 %            Fixed cover page  - Don't change any thing here            %

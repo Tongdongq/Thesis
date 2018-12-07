@@ -345,7 +345,6 @@ The clz and ctz operations return undefined values when the input is zero, so th
 
 
 \subsection{Darwin}
-\todo{maybe refer to pseudocode?}
 It is possible to run the whole GACT kernel on the GPU, for both left and right extension.
 However, since it is not known how long the resulting alignment will be, and all GPU threads have to wait until all threads are done, this will cause lots of idle time.
 Instead, it is chosen to only have a single tile aligned per GPU-thread per GPU-invocation.
@@ -408,7 +407,6 @@ It does not provide traceback information, when the start position of an alignme
 
 GASAL needs to be adapted to perform actual traceback, to guarantee that the tiles of GACT have a minimum overlap.
 It is chosen to perform the actual traceback on the GPU, instead of copying all the pointers to the CPU, and doing the traceback there.
-\todo{this choice might seem odd, since traceback on GPU is usually very divergent, might need more explanation}
 
 %Since the order of accesses is slightly different between the CPU version and GASAL, the reported coordinates of the element with the maximum score could differ.
 
