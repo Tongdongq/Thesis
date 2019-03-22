@@ -11,7 +11,7 @@ This work implements these algorithms on a GPU, and compares the two with respec
 Daligner is not suitable for GPU acceleration, but Darwin has shown speedup of 109x vs 8 CPU threads, using a Tesla K40.
 The speedup increases to 148x when the Smith-Waterman scores are not calculated.
 Despite large speedups for Darwin, Daligner is 2-6x faster than Darwin, and slightly more sensitive and specific.
-An advantage of Darwin is that is produces generally longer overlaps, calculates the Smith-Waterman score, and is able to produce a MAF file.
+An advantage of Darwin is that it produces generally longer overlaps, calculates the Smith-Waterman score, and is able to report the aligned sequences, where Daligner only reports the start and end of the overlap.
 
 
 %However, long reads can contain 15-30\% errors, depending on the technology.

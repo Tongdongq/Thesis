@@ -254,7 +254,7 @@ To avoid bank conflicts, the data can be stored as shown in Figure \ref{fig:DIAG
 \figC{width=\textwidth , clip, trim=60 170 130 120}{DIAGS.pdf}{Encoding of data in shared memory, NA and NB are not shown. The banks are indicated by b0, b1, etc. A name $X_{n}[m]$ indicates thread n, array X, index m.}{fig:DIAGS}
 
 Since shared memory is expensive, this technique can be combined with RM and NP to reduce the memory requirements per diagonal.
-
+\newpage
 Diagonals are cached per $2^n+1$, because the diagonal in the last cached position must be moved to the first one, and detecting if the current diagonal is a factor $2^n$ away from the first one in the wave is easy.
 The diagonals are recached every $2^n$ diagonals.
 The number of cached diagonals can be 5, 9 or 17 (DIAGS5, DIAGS7 and DIAGS17).
@@ -270,6 +270,7 @@ An example for 5 cached diagonals is listed below:
 \item compute diagonals 24-27
 \end{itemize}
 \end{samepage}
+
 
 A diagonal normally takes 8 ints.
 CWORK reduces that to 5 ints.

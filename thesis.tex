@@ -31,6 +31,7 @@
 % sed '/doi/ { s|"|}"| }' 
 % sed '/doi/ { s|\$|"| }'
  
+% add text to backrefs
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{[{%
     \ifcase #1 Not cited.%
@@ -39,6 +40,7 @@
     \fi%
     }]}
 
+% allow custom style, see first entry in bib file
 \makeatletter
 \def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
 \def\@bstctlcite[#1]#2{\@bsphack

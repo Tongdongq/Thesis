@@ -207,6 +207,7 @@ true &\text{ if } x = 0
 \end{cases}
 \end{align}
 
+\newpage
 
 \section{Darwin}
 Darwin is a hardware-accelerated framework for genomic sequence alignment \cite{Darwin1}\cite{Darwin2}.
@@ -260,7 +261,7 @@ The memory needed for the traceback is $O(T^2)$, which is constant since T is ch
 The traceback for the whole alignment $tb\_left$ is linear with read length, but not performance critical.
 GACT calculates the full alignment strings and uses these to calculate the score of the whole alignment.
 The right extension operates on the reverse of $R$ and $Q$.
-
+\newpage
 \lstinputlisting[caption=GACT, label=code:GACT]{\codePath GACT.c}
 
 Figure \ref{fig:GACT} shows a left extension from GACT, using T = 4 and O = 1.

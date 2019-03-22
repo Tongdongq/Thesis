@@ -113,6 +113,9 @@ CPU T8 B30 & 22.7 \\
 B30 CWORK CABSEQ & 46.1 \\ \hline
 CPU T8 NP & 17.3 \\
 %RM CWORK & 49.3 \\ \hline
+%RM NP CWORK & 30.0
+%RM NP CABSEQ & 25.2
+%RM NP CABSEQ CWORK & 25.2
 RM NP CWORK CABSEQ WORK & 27.2 \\
 RM NP CWORK CABSEQ WORK B30 & 27.2 \\
 %CWORK CABSEQ WORK & 47.3 \\
@@ -194,7 +197,7 @@ Table \ref{tbl:darwin8} shows that the speedup holds for scoring schemes that fa
 The scoring scheme is encoded as follows: (match, mismatch, gap\_open, gap\_extend).
 The third scoring scheme is based on the default one from EMBOSS Water tool \cite{emboss}.
 
-\begin{table}
+\begin{table}[h]
 \centering
 \caption{Runtimes for different Darwin implementations, with 3000 bp custom PacBio reads, run with 8 32 64 on TACC, A vs B.}
 \label{tbl:darwin0}
@@ -205,7 +208,7 @@ GASAL CMAT CPBASES & 93.7 & 16.5 \\
 \end{tabular}
 \end{table}
 
-\begin{table}
+\begin{table}[h]
 \centering
 \caption{Runtimes and speedup for different implementations, run on a 2x E.coli dataset with 8 16 32 on TACC, A vs A.}
 \label{tbl:darwin1}
@@ -236,7 +239,7 @@ BATCH 32 8 64 & 37m17s & 0.75 \\
 GPU CMAT & 14m20s & 1.95 \\
 GPU CMAT CBASES & 11m28s & 2.44 \\
 GASAL & 11m40s & 2.39 \\
-GASAL CMAT & 1m1s & 21.8 \\
+GASAL CMAT & 1m17s & 21.8 \\
 GASAL CMAT CPBASES & 1m9s & 23.0 \\
 GASAL CMAT CPBASES NOSCORE & 0m58s & 28.9 \\
 \end{tabular}
